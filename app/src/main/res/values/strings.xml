@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Me@B</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Username</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="error_faulty_username">This can\'t be the username</string>
+    <string name="error_faulty_password">This can\'t be the password</string>
+    <string name="error_fail">The username or password are incorrect or something else went wrong</string>
+    <string name="error_field_required">This field is required</string>
+</resources>

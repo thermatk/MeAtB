@@ -31,6 +31,7 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
+import com.thermatk.android.meatb.yabAPIClient;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -138,15 +139,10 @@ public class LoginActivity extends AppCompatActivity{
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            //mAuthTask = new UserLoginTask(username, password);
-            //mAuthTask.execute((Void) null);
-            AsyncHttpClient client = new AsyncHttpClient();
-            String testLoginURL = "http://ks3-mobile.unibocconi.it/universityapp_prod/api/v6/app/init?os=android";
-            client.addHeader("auth_secret", "b0cc0n1s3cr3t");
-            client.setBasicAuth(username, password);
+
             final Context mContext = this;
             final Intent returnIntent =new Intent(this, MainActivity.class);
-            client.get(testLoginURL, new JsonHttpResponseHandler() {
+            JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     // fail by default
@@ -170,7 +166,7 @@ public class LoginActivity extends AppCompatActivity{
 
                         Log.i(LogConst.LOG, "AuthRequest success, login state FAIL, response:" + response.toString());
                         showProgress(false);
-                        // TODO: show error codes
+                        // TODO: show different error codes
                         showError("Credentials not recognized");
                     }
                 }
@@ -183,7 +179,9 @@ public class LoginActivity extends AppCompatActivity{
                     showError("Network error");
                     showProgress(false);
                 }
-            });
+            };
+
+            yabAPIClient.getLogin(username,password,responseHandler);
         }
     }
 
@@ -254,7 +252,7 @@ public class LoginActivity extends AppCompatActivity{
     }
     @Override
     public void onBackPressed() {
-        //prevent going back to MainActivity
+        //preventing going back to MainActivity
     }
 }
 

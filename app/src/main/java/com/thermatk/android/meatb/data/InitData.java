@@ -1,13 +1,11 @@
-package com.thermatk.android.meatb;
+package com.thermatk.android.meatb.data;
 
 import io.realm.RealmObject;
 import io.realm.annotations.Required;
 
 public class InitData extends RealmObject {
-    @Required
     private String firstname;
     private String lastname;
-
 
     private String photo_url;
     private String carreerTitle;

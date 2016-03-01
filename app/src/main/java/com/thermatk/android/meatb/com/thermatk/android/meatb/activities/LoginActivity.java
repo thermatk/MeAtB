@@ -29,11 +29,13 @@ import android.widget.Toast;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.thermatk.android.meatb.InitData;
+import com.thermatk.android.meatb.data.DataWriter;
+import com.thermatk.android.meatb.data.InitData;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.yabAPIClient;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -160,64 +162,9 @@ public class LoginActivity extends AppCompatActivity{
                         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
                         editor.putString("bocconiusername", username);
                         editor.putString("bocconipassword", password);
-                       // editor.commit();
+                        editor.commit();
                         // TODO: Save profile info
-                        InitData profile = new InitData();
-
-                        String firstname = null;
-                        String lastname = null;
-                        String photo_url = null;
-                        String carreerTitle = null;
-                        String carreerDescription;
-                        String carreerNotes = null;
-                        long carreerId = 0;
-                        String careerDateStart = null;
-                        long lastUpdated = System.currentTimeMillis() / 1000L;
-                        String rawData=response.toString();
-                        try {
-
-                            JSONObject authSession;
-                            authSession = response.getJSONObject("auth_session");
-                            /*
-
-                                                        "auth_session":{
-                                  "careers":[
-                                     {
-                                        "date_end":null,
-                                        "date_start":"\/Date(1423868400000+0100)\/",
-                                        "description":"Attivo per Immatricolazione",
-                                        "id":257126,
-                                        "is_blocked":false,
-                                        "notes":"Corso di Laurea Magistrale - Economia e management delle istituzioni e dei mercati finanziari - finance",
-                                        "registration_number":"3002637",
-                                        "title":"LM BI06 CLEFIN-FINANCE A IMM"
-                                     }
-                                  ],
-                                  "firstname":"Ruslan",
-                                  "id":null,
-                                  "lastname":"Boitsov",
-                                  "photo_url":"http:\/\/ks3-mobile.unibocconi.it\/Esse3Photo\/userphoto?userId=my3Nd1QjAqZnCws2d7E0cA%3d%3d",
-                                  "type":1,
-                                  "user_id":3002637
-                               },
-                             */
-                            firstname = authSession.get("firstname").toString();
-                            lastname = authSession.get("lastname").toString();
-                            photo_url= java.net.URLDecoder.decode(authSession.get("photo_url").toString(), "UTF-8");
-                            JSONObject careers= authSession.getJSONObject("careers");
-                            Log.d(LogConst.LOG, careers.toString());
-                            carreerTitle = careers.get("title").toString();
-                            carreerDescription = careers.get("description").toString();
-                            carreerNotes = careers.get("notes").toString();
-                            carreerId = Long.parseLong(careers.get("id").toString());
-                            careerDateStart = careers.get("date_start").toString();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
-                        }
-                        //profile.setFirstname();
-                        Log.i(LogConst.LOG, firstname + lastname+ photo_url + carreerTitle + carreerNotes + carreerId + careerDateStart);
+                        DataWriter.writeInitData(response);
                         ////
                         Log.i(LogConst.LOG, "AuthRequest success, login state 1");
                         finish();

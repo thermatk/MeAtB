@@ -30,4 +30,6 @@ dependencies {
     }
     compile 'io.realm:realm-android:0.87.5'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.mikepenz:google-material-typeface:2.2.0.1.original@aar'
+    compile 'com.mikepenz:fontawesome-typeface:4.5.0.1@aar'
 }

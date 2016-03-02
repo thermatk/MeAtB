@@ -1,7 +1,6 @@
 package com.thermatk.android.meatb.data;
 
 import io.realm.RealmObject;
-import io.realm.annotations.Required;
 
 public class InitData extends RealmObject {
     private String firstname;

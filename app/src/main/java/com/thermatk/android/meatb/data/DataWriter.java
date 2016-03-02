@@ -1,7 +1,5 @@
 package com.thermatk.android.meatb.data;
 
-import android.content.Context;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,7 +18,7 @@ public class DataWriter {
         String carreerNotes = null;
         long carreerId = 0;
         String careerDateStart = null;
-        ;
+
         try {
             JSONObject authSession;
             authSession = rawJSON.getJSONObject("auth_session");
@@ -33,9 +31,7 @@ public class DataWriter {
             carreerNotes = careers.get("notes").toString();
             carreerId = Long.parseLong(careers.get("id").toString());
             careerDateStart = careers.get("date_start").toString();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
+        } catch (JSONException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 

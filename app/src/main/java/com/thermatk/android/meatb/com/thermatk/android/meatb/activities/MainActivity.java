@@ -2,17 +2,9 @@ package com.thermatk.android.meatb.com.thermatk.android.meatb.activities;
 
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageView;
 
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -24,9 +16,6 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.data.InitData;
-
-import io.realm.Realm;
-import io.realm.RealmQuery;
 
 public class MainActivity extends AppCompatActivity {
     private String username = null;

@@ -14,32 +14,22 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.transition.Visibility;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.thermatk.android.meatb.data.DataWriter;
-import com.thermatk.android.meatb.data.InitData;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.yabAPIClient;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.UnsupportedEncodingException;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -162,7 +152,7 @@ public class LoginActivity extends AppCompatActivity{
                         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
                         editor.putString("bocconiusername", username);
                         editor.putString("bocconipassword", password);
-                        editor.commit();
+                        editor.apply();
                         // TODO: Save profile info
                         DataWriter.writeInitData(response);
                         ////

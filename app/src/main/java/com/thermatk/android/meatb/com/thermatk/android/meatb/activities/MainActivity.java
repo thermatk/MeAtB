@@ -124,7 +124,9 @@ public class MainActivity extends AppCompatActivity {
                 agendaDrawerItem
         );
         Drawer result = resultBuilder.build();
-
+        /////
+        realm.close();
+        ////
         // TODO: on first time only
         result.openDrawer();
     }

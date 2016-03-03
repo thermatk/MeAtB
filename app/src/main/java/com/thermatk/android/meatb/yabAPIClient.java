@@ -8,6 +8,9 @@ import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.thermatk.android.meatb.data.InitData;
+
+import io.realm.Realm;
 
 public class yabAPIClient {
     private String username;
@@ -21,6 +24,7 @@ public class yabAPIClient {
 
         username = sharedPrefs.getString("bocconiusername", null);
         password = sharedPrefs.getString("bocconipassword", null);
+
         if(username == null || password == null) {
             Log.d(LogConst.LOG,"Couldn't load credentials");
         }
@@ -39,5 +43,18 @@ public class yabAPIClient {
         client.addHeader("Referer", "https://app-public.unibocconi.it/Presencespubl/RilevaPresenza");
         client.addHeader("X-Requested-With", "XMLHttpRequest");
         client.get(registerAttendanceURL, responseHandler);
+    }
+
+    public void getAgenda(String dateStart, String dateEnd, JsonHttpResponseHandler responseHandler) {
+
+        Realm realm = Realm.getDefaultInstance();
+        InitData profile = realm.where(InitData.class).findAll().first();
+
+        String agendaURL= "http://ks3-mobile.unibocconi.it/universityapp_prod/api/v6/students/"+profile.getCarreerId()+"/agenda?rl=en&start="+dateStart+"&end="+dateEnd;
+        client.addHeader("auth_secret", "b0cc0n1s3cr3t");
+        client.setBasicAuth(username, password);
+        client.get(agendaURL, responseHandler);
+        // TODO: what is Realm's best practice to open/close?
+        realm.close();
     }
 }

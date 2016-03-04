@@ -65,7 +65,7 @@ public class DataWriter {
 
 
         Realm realm = Realm.getDefaultInstance();
-
+        long currentTime = System.currentTimeMillis();
         //// Days loop
         for (int i = 0; i < response.length(); i++) {
             JSONObject oneDay;
@@ -87,7 +87,8 @@ public class DataWriter {
                 EventDay day = realm.createObject(EventDay.class);
                 day.setDate(date);
                 day.setDateLong(dateLong);
-                day.setLastUpdated(System.currentTimeMillis());
+                day.setDayString(oneDay.toString());
+                day.setLastUpdated(currentTime);
                 Log.d(LogConst.LOG,Long.toString(day.getDateLong()));
                 RealmList<AgendaEvent> agendaList = new RealmList<>();
                 ///////Events loop
@@ -140,6 +141,7 @@ public class DataWriter {
                     agendaEvent.setDate_start(date_start);
                     agendaEvent.setDescription(description);
                     agendaEvent.setId(id);
+                    agendaEvent.setEventString(oneEvent.toString());
                     agendaEvent.setSupertitle(supertitle);
                     agendaEvent.setType(type);
                     agendaEvent.setTitle(title);

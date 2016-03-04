@@ -10,8 +10,17 @@ public class EventDay extends RealmObject {
     private long dateLong;
     private Date date;
     private long lastUpdated;
+    private String dayString;
     private RealmList<AgendaEvent> agendaEvents;
 
+
+    public String getDayString() {
+        return dayString;
+    }
+
+    public void setDayString(String dayString) {
+        this.dayString = dayString;
+    }
 
     public long getDateLong() {
         return dateLong;

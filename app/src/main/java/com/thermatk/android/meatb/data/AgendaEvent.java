@@ -11,9 +11,19 @@ public class AgendaEvent extends RealmObject {
     private String description;
     private long id;
     private String supertitle;
+    private String eventString;
     private String title;
     private long type;
     private long courseId;
+
+
+    public String getEventString() {
+        return eventString;
+    }
+
+    public void setEventString(String eventString) {
+        this.eventString = eventString;
+    }
 
     public long getCourseId() {
         return courseId;

@@ -69,7 +69,7 @@ public class DataWriter {
         Realm realm = Realm.getDefaultInstance();
 
         //// Days loop
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < response.length(); i++) {
             JSONObject oneDay = null;
             long dateLong;
             Date date;
@@ -90,6 +90,7 @@ public class DataWriter {
                 day.setDate(date);
                 day.setDateLong(dateLong);
                 day.setLastUpdated(System.currentTimeMillis());
+                Log.d(LogConst.LOG,Long.toString(day.getDateLong()));
                 RealmList<AgendaEvent> agendaList = new RealmList<AgendaEvent>();
                 ///////Events loop
                 JSONArray eventsArray = oneDay.getJSONArray("events");

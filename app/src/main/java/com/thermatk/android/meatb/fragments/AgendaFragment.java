@@ -1,11 +1,13 @@
 package com.thermatk.android.meatb.fragments;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +28,7 @@ import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.adapters.FastScrollIndicatorAdapter;
 import com.thermatk.android.meatb.data.AgendaEvent;
 import com.thermatk.android.meatb.data.DataWriter;
+import com.thermatk.android.meatb.data.EventDay;
 import com.thermatk.android.meatb.data.InitData;
 import com.thermatk.android.meatb.lists.SampleItem;
 import com.thermatk.android.meatb.yabAPIClient;
@@ -40,6 +43,9 @@ import java.util.Random;
 
 import cz.msebera.android.httpclient.Header;
 import io.realm.Realm;
+import io.realm.RealmList;
+import io.realm.RealmObject;
+import io.realm.RealmResults;
 
 
 public class AgendaFragment extends Fragment {
@@ -124,17 +130,26 @@ public class AgendaFragment extends Fragment {
         //materialScrollBar.addIndicator(new AlphabetIndicator(this), true);
 
         //fill with some sample data
-        int x = 0;
+
+        //////////
+
         List<SampleItem> items = new ArrayList<>();
-        for (String s : ALPHABET) {
-            int count = new Random().nextInt(20);
-            for (int i = 1; i <= count; i++) {
-                items.add(new SampleItem().withName(s + " Test " + x).withIdentifier(100 + x));
+        int x=0;
+
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<EventDay> days = realm.where(EventDay.class).findAll();
+        Log.d(LogConst.LOG,Integer.toString(days.size()));
+        for(EventDay day: days) {
+            Log.d(LogConst.LOG,day.getDate().toString());
+            RealmList<AgendaEvent> events = day.getAgendaEvents();
+            for(AgendaEvent event: events) {
+                items.add(new SampleItem().withName(event.getTitle() + " Starts " + DateFormat.format("yyyyMMdd kk:mm:ss", event.getDate_start())).withIdentifier(100 + x));
                 x++;
             }
         }
-        fastItemAdapter.add(items);
 
+        fastItemAdapter.add(items);
+        ////////////
         //restore selections (this has to be done after the items were added
         fastItemAdapter.withSavedInstanceState(savedInstanceState);
 
@@ -142,7 +157,7 @@ public class AgendaFragment extends Fragment {
     }
 
 
-    private void sendRequest() {
+    public static void sendRequest(Activity activity) {
         JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
@@ -159,7 +174,7 @@ public class AgendaFragment extends Fragment {
                 Log.i(LogConst.LOG, "AgendaRequest failed " + response);
             }
         };
-        yabAPIClient agendaClient = new yabAPIClient(getActivity());
+        yabAPIClient agendaClient = new yabAPIClient(activity);
         agendaClient.getAgendaForAYear(responseHandler);
 
     }

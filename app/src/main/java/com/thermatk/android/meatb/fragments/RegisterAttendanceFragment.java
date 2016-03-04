@@ -130,6 +130,7 @@ public class RegisterAttendanceFragment extends Fragment {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    showProgress(false);
                     if(esito == 1) {
                         ////
                         Log.i(LogConst.LOG, "AttendRegRequest success");
@@ -143,7 +144,6 @@ public class RegisterAttendanceFragment extends Fragment {
                     } else {
 
                         Log.i(LogConst.LOG, "AttendRegRequest success, state FAIL, response:" + response.toString());
-                        showProgress(false);
                         // TODO: show different error codes
                         showInfo("Something went wrong: "+ message + wrkMessage, true);
                     }

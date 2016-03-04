@@ -1,11 +1,20 @@
 package com.thermatk.android.meatb.data;
 
+import android.text.format.DateFormat;
+import android.text.format.DateUtils;
+import android.util.Log;
+
+import com.thermatk.android.meatb.LogConst;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 
 public class DataWriter {
     public static void writeInitData(JSONObject rawJSON) {
@@ -48,8 +57,109 @@ public class DataWriter {
         data.setCarreerId(carreerId);
         data.setCarreerNotes(carreerNotes);
         data.setRawData(rawJSON.toString());
-        data.setLastUpdated(System.currentTimeMillis() / 1000L);
+        data.setLastUpdated(System.currentTimeMillis());
         realm.commitTransaction();
         realm.close();
+    }
+
+    public static void writeAgendaData(JSONArray response) {
+
+
+
+        Realm realm = Realm.getDefaultInstance();
+
+        //// Days loop
+        for (int i = 0; i < 1; i++) {
+            JSONObject oneDay = null;
+            long dateLong;
+            Date date;
+            try {
+                oneDay = response.getJSONObject(i);
+                String strTemp = oneDay.getString("date");
+
+                dateLong = Long.parseLong(strTemp.substring(strTemp.indexOf('(')+1,strTemp.indexOf('+')));
+                //TODO: do some better timezone hacks
+                // add 4 hours to be sure we're in the right day
+                //dateLong +=  (DateUtils.HOUR_IN_MILLIS * 4);
+                date = getDateAPI(strTemp);
+                //
+                // TODO: find previously done days and compare
+
+                realm.beginTransaction();
+                EventDay day = realm.createObject(EventDay.class);
+                day.setDate(date);
+                day.setDateLong(dateLong);
+                day.setLastUpdated(System.currentTimeMillis());
+                RealmList<AgendaEvent> agendaList = new RealmList<AgendaEvent>();
+                ///////Events loop
+                JSONArray eventsArray = oneDay.getJSONArray("events");
+
+                for (int j = 0; j < eventsArray.length(); j++) {
+
+                    JSONObject oneEvent;
+                    Date date_end;
+                    Date date_start;
+                    String description;
+                    long id;
+                    String supertitle;
+                    String title;
+                    long type;
+                    long courseId;
+
+                    oneEvent = eventsArray.getJSONObject(j);
+                    title = oneEvent.getString("title");
+                    supertitle = oneEvent.getString("supertitle");
+                    description = oneEvent.getString("description");
+
+                    id = oneEvent.getLong("id");
+                    type = oneEvent.getInt("type");
+
+                    /// Date fun
+                    strTemp = oneEvent.getString("date_end");
+
+                    if(strTemp.equals("null")) {
+                        date_end = null;
+                    } else {
+                        date_end = getDateAPI(strTemp);
+                    }
+                    strTemp = oneEvent.getString("date_start");
+                    date_start = getDateAPI(strTemp);
+                    //////
+                    ///course id cut fun
+                    strTemp = description.substring(0,description.indexOf(' '));
+                    if(strTemp.matches("[-+]?\\d*\\.?\\d+")){
+                        courseId = Long.parseLong(strTemp);
+                    } else {
+                        courseId = 0L;
+                    }
+                    ///
+
+                    AgendaEvent agendaEvent = realm.createObject(AgendaEvent.class);
+
+                    agendaEvent.setCourseId(courseId);
+                    agendaEvent.setDate_end(date_end);
+                    agendaEvent.setDate_start(date_start);
+                    agendaEvent.setDescription(description);
+                    agendaEvent.setId(id);
+                    agendaEvent.setSupertitle(supertitle);
+                    agendaEvent.setType(type);
+                    agendaEvent.setTitle(title);
+
+                    agendaList.add(agendaEvent);
+                }
+                day.setAgendaEvents(agendaList);
+                realm.commitTransaction();
+                ///////
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        realm.close();        
+    }
+
+    private static Date getDateAPI(String dateAPI) {
+        return new Date(Long.parseLong(dateAPI.substring(dateAPI.indexOf('(')+1,dateAPI.indexOf('+'))));
     }
 }

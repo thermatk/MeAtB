@@ -22,6 +22,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.data.InitData;
+import com.thermatk.android.meatb.fragments.AgendaFragment;
 import com.thermatk.android.meatb.fragments.RegisterAttendanceFragment;
 import com.thermatk.android.meatb.fragments.ProfileFragment;
 
@@ -91,11 +92,23 @@ public class MainActivity extends AppCompatActivity {
         resultBuilder.withAccountHeader(headerResult);
         ///////
         // TODO: non-hacky fragments
+        addDrawerItems(resultBuilder);
+
+        Drawer result = resultBuilder.build();
+        /////
+        realm.close();
+        ////
+        // TODO: on first time only
+        result.openDrawer();
+    }
+
+    private void addDrawerItems(DrawerBuilder resultBuilder) {
         PrimaryDrawerItem profileDrawerItem = new PrimaryDrawerItem().withName("Profile").withIcon(GoogleMaterial.Icon.gmd_perm_identity)
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         changeFragment(new ProfileFragment());
+                        setTitle("Profile");
                         return false;
                     }
                 });
@@ -112,7 +125,8 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        changeFragment(new ProfileFragment());
+                        changeFragment(new AgendaFragment());
+                        setTitle("Agenda");
                         return false;
                     }
                 });
@@ -123,11 +137,5 @@ public class MainActivity extends AppCompatActivity {
                 attendanceDrawerItem,
                 agendaDrawerItem
         );
-        Drawer result = resultBuilder.build();
-        /////
-        realm.close();
-        ////
-        // TODO: on first time only
-        result.openDrawer();
     }
 }

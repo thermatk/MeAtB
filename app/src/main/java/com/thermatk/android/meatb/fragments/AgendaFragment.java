@@ -50,6 +50,8 @@ import io.realm.RealmResults;
 
 public class AgendaFragment extends Fragment {
 
+    Realm realm;
+
     private static final String[] ALPHABET = new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
 
     //save our FastAdapter
@@ -85,9 +87,18 @@ public class AgendaFragment extends Fragment {
         // TODO: call populate database
 
 
+        realm = Realm.getDefaultInstance();
+        //// check if first time in agenda
 
-        /////
-        fillRecyclerView(savedInstanceState, rootView);
+        RealmResults<EventDay> days = realm.where(EventDay.class).findAll();
+        if (days.size() == 0) {
+            sendRequest();
+            /// TODO: callback, with RealmChangeListener?
+        } else {
+            /////
+            fillRecyclerView(savedInstanceState, rootView);
+        }
+
         ////
 
         return rootView;
@@ -136,7 +147,6 @@ public class AgendaFragment extends Fragment {
         List<SampleItem> items = new ArrayList<>();
         int x=0;
 
-        Realm realm = Realm.getDefaultInstance();
         RealmResults<EventDay> days = realm.where(EventDay.class).findAll();
         Log.d(LogConst.LOG,Integer.toString(days.size()));
         for(EventDay day: days) {
@@ -157,7 +167,7 @@ public class AgendaFragment extends Fragment {
     }
 
 
-    public static void sendRequest(Activity activity) {
+    public void sendRequest() {
         JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
@@ -174,7 +184,7 @@ public class AgendaFragment extends Fragment {
                 Log.i(LogConst.LOG, "AgendaRequest failed " + response);
             }
         };
-        yabAPIClient agendaClient = new yabAPIClient(activity);
+        yabAPIClient agendaClient = new yabAPIClient(getActivity());
         agendaClient.getAgendaForAYear(responseHandler);
 
     }

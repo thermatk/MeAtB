@@ -1,18 +1,15 @@
 package com.thermatk.android.meatb.fragments;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -20,8 +17,6 @@ import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.IItemAdapter;
 import com.mikepenz.fastadapter.adapters.FastItemAdapter;
-import com.mikepenz.fastadapter.adapters.ItemAdapter;
-import com.mikepenz.fastadapter_extensions.drag.SimpleDragCallback;
 
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
@@ -29,30 +24,24 @@ import com.thermatk.android.meatb.adapters.FastScrollIndicatorAdapter;
 import com.thermatk.android.meatb.data.AgendaEvent;
 import com.thermatk.android.meatb.data.DataWriter;
 import com.thermatk.android.meatb.data.EventDay;
-import com.thermatk.android.meatb.data.InitData;
 import com.thermatk.android.meatb.lists.SampleItem;
 import com.thermatk.android.meatb.yabAPIClient;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import cz.msebera.android.httpclient.Header;
 import io.realm.Realm;
 import io.realm.RealmList;
-import io.realm.RealmObject;
 import io.realm.RealmResults;
 
 
 public class AgendaFragment extends Fragment {
 
     Realm realm;
-
-    private static final String[] ALPHABET = new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
 
     //save our FastAdapter
     private FastItemAdapter<SampleItem> fastItemAdapter;

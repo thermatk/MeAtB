@@ -3,7 +3,6 @@ package com.thermatk.android.meatb;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.location.Location;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
@@ -13,7 +12,6 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.thermatk.android.meatb.data.InitData;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import io.realm.Realm;
@@ -66,7 +64,7 @@ public class yabAPIClient {
 
     public void getAgendaForAYear(JsonHttpResponseHandler responseHandler) {
         String dateStart=DateFormat.format("yyyyMMdd", new Date()).toString();
-        String dateEnd=DateFormat.format("yyyyMMdd", new Date(System.currentTimeMillis() + DateUtils.YEAR_IN_MILLIS)).toString(); ;
+        String dateEnd=DateFormat.format("yyyyMMdd", new Date(System.currentTimeMillis() + DateUtils.YEAR_IN_MILLIS)).toString();
 
         getAgenda(dateStart, dateEnd, responseHandler);
     }

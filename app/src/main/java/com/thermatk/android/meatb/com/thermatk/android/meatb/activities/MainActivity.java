@@ -44,10 +44,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             setContentView(R.layout.activity_main);
             drawerStart(savedInstanceState);
-            if (savedInstanceState != null) {
-                //Nothing
-
-            } else {
+            if (savedInstanceState == null) {
                 ProfileFragment firstFragment = new ProfileFragment();
                 firstFragment.setArguments(getIntent().getExtras());
 

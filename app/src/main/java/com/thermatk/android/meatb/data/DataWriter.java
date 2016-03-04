@@ -1,7 +1,5 @@
 package com.thermatk.android.meatb.data;
 
-import android.text.format.DateFormat;
-import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.thermatk.android.meatb.LogConst;
@@ -70,7 +68,7 @@ public class DataWriter {
 
         //// Days loop
         for (int i = 0; i < response.length(); i++) {
-            JSONObject oneDay = null;
+            JSONObject oneDay;
             long dateLong;
             Date date;
             try {
@@ -91,7 +89,7 @@ public class DataWriter {
                 day.setDateLong(dateLong);
                 day.setLastUpdated(System.currentTimeMillis());
                 Log.d(LogConst.LOG,Long.toString(day.getDateLong()));
-                RealmList<AgendaEvent> agendaList = new RealmList<AgendaEvent>();
+                RealmList<AgendaEvent> agendaList = new RealmList<>();
                 ///////Events loop
                 JSONArray eventsArray = oneDay.getJSONArray("events");
 

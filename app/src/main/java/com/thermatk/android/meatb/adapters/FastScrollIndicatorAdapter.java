@@ -8,10 +8,6 @@ import com.turingtechnologies.materialscrollbar.INameableAdapter;
 
 import java.util.List;
 
-/**
- * Created by thermatk on 04.03.16.
- */
-
 public class FastScrollIndicatorAdapter<Item extends IItem> extends AbstractAdapter<Item> implements INameableAdapter, ICustomAdapter {
     @Override
     public Character getCharacterForElement(int position) {

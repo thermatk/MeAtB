@@ -84,7 +84,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
             /// TODO: callback, with RealmChangeListener?
         } else {
             /////
-            fillRecyclerView(savedInstanceState, rootView);
+            fillView();
         }
 
         ////
@@ -92,7 +92,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         return rootView;
     }
 
-    private void fillRecyclerView(Bundle savedInstanceState, View aView){
+    private void fillView(){
 
         // minimum and maximum date of our calendar
         // 2 month behind, one year ahead, example: March 2015 <-> May 2015 <-> May 2016
@@ -104,68 +104,11 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         maxDate.add(Calendar.YEAR, 1);
 
         List<CalendarEvent> eventList = new ArrayList<>();
+        // TODO: makeasync
         trueList(eventList);
         Log.d(LogConst.LOG, Integer.toString(eventList.size()));
         mAgendaCalendarView.init(eventList, minDate, maxDate, Locale.getDefault(), this);
         mAgendaCalendarView.addEventRenderer(new BocconiEventRenderer());
-        //create our FastAdapter which will manage everything
-        /*fastItemAdapter = new FastItemAdapter<>();
-
-        final FastScrollIndicatorAdapter<SampleItem> fastScrollIndicatorAdapter = new FastScrollIndicatorAdapter<>();
-
-        //configure our fastAdapter
-        fastItemAdapter.withOnClickListener(new FastAdapter.OnClickListener<SampleItem>() {
-            @Override
-            public boolean onClick(View v, IAdapter<SampleItem> adapter, SampleItem item, int position) {
-                Toast.makeText(v.getContext(), (item).name.getText(v.getContext()), Toast.LENGTH_LONG).show();
-                return false;
-            }
-        });
-
-        //configure the itemAdapter
-        fastItemAdapter.withFilterPredicate(new IItemAdapter.Predicate<SampleItem>() {
-            @Override
-            public boolean filter(SampleItem item, CharSequence constraint) {
-                //return true if we should filter it out
-                //return false to keep it
-                return !item.name.getText().toLowerCase().contains(constraint.toString().toLowerCase());
-            }
-        });
-
-        //get our recyclerView and do basic setup
-        RecyclerView recyclerView = (RecyclerView) aView.findViewById(R.id.rv);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(fastScrollIndicatorAdapter.wrap(fastItemAdapter));
-
-        //add a FastScrollBar (Showcase compatibility)
-        //DragScrollBar materialScrollBar = new DragScrollBar(this, recyclerView, true);
-        //materialScrollBar.setHandleColour(ContextCompat.getColor(this, R.color.accent));
-        //materialScrollBar.addIndicator(new AlphabetIndicator(this), true);
-
-        //fill with some sample data
-
-        //////////
-
-        List<SampleItem> items = new ArrayList<>();
-        int x=0;
-
-        RealmResults<EventDay> days = realm.where(EventDay.class).findAll();
-        Log.d(LogConst.LOG,Integer.toString(days.size()));
-        for(EventDay day: days) {
-            Log.d(LogConst.LOG,day.getDate().toString());
-            RealmList<AgendaEvent> events = day.getAgendaEvents();
-            for(AgendaEvent event: events) {
-                items.add(new SampleItem().withName(event.getTitle() + " Starts " + DateFormat.format("yyyyMMdd kk:mm:ss", event.getDate_start())).withIdentifier(100 + x));
-                x++;
-            }
-        }
-
-        fastItemAdapter.add(items);
-        ////////////
-        //restore selections (this has to be done after the items were added
-        fastItemAdapter.withSavedInstanceState(savedInstanceState);
-        */
 
     }
     private void trueList(List<CalendarEvent> eventList) {
@@ -200,36 +143,6 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         }
 
     }
-
-    private void mockList(List<CalendarEvent> eventList) {
-        Calendar startTime1 = Calendar.getInstance();
-        Calendar endTime1 = Calendar.getInstance();
-        startTime1.setTimeInMillis(1457270486000L);
-        endTime1.setTimeInMillis(1457270686000L);
-        BocconiCalendarEvent event1 = new BocconiCalendarEvent("Some lecture", "A wonderful lecture!", "Velodromo",
-                ContextCompat.getColor(getActivity(), R.color.orange_dark), startTime1, endTime1, false, "11-55");
-        eventList.add(event1);
-
-        Calendar startTime2 = Calendar.getInstance();
-        Calendar endTime2 = Calendar.getInstance();
-        startTime2.setTimeInMillis(1457270186000L);
-        endTime2.setTimeInMillis(1457502971000L);
-
-        BocconiCalendarEvent event2 = new BocconiCalendarEvent("test 1", "Some description", "Bocconi",
-                ContextCompat.getColor(getActivity(), R.color.yellow), startTime2, endTime2, false, "11-55");
-        eventList.add(event2);
-        // Example on how to provide your own layout
-        Calendar startTime3 = Calendar.getInstance();
-        Calendar endTime3 = Calendar.getInstance();
-        startTime3.setTimeInMillis(1457502972000L);
-        endTime3.setTimeInMillis(1457502982000L);
-
-        BocconiCalendarEvent event3 = new BocconiCalendarEvent("Some seminar", "saadsdsa", "Leoni",
-                ContextCompat.getColor(getActivity(), R.color.blue_dark), startTime3, endTime3, false, "11-55");
-        eventList.add(event3);
-
-    }
-
 
     public void sendRequest() {
         JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {

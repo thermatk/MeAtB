@@ -2,9 +2,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:agendaCalendar="http://schemas.android.com/apk/res-auto"
     tools:context="com.thermatk.android.meatb.fragments.AgendaFragment">
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv"
+
+    <com.github.tibolte.agendacalendarview.AgendaCalendarView
+        android:id="@+id/agenda_calendar_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        agendaCalendar:agendaCurrentDayTextColor="@color/theme_primary"
+        agendaCalendar:calendarColor="@color/theme_primary"
+        agendaCalendar:calendarCurrentDayTextColor="@color/calendar_text_current_day"
+        agendaCalendar:calendarDayTextColor="@color/theme_text_icons"
+        agendaCalendar:calendarHeaderColor="@color/theme_primary_dark"
+        agendaCalendar:calendarPastDayTextColor="@color/theme_light_primary"
+        agendaCalendar:fabColor="@color/theme_accent" />
 </FrameLayout>

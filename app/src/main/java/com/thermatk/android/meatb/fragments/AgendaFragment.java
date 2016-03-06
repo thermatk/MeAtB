@@ -2,6 +2,7 @@ package com.thermatk.android.meatb.fragments;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,28 +11,35 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CalendarView;
 import android.widget.Toast;
 
+import com.github.tibolte.agendacalendarview.AgendaCalendarView;
+import com.github.tibolte.agendacalendarview.CalendarPickerController;
+import com.github.tibolte.agendacalendarview.models.BaseCalendarEvent;
+import com.github.tibolte.agendacalendarview.models.CalendarEvent;
+import com.github.tibolte.agendacalendarview.models.DayItem;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.IItemAdapter;
 import com.mikepenz.fastadapter.adapters.FastItemAdapter;
 
+import com.thermatk.android.meatb.DrawableCalendarEvent;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
-import com.thermatk.android.meatb.adapters.FastScrollIndicatorAdapter;
 import com.thermatk.android.meatb.data.AgendaEvent;
 import com.thermatk.android.meatb.data.DataWriter;
 import com.thermatk.android.meatb.data.EventDay;
-import com.thermatk.android.meatb.lists.SampleItem;
 import com.thermatk.android.meatb.yabAPIClient;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
 import io.realm.Realm;
@@ -39,12 +47,10 @@ import io.realm.RealmList;
 import io.realm.RealmResults;
 
 
-public class AgendaFragment extends Fragment {
+public class AgendaFragment extends Fragment implements CalendarPickerController {
 
     Realm realm;
-
-    //save our FastAdapter
-    private FastItemAdapter<SampleItem> fastItemAdapter;
+    AgendaCalendarView mAgendaCalendarView;
 
     public AgendaFragment() {
         // Required empty public constructor
@@ -64,7 +70,7 @@ public class AgendaFragment extends Fragment {
 
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_agenda, container, false);
-
+        mAgendaCalendarView = (AgendaCalendarView) rootView.findViewById(R.id.agenda_calendar_view);
         /*Button mSignInButton = (Button) rootView.findViewById(R.id.button);
         mSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,8 +100,22 @@ public class AgendaFragment extends Fragment {
     }
 
     private void fillRecyclerView(Bundle savedInstanceState, View aView){
+
+        // minimum and maximum date of our calendar
+        // 2 month behind, one year ahead, example: March 2015 <-> May 2015 <-> May 2016
+        Calendar minDate = Calendar.getInstance();
+        Calendar maxDate = Calendar.getInstance();
+
+        minDate.add(Calendar.MONTH, -2);
+        minDate.set(Calendar.DAY_OF_MONTH, 1);
+        maxDate.add(Calendar.YEAR, 1);
+
+        List<CalendarEvent> eventList = new ArrayList<>();
+        mockList(eventList);
+        Log.d(LogConst.LOG,Integer.toString(eventList.size()));
+        mAgendaCalendarView.init(eventList, minDate, maxDate, Locale.getDefault(), this);
         //create our FastAdapter which will manage everything
-        fastItemAdapter = new FastItemAdapter<>();
+        /*fastItemAdapter = new FastItemAdapter<>();
 
         final FastScrollIndicatorAdapter<SampleItem> fastScrollIndicatorAdapter = new FastScrollIndicatorAdapter<>();
 
@@ -151,8 +171,43 @@ public class AgendaFragment extends Fragment {
         ////////////
         //restore selections (this has to be done after the items were added
         fastItemAdapter.withSavedInstanceState(savedInstanceState);
+        */
 
+    }
+    private void mockList(List<CalendarEvent> eventList) {
+        Calendar startTime1 = Calendar.getInstance();
+        Calendar endTime1 = Calendar.getInstance();
+        endTime1.add(Calendar.MONTH, 1);
+        BaseCalendarEvent event1 = new BaseCalendarEvent("Thibault travels in Iceland", "A wonderful journey!", "Iceland",
+                ContextCompat.getColor(getActivity(), R.color.orange_dark), startTime1, endTime1, true);
+        eventList.add(event1);
+        /*
+        <?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="orange_dark">#E64A19</color>
+    <color name="blue_dark">#00537F</color>
+    <color name="yellow">#F5A623</color>
+</resources>
+         */
 
+        Calendar startTime2 = Calendar.getInstance();
+        startTime2.add(Calendar.DAY_OF_YEAR, 1);
+        Calendar endTime2 = Calendar.getInstance();
+        endTime2.add(Calendar.DAY_OF_YEAR, 3);
+        BaseCalendarEvent event2 = new BaseCalendarEvent("Visit to Dalvík", "A beautiful small town", "Dalvík",
+                ContextCompat.getColor(getActivity(), R.color.yellow), startTime2, endTime2, true);
+        eventList.add(event2);
+
+        // Example on how to provide your own layout
+        Calendar startTime3 = Calendar.getInstance();
+        Calendar endTime3 = Calendar.getInstance();
+        startTime3.set(Calendar.HOUR_OF_DAY, 14);
+        startTime3.set(Calendar.MINUTE, 0);
+        endTime3.set(Calendar.HOUR_OF_DAY, 15);
+        endTime3.set(Calendar.MINUTE, 0);
+        DrawableCalendarEvent event3 = new DrawableCalendarEvent("Visit of Harpa", "", "Dalvík",
+                ContextCompat.getColor(getActivity(), R.color.blue_dark), startTime3, endTime3, false, R.drawable.common_ic_googleplayservices);
+        eventList.add(event3);
     }
 
 
@@ -178,4 +233,18 @@ public class AgendaFragment extends Fragment {
 
     }
 
+    @Override
+    public void onDaySelected(DayItem dayItem) {
+
+    }
+
+    @Override
+    public void onEventSelected(CalendarEvent event) {
+
+    }
+
+    @Override
+    public void onScrollToDate(Calendar calendar) {
+
+    }
 }

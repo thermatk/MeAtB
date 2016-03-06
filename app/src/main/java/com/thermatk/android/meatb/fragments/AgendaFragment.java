@@ -3,16 +3,12 @@ package com.thermatk.android.meatb.fragments;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CalendarView;
-import android.widget.Toast;
 
 import com.github.tibolte.agendacalendarview.AgendaCalendarView;
 import com.github.tibolte.agendacalendarview.CalendarPickerController;
@@ -20,14 +16,11 @@ import com.github.tibolte.agendacalendarview.models.BaseCalendarEvent;
 import com.github.tibolte.agendacalendarview.models.CalendarEvent;
 import com.github.tibolte.agendacalendarview.models.DayItem;
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.mikepenz.fastadapter.FastAdapter;
-import com.mikepenz.fastadapter.IAdapter;
-import com.mikepenz.fastadapter.IItemAdapter;
-import com.mikepenz.fastadapter.adapters.FastItemAdapter;
 
-import com.thermatk.android.meatb.DrawableCalendarEvent;
+import com.thermatk.android.meatb.agenda.BocconiCalendarEvent;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
+import com.thermatk.android.meatb.agenda.BocconiEventRenderer;
 import com.thermatk.android.meatb.data.AgendaEvent;
 import com.thermatk.android.meatb.data.DataWriter;
 import com.thermatk.android.meatb.data.EventDay;
@@ -38,6 +31,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -111,9 +105,10 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         maxDate.add(Calendar.YEAR, 1);
 
         List<CalendarEvent> eventList = new ArrayList<>();
-        mockList(eventList);
-        Log.d(LogConst.LOG,Integer.toString(eventList.size()));
+        trueList(eventList);
+        Log.d(LogConst.LOG, Integer.toString(eventList.size()));
         mAgendaCalendarView.init(eventList, minDate, maxDate, Locale.getDefault(), this);
+        mAgendaCalendarView.addEventRenderer(new BocconiEventRenderer());
         //create our FastAdapter which will manage everything
         /*fastItemAdapter = new FastItemAdapter<>();
 
@@ -174,40 +169,66 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         */
 
     }
+    private void trueList(List<CalendarEvent> eventList) {
+        /////
+
+        RealmResults<EventDay> days = realm.where(EventDay.class).findAll();
+        Log.d(LogConst.LOG,Integer.toString(days.size()));
+        for(EventDay day: days) {
+            Log.d(LogConst.LOG,day.getDate().toString());
+            RealmList<AgendaEvent> events = day.getAgendaEvents();
+            for(AgendaEvent event: events) {
+
+                Calendar startTime = Calendar.getInstance();
+                Calendar endTime = Calendar.getInstance();
+                Date start = event.getDate_start();
+                Date end = event.getDate_end();
+                String dateString;
+                if (end == null){
+                    end =  new Date(start.getTime() + DateUtils.HOUR_IN_MILLIS);
+                    dateString = DateFormat.format("kk:mm", event.getDate_start()) + " - ∞";
+                } else {
+                    dateString  = DateFormat.format("kk:mm", event.getDate_start()) + " - " +DateFormat.format("kk:mm", event.getDate_end());
+                }
+                startTime.setTimeInMillis(start.getTime());
+                endTime.setTimeInMillis(end.getTime());
+
+                BocconiCalendarEvent eventBocconi = new BocconiCalendarEvent(event.getTitle(), event.getDescription(), event.getSupertitle(),
+                        ContextCompat.getColor(getActivity(), R.color.orange_dark), startTime, endTime, false, dateString);
+                        //new SampleItem().withName(event.getTitle() + " Starts " + DateFormat.format("yyyyMMdd kk:mm:ss", event.getDate_start()))
+                eventList.add(eventBocconi);
+            }
+        }
+
+    }
+
     private void mockList(List<CalendarEvent> eventList) {
         Calendar startTime1 = Calendar.getInstance();
         Calendar endTime1 = Calendar.getInstance();
-        endTime1.add(Calendar.MONTH, 1);
-        BaseCalendarEvent event1 = new BaseCalendarEvent("Some lecture", "A wonderful lecture!", "Velodromo",
-                ContextCompat.getColor(getActivity(), R.color.orange_dark), startTime1, endTime1, true);
+        startTime1.setTimeInMillis(1457270486000L);
+        endTime1.setTimeInMillis(1457270686000L);
+        BocconiCalendarEvent event1 = new BocconiCalendarEvent("Some lecture", "A wonderful lecture!", "Velodromo",
+                ContextCompat.getColor(getActivity(), R.color.orange_dark), startTime1, endTime1, false, "11-55");
         eventList.add(event1);
-        /*
-        <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <color name="orange_dark">#E64A19</color>
-    <color name="blue_dark">#00537F</color>
-    <color name="yellow">#F5A623</color>
-</resources>
-         */
 
         Calendar startTime2 = Calendar.getInstance();
-        startTime2.add(Calendar.DAY_OF_YEAR, 1);
         Calendar endTime2 = Calendar.getInstance();
-        endTime2.add(Calendar.DAY_OF_YEAR, 3);
-        BaseCalendarEvent event2 = new BaseCalendarEvent("test 1", "Some description", "Bocconi",
-                ContextCompat.getColor(getActivity(), R.color.yellow), startTime2, endTime2, true);
-        eventList.add(event2);
+        startTime2.setTimeInMillis(1457270186000L);
+        endTime2.setTimeInMillis(1457502971000L);
 
+        BocconiCalendarEvent event2 = new BocconiCalendarEvent("test 1", "Some description", "Bocconi",
+                ContextCompat.getColor(getActivity(), R.color.yellow), startTime2, endTime2, false, "11-55");
+        eventList.add(event2);
         // Example on how to provide your own layout
         Calendar startTime3 = Calendar.getInstance();
         Calendar endTime3 = Calendar.getInstance();
-        startTime3.set(Calendar.HOUR_OF_DAY, 14);
-        startTime3.set(Calendar.MINUTE, 0);
-        endTime3.set(Calendar.HOUR_OF_DAY, 15);
-        endTime3.set(Calendar.MINUTE, 0);
-        DrawableCalendarEvent event3 = new DrawableCalendarEvent("Some seminar", "", "Leoni",
-                ContextCompat.getColor(getActivity(), R.color.blue_dark), startTime3, endTime3, false, R.drawable.common_ic_googleplayservices);
+        startTime3.setTimeInMillis(1457502972000L);
+        endTime3.setTimeInMillis(1457502982000L);
+
+        BocconiCalendarEvent event3 = new BocconiCalendarEvent("Some seminar", "saadsdsa", "Leoni",
+                ContextCompat.getColor(getActivity(), R.color.blue_dark), startTime3, endTime3, false, "11-55");
         eventList.add(event3);
+
     }
 
 

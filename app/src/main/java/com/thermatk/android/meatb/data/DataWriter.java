@@ -1,5 +1,7 @@
 package com.thermatk.android.meatb.data;
 
+import android.text.format.DateFormat;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.thermatk.android.meatb.LogConst;
@@ -75,11 +77,11 @@ public class DataWriter {
                 oneDay = response.getJSONObject(i);
                 String strTemp = oneDay.getString("date");
 
-                dateLong = Long.parseLong(strTemp.substring(strTemp.indexOf('(')+1,strTemp.indexOf('+')));
+                dateLong = getDateAPI(strTemp);
                 //TODO: do some better timezone hacks
                 // add 4 hours to be sure we're in the right day
                 //dateLong +=  (DateUtils.HOUR_IN_MILLIS * 4);
-                date = getDateAPI(strTemp);
+                date = new Date(dateLong);
                 //
                 // TODO: find previously done days and compare
 
@@ -89,7 +91,7 @@ public class DataWriter {
                 day.setDateLong(dateLong);
                 day.setDayString(oneDay.toString());
                 day.setLastUpdated(currentTime);
-                Log.d(LogConst.LOG,Long.toString(day.getDateLong()));
+                //Log.d(LogConst.LOG,Long.toString(day.getDateLong()));
                 RealmList<AgendaEvent> agendaList = new RealmList<>();
                 ///////Events loop
                 JSONArray eventsArray = oneDay.getJSONArray("events");
@@ -99,6 +101,9 @@ public class DataWriter {
                     JSONObject oneEvent;
                     Date date_end;
                     Date date_start;
+                    long date_end_long = 0;
+                    long date_start_long;
+                    String duration;
                     String description;
                     long id;
                     String supertitle;
@@ -120,10 +125,18 @@ public class DataWriter {
                     if(strTemp.equals("null")) {
                         date_end = null;
                     } else {
-                        date_end = getDateAPI(strTemp);
+                        date_end_long = getDateAPI(strTemp);
+                        date_end = new Date(date_end_long);
                     }
                     strTemp = oneEvent.getString("date_start");
-                    date_start = getDateAPI(strTemp);
+                    date_start_long = getDateAPI(strTemp);
+                    date_start = new Date(date_start_long);
+
+                    if (date_end == null){
+                        duration = DateFormat.format("kk:mm", date_start) + " - ∞";
+                    } else {
+                        duration  = DateFormat.format("kk:mm", date_start) + " - " +DateFormat.format("kk:mm", date_end);
+                    }
                     //////
                     ///course id cut fun
                     strTemp = description.substring(0,description.indexOf(' '));
@@ -139,6 +152,9 @@ public class DataWriter {
                     agendaEvent.setCourseId(courseId);
                     agendaEvent.setDate_end(date_end);
                     agendaEvent.setDate_start(date_start);
+                    agendaEvent.setDuration(duration);
+                    agendaEvent.setDate_start_long(date_start_long);
+                    agendaEvent.setDate_end_long(date_end_long);
                     agendaEvent.setDescription(description);
                     agendaEvent.setId(id);
                     agendaEvent.setEventString(oneEvent.toString());
@@ -160,7 +176,7 @@ public class DataWriter {
         realm.close();        
     }
 
-    private static Date getDateAPI(String dateAPI) {
-        return new Date(Long.parseLong(dateAPI.substring(dateAPI.indexOf('(')+1,dateAPI.indexOf('+'))));
+    private static long getDateAPI(String dateAPI) {
+        return Long.parseLong(dateAPI.substring(dateAPI.indexOf('(')+1,dateAPI.indexOf('+')));
     }
 }

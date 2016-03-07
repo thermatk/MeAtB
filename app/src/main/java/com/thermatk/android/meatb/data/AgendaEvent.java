@@ -8,6 +8,10 @@ public class AgendaEvent extends RealmObject {
 
     private Date date_end;
     private Date date_start;
+    private long date_end_long;
+    private long date_start_long;
+    private String duration;
+
     private String description;
     private long id;
     private String supertitle;
@@ -17,8 +21,32 @@ public class AgendaEvent extends RealmObject {
     private long courseId;
 
 
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
     public String getEventString() {
         return eventString;
+    }
+
+    public long getDate_end_long() {
+        return date_end_long;
+    }
+
+    public void setDate_end_long(long date_end_long) {
+        this.date_end_long = date_end_long;
+    }
+
+    public long getDate_start_long() {
+        return date_start_long;
+    }
+
+    public void setDate_start_long(long date_start_long) {
+        this.date_start_long = date_start_long;
     }
 
     public void setEventString(String eventString) {

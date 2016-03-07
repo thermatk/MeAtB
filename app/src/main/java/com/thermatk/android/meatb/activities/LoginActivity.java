@@ -1,4 +1,4 @@
-package com.thermatk.android.meatb.com.thermatk.android.meatb.activities;
+package com.thermatk.android.meatb.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;

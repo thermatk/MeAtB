@@ -88,7 +88,9 @@ public class DataWriter {
                 realm.beginTransaction();
                 EventDay day = realm.createObject(EventDay.class);
                 day.setDate(date);
+                day.setId(i + 1); ///// TODO: do not forget about the id problem
                 day.setDateLong(dateLong);
+                day.setDateString(DateFormat.format("dd-MM-yyyy", date).toString());
                 day.setDayString(oneDay.toString());
                 day.setLastUpdated(currentTime);
                 //Log.d(LogConst.LOG,Long.toString(day.getDateLong()));

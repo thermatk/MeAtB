@@ -4,15 +4,34 @@ import java.util.Date;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 public class EventDay extends RealmObject {
 
+    @PrimaryKey
+    private long id;
     private long dateLong;
     private Date date;
+    private String dateString;
     private long lastUpdated;
     private String dayString;
     private RealmList<AgendaEvent> agendaEvents;
 
+    public String getDateString() {
+        return dateString;
+    }
+
+    public void setDateString(String dateString) {
+        this.dateString = dateString;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public String getDayString() {
         return dayString;

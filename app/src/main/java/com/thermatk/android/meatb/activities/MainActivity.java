@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
             setContentView(R.layout.activity_main);
             drawerStart(savedInstanceState);
             if (savedInstanceState == null) {
-                ProfileFragment firstFragment = new ProfileFragment();
+                RegisterAttendanceFragment firstFragment = new RegisterAttendanceFragment();
                 firstFragment.setArguments(getIntent().getExtras());
 
                 if (findViewById(R.id.content_main_frame) != null) {

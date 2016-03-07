@@ -3,11 +3,9 @@ package com.thermatk.android.meatb.adapter;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.data.AgendaEvent;
 import com.thermatk.android.meatb.data.EventDay;
@@ -29,11 +27,11 @@ public class BocconiRealmRecyclerViewAdapter extends RealmBasedRecyclerViewAdapt
     }
 
     public class ViewHolder extends RealmViewHolder {
-        public TextView storyAbstract;
+        public TextView courseName;
 
         public ViewHolder(LinearLayout container) {
             super(container);
-            this.storyAbstract = (TextView) container.findViewById(R.id.courseName);
+            this.courseName = (TextView) container.findViewById(R.id.courseName);
         }
     }
 
@@ -46,13 +44,13 @@ public class BocconiRealmRecyclerViewAdapter extends RealmBasedRecyclerViewAdapt
 
     @Override
     public void onBindRealmViewHolder(ViewHolder viewHolder, int position) {
-        final EventDay nyTimesStory = realmResults.get(position);
-        final RealmList<AgendaEvent> multimedia = nyTimesStory.getAgendaEvents();
-        if (multimedia != null && !multimedia.isEmpty()) {
+        final EventDay eventDay = realmResults.get(position);
+        final RealmList<AgendaEvent> events = eventDay.getAgendaEvents();
+        if (events != null && !events.isEmpty()) {
             //multimedia.get(0).getUrl()
         } else {
            // viewHolder.image.setImageResource(R.drawable.nytimes_logo);
         }
-        viewHolder.storyAbstract.setText(nyTimesStory.getDayString());
+        viewHolder.courseName.setText(eventDay.getDayString());
     }
 }

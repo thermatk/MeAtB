@@ -1,8 +1,10 @@
 package com.thermatk.android.meatb.fragments;
 
 import android.app.Fragment;
+import android.content.Context;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -80,6 +82,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
 
         RealmResults<EventDay> days = realm.where(EventDay.class).findAll();
         if (days.size() == 0) {
+            mAgendaCalendarView.setVisibility(View.INVISIBLE);
             sendRequest();
             /// TODO: callback, with RealmChangeListener?
         } else {
@@ -99,15 +102,14 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         Calendar minDate = Calendar.getInstance();
         Calendar maxDate = Calendar.getInstance();
 
-        minDate.add(Calendar.MONTH, -2);
-        minDate.set(Calendar.DAY_OF_MONTH, 1);
+        minDate.add(Calendar.DAY_OF_MONTH, -2);
         maxDate.add(Calendar.YEAR, 1);
 
         List<CalendarEvent> eventList = new ArrayList<>();
         // TODO: makeasync
         trueList(eventList);
-        Log.d(LogConst.LOG, Integer.toString(eventList.size()));
-        mAgendaCalendarView.init(eventList, minDate, maxDate, Locale.getDefault(), this);
+        Log.d(LogConst.LOG, "Events: " + Integer.toString(eventList.size()));
+        mAgendaCalendarView.init(eventList, minDate, maxDate, Locale.ENGLISH, this); // TODO: LOCALE.getDefault()
         mAgendaCalendarView.addEventRenderer(new BocconiEventRenderer());
 
     }
@@ -115,40 +117,48 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         /////
 
         RealmResults<EventDay> days = realm.where(EventDay.class).findAll();
-        Log.d(LogConst.LOG,Integer.toString(days.size()));
+        //Log.d(LogConst.LOG, Integer.toString(days.size()));
         for(EventDay day: days) {
-            Log.d(LogConst.LOG,day.getDate().toString());
+            //Log.d(LogConst.LOG,day.getDate().toString());
             RealmList<AgendaEvent> events = day.getAgendaEvents();
             for(AgendaEvent event: events) {
 
                 Calendar startTime = Calendar.getInstance();
                 Calendar endTime = Calendar.getInstance();
-                Date start = event.getDate_start();
-                Date end = event.getDate_end();
-                String dateString;
-                if (end == null){
-                    end =  new Date(start.getTime() + DateUtils.HOUR_IN_MILLIS);
-                    dateString = DateFormat.format("kk:mm", event.getDate_start()) + " - ∞";
-                } else {
-                    dateString  = DateFormat.format("kk:mm", event.getDate_start()) + " - " +DateFormat.format("kk:mm", event.getDate_end());
-                }
-                startTime.setTimeInMillis(start.getTime());
-                endTime.setTimeInMillis(end.getTime());
+                String dateString = event.getDuration();
+                startTime.setTimeInMillis(event.getDate_start_long());
+                endTime.setTimeInMillis(event.getDate_end_long());
 
                 BocconiCalendarEvent eventBocconi = new BocconiCalendarEvent(event.getTitle(), event.getDescription(), event.getSupertitle(),
-                        ContextCompat.getColor(getActivity(), R.color.orange_dark), startTime, endTime, false, dateString);
-                        //new SampleItem().withName(event.getTitle() + " Starts " + DateFormat.format("yyyyMMdd kk:mm:ss", event.getDate_start()))
+                    getColorWrapper(getActivity(), R.color.orange_dark), startTime, endTime, false, dateString);
                 eventList.add(eventBocconi);
             }
         }
 
     }
-
+    // support v4 workaround
+    private static int getColorWrapper(Context context, int id) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return context.getColor(id);
+        } else {
+            return context.getResources().getColor(id);
+        }
+    }
     public void sendRequest() {
+
+        Calendar minDate = Calendar.getInstance();
+        Calendar maxDate = Calendar.getInstance();
+
+        minDate.add(Calendar.DAY_OF_MONTH, -2);
+        maxDate.add(Calendar.MONTH, 1);
+
+        mAgendaCalendarView.init(new ArrayList<CalendarEvent>(), minDate, maxDate, Locale.ENGLISH, this);
         JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 DataWriter.writeAgendaData(response);
+                mAgendaCalendarView.setVisibility(View.VISIBLE);
+                fillView();
             }
 
             @Override
@@ -180,4 +190,5 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
     public void onScrollToDate(Calendar calendar) {
 
     }
+
 }

@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+
 /**
  * This class manages information about the calendar. (Events, weather info...)
  * Holds reference to the days list of the calendar.
@@ -279,5 +280,7 @@ public class CalendarManager {
     private MonthItem getLastMonth() {
         return getMonths().get(getMonths().size() - 1);
     }
+
+
     // endregion
 }

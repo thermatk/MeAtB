@@ -3,7 +3,6 @@ package com.github.tibolte.agendacalendarview;
 import com.github.tibolte.agendacalendarview.agenda.AgendaAdapter;
 import com.github.tibolte.agendacalendarview.agenda.AgendaView;
 import com.github.tibolte.agendacalendarview.calendar.CalendarView;
-import com.github.tibolte.agendacalendarview.models.BaseCalendarEvent;
 import com.github.tibolte.agendacalendarview.models.CalendarEvent;
 import com.github.tibolte.agendacalendarview.render.DefaultEventRenderer;
 import com.github.tibolte.agendacalendarview.render.EventRenderer;
@@ -190,7 +189,7 @@ public class AgendaCalendarView extends FrameLayout implements StickyListHeaders
 
     public void init(List<CalendarEvent> eventList, Calendar minDate, Calendar maxDate, Locale locale, CalendarPickerController calendarPickerController) {
         mCalendarPickerController = calendarPickerController;
-
+        /// TODO: async
         CalendarManager.getInstance(getContext()).buildCal(minDate, maxDate, locale);
 
         // Feed our views with weeks list and events

@@ -1,5 +1,6 @@
 package com.thermatk.android.meatb.activities;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
@@ -9,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -57,7 +59,9 @@ public class MainActivity extends AppCompatActivity {
     private void changeFragment(Fragment fragmentCurrent) {
         // TODO: no replacement of the same type fragment
         if (findViewById(R.id.content_main_frame) != null) {
-                getFragmentManager().beginTransaction().replace(R.id.content_main_frame, fragmentCurrent).commit();
+            InputMethodManager inputMethodManager = (InputMethodManager)  this.getSystemService(Activity.INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
+            getFragmentManager().beginTransaction().replace(R.id.content_main_frame, fragmentCurrent).commit();
         }
     }
     private void drawerStart(Bundle savedInstanceState) {
@@ -72,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         DrawerBuilder resultBuilder= new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
-                .withSavedInstance(savedInstanceState);
+                .withSavedInstance(savedInstanceState).;
         ///////
 
         ColorDrawable cd = new ColorDrawable(0xFF42A5F5);

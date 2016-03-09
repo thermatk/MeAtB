@@ -283,14 +283,9 @@ public class CalendarManager {
             int weekPosition = weekMap.get(eventWeekId);
             WeekItem week = mWeeks.get(weekPosition);
             int dayOfWeek = startTime.get(Calendar.DAY_OF_WEEK) - 1;
-            Log.d(LOG_TAG, "DW "+ dayOfWeek);
-            int counter = 0;
-            //for (DayItem dayItem : week.getDayItems()) { // for each day
-                counter++;
                 DayItem dayItem = week.getDayItems().get(dayOfWeek);
                // boolean isEventForDay = DateHelper.isBetweenInclusive(dayItem.getDate(), event.getStartTime(), event.getEndTime()); // no events
                 //if (isEventForDay) { // check if it goes between the dates
-                    Log.d(LOG_TAG, "C "+ counter);
 
                     CalendarEvent copy = event.copy();
 
@@ -315,7 +310,6 @@ public class CalendarManager {
                         mapEvents.put(dayId, newList);
                     }
               //  }
-           // }
         }
         for (WeekItem weekItem : mWeeks) {
             for (DayItem dayItem : weekItem.getDayItems()) {
@@ -339,7 +333,6 @@ public class CalendarManager {
                 }
             }
         }
-        Log.d(LOG_TAG, mEvents.toString());
 
         BusProvider.getInstance().send(new Events.EventsFetched());
         Log.d(LOG_TAG, "CalendarEventTask finished");

@@ -98,12 +98,19 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
     private void fillView(){
 
         // minimum and maximum date of our calendar
-        // 2 month behind, one year ahead, example: March 2015 <-> May 2015 <-> May 2016
         Calendar minDate = Calendar.getInstance();
         Calendar maxDate = Calendar.getInstance();
 
-        minDate.add(Calendar.DAY_OF_MONTH, -2);
-        maxDate.add(Calendar.YEAR, 1);
+        minDate.add(Calendar.DAY_OF_MONTH, -1);
+        //// TODO: optimize
+
+        RealmResults<EventDay> days = realm.where(EventDay.class).findAllSorted("date");
+        EventDay lastDay = days.last();
+
+
+        ///
+        maxDate.setTimeInMillis(lastDay.getDateLong());
+        maxDate.add(Calendar.DAY_OF_WEEK,1);
 
         List<CalendarEvent> eventList = new ArrayList<>();
         // TODO: makeasync
@@ -117,6 +124,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         /////
 
         RealmResults<EventDay> days = realm.where(EventDay.class).findAll();
+        //TODO: only days in scope
         //Log.d(LogConst.LOG, Integer.toString(days.size()));
         for(EventDay day: days) {
             //Log.d(LogConst.LOG,day.getDate().toString());

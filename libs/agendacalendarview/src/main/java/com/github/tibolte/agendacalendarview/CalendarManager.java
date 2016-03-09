@@ -11,6 +11,8 @@ import com.github.tibolte.agendacalendarview.utils.Events;
 
 import android.content.Context;
 import android.util.Log;
+import android.util.SparseArray;
+import android.util.SparseIntArray;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 
 /**
@@ -45,7 +45,7 @@ public class CalendarManager {
     /* Map approach
 
     */
-    private HashMap<Integer,Integer> weekMap = new HashMap<>();
+    private SparseIntArray weekMap = new SparseIntArray();
     /**
      * List of days used by the calendar
      */
@@ -274,7 +274,7 @@ public class CalendarManager {
         ///
         //sorting problem
 
-        HashMap<Integer,List<CalendarEvent>> mapEvents = new HashMap<>();
+        SparseArray<List<CalendarEvent>> mapEvents = new SparseArray<>();
         for (CalendarEvent event : eventList) { // for each event
             Calendar startTime = event.getStartTime();
             int eWeekOfYear = startTime.get(Calendar.WEEK_OF_YEAR);
@@ -306,7 +306,7 @@ public class CalendarManager {
                     int dYear = dayInstance.get(Calendar.YEAR);
                     int dayId = (dYear * 1000) + dDayOfyear;
 
-                    if (mapEvents.containsKey(dayId)) {
+                    if (mapEvents.indexOfKey(dayId)<0) {
                         List<CalendarEvent> oldList = mapEvents.get(dayId);
                         oldList.add(copy);
                         mapEvents.put(dayId, oldList);
@@ -329,7 +329,7 @@ public class CalendarManager {
                 int eYear = dayInstance.get(Calendar.YEAR);
                 int dayId = (eYear * 1000) + eDayOfyear;
 
-                if(mapEvents.containsKey(dayId)) {
+                if(mapEvents.indexOfKey(dayId)<0) {
                     List<CalendarEvent> listEvents = mapEvents.get(dayId);
                     mEvents.addAll(listEvents);
                 } else {

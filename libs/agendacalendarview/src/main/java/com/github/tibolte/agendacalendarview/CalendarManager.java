@@ -18,7 +18,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -306,7 +305,7 @@ public class CalendarManager {
                     int dYear = dayInstance.get(Calendar.YEAR);
                     int dayId = (dYear * 1000) + dDayOfyear;
 
-                    if (mapEvents.indexOfKey(dayId)<0) {
+                    if (mapEvents.indexOfKey(dayId)>0) {
                         List<CalendarEvent> oldList = mapEvents.get(dayId);
                         oldList.add(copy);
                         mapEvents.put(dayId, oldList);

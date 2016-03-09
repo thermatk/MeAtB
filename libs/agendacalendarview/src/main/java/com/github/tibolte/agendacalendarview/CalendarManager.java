@@ -19,6 +19,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 
 /**
@@ -43,7 +45,7 @@ public class CalendarManager {
     /* Map approach
 
     */
-    private HashMap<String,Integer> weekMap = new HashMap<>();
+    private HashMap<Integer,Integer> weekMap = new HashMap<>();
     /**
      * List of days used by the calendar
      */
@@ -206,7 +208,7 @@ public class CalendarManager {
             int currentWeekOfYear = mWeekCounter.get(Calendar.WEEK_OF_YEAR);
 
             /////
-            String uniqueWeekId = Integer.toString(currentYear) + Integer.toString(currentWeekOfYear);
+            int uniqueWeekId = (currentYear * 100) + currentWeekOfYear;
             ////
 
 
@@ -272,20 +274,24 @@ public class CalendarManager {
         ///
         //sorting problem
 
-        HashMap<String,List<CalendarEvent>> mapEvents = new HashMap<>();
+        HashMap<Integer,List<CalendarEvent>> mapEvents = new HashMap<>();
         for (CalendarEvent event : eventList) { // for each event
             Calendar startTime = event.getStartTime();
             int eWeekOfYear = startTime.get(Calendar.WEEK_OF_YEAR);
             int eYear = startTime.get(Calendar.YEAR);
-            String eventWeekId = Integer.toString(eYear) + Integer.toString(eWeekOfYear);
+            int eventWeekId = (eYear * 100) + eWeekOfYear;
 
             int weekPosition = weekMap.get(eventWeekId);
             WeekItem week = mWeeks.get(weekPosition);
-
+            int dayOfWeek = startTime.get(Calendar.DAY_OF_WEEK);
+            Log.d(LOG_TAG, "DW "+ dayOfWeek);
+            int counter = 0;
             for (DayItem dayItem : week.getDayItems()) { // for each day
-
+                counter++;
+                //DayItem dayItem = week.getDayItems().get(dayOfWeek);
                 boolean isEventForDay = DateHelper.isBetweenInclusive(dayItem.getDate(), event.getStartTime(), event.getEndTime()); // no events
                 if (isEventForDay) { // check if it goes between the dates
+                    Log.d(LOG_TAG, "C "+ counter);
 
                     CalendarEvent copy = event.copy();
 
@@ -298,20 +304,19 @@ public class CalendarManager {
                     /////
                     int dDayOfyear = dayInstance.get(Calendar.DAY_OF_YEAR);
                     int dYear = dayInstance.get(Calendar.YEAR);
-                    String dayId = Integer.toString(dYear) + Integer.toString(dDayOfyear);
+                    int dayId = (dYear * 1000) + dDayOfyear;
 
-                    if(mapEvents.containsKey(dayId)) {
+                    if (mapEvents.containsKey(dayId)) {
                         List<CalendarEvent> oldList = mapEvents.get(dayId);
                         oldList.add(copy);
                         mapEvents.put(dayId, oldList);
                     } else {
                         List<CalendarEvent> newList = new ArrayList<>();
                         newList.add(copy);
-                        mapEvents.put(dayId,newList);
+                        mapEvents.put(dayId, newList);
                     }
                 }
             }
-
         }
         for (WeekItem weekItem : mWeeks) {
             for (DayItem dayItem : weekItem.getDayItems()) {
@@ -322,11 +327,11 @@ public class CalendarManager {
 
                 int eDayOfyear = dayInstance.get(Calendar.DAY_OF_YEAR);
                 int eYear = dayInstance.get(Calendar.YEAR);
-                String dayId = Integer.toString(eYear) + Integer.toString(eDayOfyear);
+                int dayId = (eYear * 1000) + eDayOfyear;
 
                 if(mapEvents.containsKey(dayId)) {
-                    List<CalendarEvent> oldList = mapEvents.get(dayId);
-                    mEvents.addAll(oldList);
+                    List<CalendarEvent> listEvents = mapEvents.get(dayId);
+                    mEvents.addAll(listEvents);
                 } else {
                     BaseCalendarEvent event = new BaseCalendarEvent(dayInstance, getContext().getResources().getString(R.string.agenda_event_no_events));
                     event.setDayReference(dayItem);

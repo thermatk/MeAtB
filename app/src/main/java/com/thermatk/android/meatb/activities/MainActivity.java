@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         DrawerBuilder resultBuilder= new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
-                .withSavedInstance(savedInstanceState).;
+                .withSavedInstance(savedInstanceState);
         ///////
 
         ColorDrawable cd = new ColorDrawable(0xFF42A5F5);

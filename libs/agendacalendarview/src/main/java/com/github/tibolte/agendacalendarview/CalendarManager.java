@@ -328,7 +328,7 @@ public class CalendarManager {
                 int eYear = dayInstance.get(Calendar.YEAR);
                 int dayId = (eYear * 1000) + eDayOfyear;
 
-                if(mapEvents.indexOfKey(dayId)<0) {
+                if(mapEvents.indexOfKey(dayId)>0) {
                     List<CalendarEvent> listEvents = mapEvents.get(dayId);
                     mEvents.addAll(listEvents);
                 } else {

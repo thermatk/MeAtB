@@ -1,10 +1,6 @@
 package com.thermatk.android.meatb.data;
 
 import android.text.format.DateFormat;
-import android.text.format.DateUtils;
-import android.util.Log;
-
-import com.thermatk.android.meatb.LogConst;
 
 import org.json.JSONArray;
 import org.json.JSONException;

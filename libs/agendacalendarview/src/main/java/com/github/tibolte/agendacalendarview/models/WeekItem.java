@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Week model class.
  */
-public class WeekItem {
+public class WeekItem implements IWeekItem {
     private int mWeekInYear;
     private int mYear;
     private int mMonth;

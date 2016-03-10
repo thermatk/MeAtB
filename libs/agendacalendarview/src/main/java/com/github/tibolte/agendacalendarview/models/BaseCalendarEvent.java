@@ -66,7 +66,7 @@ public class BaseCalendarEvent implements CalendarEvent {
      * References to a WeekItem instance for that event, used to link interaction between the
      * calendar view and the agenda view.
      */
-    private WeekItem mWeekReference;
+    private IWeekItem mWeekReference;
     /**
      * Weather icon string returned by the Dark Sky API.
      */
@@ -94,7 +94,7 @@ public class BaseCalendarEvent implements CalendarEvent {
     public BaseCalendarEvent(long id, int color, String title, String description, String location, long dateStart, long dateEnd, int allDay, String duration) {
         this.mId = id;
         this.mColor = color;
-        this.mAllDay = (allDay == 1) ? true : false;
+        this.mAllDay = (allDay == 1);
         this.mDuration = duration;
         this.mTitle = title;
         this.mDescription = description;
@@ -264,11 +264,11 @@ public class BaseCalendarEvent implements CalendarEvent {
         this.mDayReference = mDayReference;
     }
 
-    public WeekItem getWeekReference() {
+    public IWeekItem getWeekReference() {
         return mWeekReference;
     }
 
-    public void setWeekReference(WeekItem mWeekReference) {
+    public void setWeekReference(IWeekItem mWeekReference) {
         this.mWeekReference = mWeekReference;
     }
 

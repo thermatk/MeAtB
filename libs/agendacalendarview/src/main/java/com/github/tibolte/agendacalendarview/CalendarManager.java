@@ -4,6 +4,7 @@ import com.github.tibolte.agendacalendarview.models.BaseCalendarEvent;
 import com.github.tibolte.agendacalendarview.models.CalendarEvent;
 import com.github.tibolte.agendacalendarview.models.DayItem;
 import com.github.tibolte.agendacalendarview.models.IDayItem;
+import com.github.tibolte.agendacalendarview.models.IWeekItem;
 import com.github.tibolte.agendacalendarview.models.WeekItem;
 import com.github.tibolte.agendacalendarview.utils.BusProvider;
 import com.github.tibolte.agendacalendarview.utils.Events;
@@ -49,7 +50,7 @@ public class CalendarManager {
     /**
      * List of weeks used by the calendar
      */
-    private List<WeekItem> mWeeks = new ArrayList<>();
+    private List<IWeekItem> mWeeks = new ArrayList<>();
     /**
      * List of events instances
      */
@@ -84,7 +85,7 @@ public class CalendarManager {
         return mContext;
     }
 
-    public List<WeekItem> getWeeks() {
+    public List<IWeekItem> getWeeks() {
         return mWeeks;
     }
 
@@ -175,7 +176,7 @@ public class CalendarManager {
             ////
 
 
-            WeekItem weekItem = new WeekItem(currentWeekOfYear, currentYear, date, mMonthHalfNameFormat.format(date), currentMonth);
+            IWeekItem weekItem = new WeekItem(currentWeekOfYear, currentYear, date, mMonthHalfNameFormat.format(date), currentMonth);
             List<IDayItem> dayItems = getDayCells(mWeekCounter); // gather days for the built week
             weekItem.setDayItems(dayItems);
             mWeeks.add(weekItem);
@@ -204,7 +205,7 @@ public class CalendarManager {
             int eventWeekId = (eYear * 100) + eWeekOfYear;
 
             int weekPosition = weekMap.get(eventWeekId);
-            WeekItem week = mWeeks.get(weekPosition);
+            IWeekItem week = mWeeks.get(weekPosition);
             int dayOfWeek = startTime.get(Calendar.DAY_OF_WEEK) - 1;
             IDayItem dayItem = week.getDayItems().get(dayOfWeek);
 
@@ -231,7 +232,7 @@ public class CalendarManager {
                 mapEvents.put(dayId, oldList);
             }
         }
-        for (WeekItem weekItem : mWeeks) {
+        for (IWeekItem weekItem : mWeeks) {
             for (IDayItem dayItem : weekItem.getDayItems()) {
 
 
@@ -258,7 +259,7 @@ public class CalendarManager {
         Log.d(LOG_TAG, "CalendarEventTask finished");
     }
 
-    public void loadCal (Locale locale, SparseIntArray lWeekMap, List<WeekItem> lWeeks, List<IDayItem> lDays, List<CalendarEvent> lEvents) {
+    public void loadCal (Locale locale, SparseIntArray lWeekMap, List<IWeekItem> lWeeks, List<IDayItem> lDays, List<CalendarEvent> lEvents) {
         weekMap = lWeekMap;
         mWeeks = lWeeks;
         mDays = lDays;

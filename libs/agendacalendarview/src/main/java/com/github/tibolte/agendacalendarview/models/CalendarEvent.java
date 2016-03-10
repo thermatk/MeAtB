@@ -28,9 +28,9 @@ public interface CalendarEvent {
 
     void setDayReference(IDayItem mDayReference);
 
-    WeekItem getWeekReference();
+    IWeekItem getWeekReference();
 
-    void setWeekReference(WeekItem mWeekReference);
+    void setWeekReference(IWeekItem mWeekReference);
 
     CalendarEvent copy();
 }

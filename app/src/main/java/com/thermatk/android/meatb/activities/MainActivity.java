@@ -3,6 +3,7 @@ package com.thermatk.android.meatb.activities;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -33,12 +34,14 @@ import io.realm.Realm;
 
 public class MainActivity extends AppCompatActivity {
     private String username = null;
+    private SharedPreferences mSharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        username = PreferenceManager.getDefaultSharedPreferences(this).getString("bocconiusername", null);
-        if(username == null || PreferenceManager.getDefaultSharedPreferences(this).getString("bocconipassword", null) == null) {
+        mSharedPreferences  =  PreferenceManager.getDefaultSharedPreferences(this);
+        username = mSharedPreferences.getString("bocconiusername", null);
+        if(username == null || mSharedPreferences.getString("bocconipassword", null) == null) {
             Log.d(LogConst.LOG, "no credentials, switching to login");
             Intent i = new Intent(this, LoginActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -116,8 +119,13 @@ public class MainActivity extends AppCompatActivity {
         /////
         realm.close();
         ////
-        // TODO: on first time only
-        result.openDrawer();
+        if(isFirstLaunch()) {
+            result.openDrawer();
+            SharedPreferences.Editor editSP = mSharedPreferences.edit();
+
+            editSP.putBoolean("isFirstLaunch", false);
+            editSP.apply();
+        }
     }
 
     private void addDrawerItems(DrawerBuilder resultBuilder) {
@@ -155,5 +163,11 @@ public class MainActivity extends AppCompatActivity {
                 attendanceDrawerItem,
                 agendaDrawerItem
         );
+    }
+
+    private boolean isFirstLaunch() {
+        boolean isFirstLaunch = mSharedPreferences.getBoolean("isFirstLaunch", true);
+        Log.i(LogConst.LOG, "isFirstLaunch");
+        return isFirstLaunch;
     }
 }

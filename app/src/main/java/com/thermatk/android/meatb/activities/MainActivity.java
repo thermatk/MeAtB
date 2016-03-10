@@ -21,6 +21,7 @@ import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.util.KeyboardUtil;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.data.InitData;
@@ -59,8 +60,6 @@ public class MainActivity extends AppCompatActivity {
     private void changeFragment(Fragment fragmentCurrent) {
         // TODO: no replacement of the same type fragment
         if (findViewById(R.id.content_main_frame) != null) {
-            InputMethodManager inputMethodManager = (InputMethodManager)  this.getSystemService(Activity.INPUT_METHOD_SERVICE);
-            inputMethodManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
             getFragmentManager().beginTransaction().replace(R.id.content_main_frame, fragmentCurrent).commit();
         }
     }
@@ -76,7 +75,25 @@ public class MainActivity extends AppCompatActivity {
         DrawerBuilder resultBuilder= new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
-                .withSavedInstance(savedInstanceState);
+                .withSavedInstance(savedInstanceState)
+                .withOnDrawerListener(new Drawer.OnDrawerListener() {
+
+                    @Override
+                    public void onDrawerOpened(View drawerView) {
+                        // fix keyboard
+                        KeyboardUtil.hideKeyboard(MainActivity.this);
+                    }
+
+                    @Override
+                    public void onDrawerClosed(View drawerView) {
+
+                    }
+
+                    @Override
+                    public void onDrawerSlide(View drawerView, float slideOffset) {
+
+                    }
+                });
         ///////
 
         ColorDrawable cd = new ColorDrawable(0xFF42A5F5);

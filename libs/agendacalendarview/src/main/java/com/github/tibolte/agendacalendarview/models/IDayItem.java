@@ -10,23 +10,23 @@ public interface IDayItem {
 
     void setDate(Date date);
 
-    public int getValue();
+    int getValue();
 
-    public void setValue(int value);
+    void setValue(int value);
 
-    public boolean isToday();
+    boolean isToday();
 
-    public void setToday(boolean today);
+    void setToday(boolean today);
 
-    public boolean isSelected();
+    boolean isSelected();
 
-    public void setSelected(boolean selected);
+    void setSelected(boolean selected);
 
-    public boolean isFirstDayOfTheMonth();
+    boolean isFirstDayOfTheMonth();
 
-    public void setFirstDayOfTheMonth(boolean firstDayOfTheMonth);
+    void setFirstDayOfTheMonth(boolean firstDayOfTheMonth);
 
-    public String getMonth();
+    String getMonth();
 
     void setMonth(String month);
 

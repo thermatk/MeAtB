@@ -61,7 +61,7 @@ public class BaseCalendarEvent implements CalendarEvent {
      * References to a DayItem instance for that event, used to link interaction between the
      * calendar view and the agenda view.
      */
-    private DayItem mDayReference;
+    private IDayItem mDayReference;
     /**
      * References to a WeekItem instance for that event, used to link interaction between the
      * calendar view and the agenda view.
@@ -256,11 +256,11 @@ public class BaseCalendarEvent implements CalendarEvent {
         this.mWeather = mWeather;
     }
 
-    public DayItem getDayReference() {
+    public IDayItem getDayReference() {
         return mDayReference;
     }
 
-    public void setDayReference(DayItem mDayReference) {
+    public void setDayReference(IDayItem mDayReference) {
         this.mDayReference = mDayReference;
     }
 

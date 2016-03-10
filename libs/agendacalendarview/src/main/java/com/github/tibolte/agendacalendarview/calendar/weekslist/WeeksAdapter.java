@@ -2,7 +2,7 @@ package com.github.tibolte.agendacalendarview.calendar.weekslist;
 
 import com.github.tibolte.agendacalendarview.CalendarManager;
 import com.github.tibolte.agendacalendarview.R;
-import com.github.tibolte.agendacalendarview.models.DayItem;
+import com.github.tibolte.agendacalendarview.models.IDayItem;
 import com.github.tibolte.agendacalendarview.models.WeekItem;
 import com.github.tibolte.agendacalendarview.utils.BusProvider;
 import com.github.tibolte.agendacalendarview.utils.DateHelper;
@@ -127,10 +127,10 @@ public class WeeksAdapter extends RecyclerView.Adapter<WeeksAdapter.WeekViewHold
         public void bindWeek(WeekItem weekItem, Calendar today) {
             setUpMonthOverlay();
 
-            List<DayItem> dayItems = weekItem.getDayItems();
+            List<IDayItem> dayItems = weekItem.getDayItems();
 
             for (int c = 0; c < dayItems.size(); c++) {
-                final DayItem dayItem = dayItems.get(c);
+                final IDayItem dayItem = dayItems.get(c);
                 LinearLayout cellItem = mCells.get(c);
                 TextView txtDay = (TextView) cellItem.findViewById(R.id.view_day_day_label);
                 TextView txtMonth = (TextView) cellItem.findViewById(R.id.view_day_month_label);

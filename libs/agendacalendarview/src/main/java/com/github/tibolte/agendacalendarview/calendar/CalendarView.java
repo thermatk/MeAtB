@@ -5,7 +5,7 @@ import com.github.tibolte.agendacalendarview.R;
 import com.github.tibolte.agendacalendarview.calendar.weekslist.WeekListView;
 import com.github.tibolte.agendacalendarview.calendar.weekslist.WeeksAdapter;
 import com.github.tibolte.agendacalendarview.models.CalendarEvent;
-import com.github.tibolte.agendacalendarview.models.DayItem;
+import com.github.tibolte.agendacalendarview.models.IDayItem;
 import com.github.tibolte.agendacalendarview.models.WeekItem;
 import com.github.tibolte.agendacalendarview.utils.BusProvider;
 import com.github.tibolte.agendacalendarview.utils.DateHelper;
@@ -49,7 +49,7 @@ public class CalendarView extends LinearLayout {
     /**
      * The current highlighted day in blue
      */
-    private DayItem mSelectedDay;
+    private IDayItem mSelectedDay;
     /**
      * The current row displayed at top of the list
      */
@@ -73,11 +73,11 @@ public class CalendarView extends LinearLayout {
 
     // endregion
 
-    public DayItem getSelectedDay() {
+    public IDayItem getSelectedDay() {
         return mSelectedDay;
     }
 
-    public void setSelectedDay(DayItem mSelectedDay) {
+    public void setSelectedDay(IDayItem mSelectedDay) {
         this.mSelectedDay = mSelectedDay;
     }
 
@@ -242,7 +242,7 @@ public class CalendarView extends LinearLayout {
      * @param dayItem  The DayItem information held by the cell item.
      * @return The selected row of the weeks list, to be updated.
      */
-    private int updateSelectedDay(Calendar calendar, DayItem dayItem) {
+    private int updateSelectedDay(Calendar calendar, IDayItem dayItem) {
         Integer currentWeekIndex = null;
         Calendar scrollToCal = calendar;
 

@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import com.github.tibolte.agendacalendarview.AgendaCalendarView;
 import com.github.tibolte.agendacalendarview.CalendarPickerController;
 import com.github.tibolte.agendacalendarview.models.CalendarEvent;
-import com.github.tibolte.agendacalendarview.models.DayItem;
+import com.github.tibolte.agendacalendarview.models.IDayItem;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import com.thermatk.android.meatb.agenda.BocconiCalendarEvent;
@@ -185,7 +185,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
     }
 
     @Override
-    public void onDaySelected(DayItem dayItem) {
+    public void onDaySelected(IDayItem dayItem) {
 
     }
 

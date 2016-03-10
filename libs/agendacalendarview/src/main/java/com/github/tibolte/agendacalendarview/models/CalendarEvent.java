@@ -24,9 +24,9 @@ public interface CalendarEvent {
 
     void setInstanceDay(Calendar mInstanceDay);
 
-    DayItem getDayReference();
+    IDayItem getDayReference();
 
-    void setDayReference(DayItem mDayReference);
+    void setDayReference(IDayItem mDayReference);
 
     WeekItem getWeekReference();
 

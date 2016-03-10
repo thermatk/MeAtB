@@ -300,14 +300,14 @@ public class CalendarManager {
                     int dYear = dayInstance.get(Calendar.YEAR);
                     int dayId = (dYear * 1000) + dDayOfyear;
 
-                    if (mapEvents.indexOfKey(dayId)>0) {
-                        List<CalendarEvent> oldList = mapEvents.get(dayId);
-                        oldList.add(copy);
-                        mapEvents.put(dayId, oldList);
-                    } else {
+                    if (mapEvents.indexOfKey(dayId)<0) {
                         List<CalendarEvent> newList = new ArrayList<>();
                         newList.add(copy);
                         mapEvents.put(dayId, newList);
+                    } else {
+                        List<CalendarEvent> oldList = mapEvents.get(dayId);
+                        oldList.add(copy);
+                        mapEvents.put(dayId, oldList);
                     }
               //  }
         }
@@ -322,14 +322,14 @@ public class CalendarManager {
                 int eYear = dayInstance.get(Calendar.YEAR);
                 int dayId = (eYear * 1000) + eDayOfyear;
 
-                if(mapEvents.indexOfKey(dayId)>0) {
-                    List<CalendarEvent> listEvents = mapEvents.get(dayId);
-                    mEvents.addAll(listEvents);
-                } else {
+                if(mapEvents.indexOfKey(dayId)<0) {
                     BaseCalendarEvent event = new BaseCalendarEvent(dayInstance, getContext().getResources().getString(R.string.agenda_event_no_events));
                     event.setDayReference(dayItem);
                     event.setWeekReference(weekItem);
                     mEvents.add(event);
+                } else {
+                    List<CalendarEvent> listEvents = mapEvents.get(dayId);
+                    mEvents.addAll(listEvents);
                 }
             }
         }

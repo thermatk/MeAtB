@@ -1,16 +1,33 @@
 package com.thermatk.android.meatb.data;
 
 import android.text.format.DateFormat;
+import android.util.Log;
+
+import com.github.tibolte.agendacalendarview.models.CalendarEvent;
+import com.github.tibolte.agendacalendarview.models.IDayItem;
+import com.github.tibolte.agendacalendarview.models.IWeekItem;
+import com.thermatk.android.meatb.LogConst;
+import com.thermatk.android.meatb.agenda.ACVDay;
+import com.thermatk.android.meatb.agenda.ACVWeek;
+import com.thermatk.android.meatb.agenda.BocconiCalendarEvent;
+import com.thermatk.android.meatb.data.agenda.RCal;
+import com.thermatk.android.meatb.data.agenda.RDay;
+import com.thermatk.android.meatb.data.agenda.REvent;
+import com.thermatk.android.meatb.data.agenda.RWeek;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmList;
+import io.realm.RealmObject;
+import io.realm.RealmResults;
 
 public class DataWriter {
     public static void writeInitData(JSONObject rawJSON) {
@@ -176,5 +193,103 @@ public class DataWriter {
 
     private static long getDateAPI(String dateAPI) {
         return Long.parseLong(dateAPI.substring(dateAPI.indexOf('(')+1,dateAPI.indexOf('+')));
+    }
+
+    public static void writeAgendaCalendarViewPersistence(List<CalendarEvent> doneEvents, List<IDayItem> doneDays,List<IWeekItem> doneWeeks) {
+
+        Realm realm = Realm.getDefaultInstance();
+        long currentTime = System.currentTimeMillis();
+        realm.beginTransaction();
+
+        ////// clear the realm
+        realm.clear(RDay.class);
+        realm.clear(RCal.class);
+        realm.clear(REvent.class);
+        realm.clear(RWeek.class);
+        ///////
+        RCal rCal = realm.createObject(RCal.class);
+
+
+        // Days
+        RealmList<RDay> rDays = new RealmList<>();
+        for (IDayItem day : doneDays) {
+            RDay rDay = realm.createObject(RDay.class);
+            rDay.setDate(day.getDate());
+            rDay.setValue(day.getValue());
+            rDay.setToday(day.isToday());
+            rDay.setDayOfTheWeek(day.getDayOftheWeek());
+            rDay.setFirstDayOfTheMonth(day.isFirstDayOfTheMonth());
+            rDay.setSelected(day.isSelected());
+            rDay.setMonth(day.getMonth());
+            rDays.add(rDay);
+        }
+        rCal.setrDays(rDays);
+
+        realm.commitTransaction();
+        // weeks
+        realm.beginTransaction();
+
+        RealmList<RWeek> rWeeks = new RealmList<>();
+        for (IWeekItem week : doneWeeks) {
+            RWeek rWeek = realm.createObject(RWeek.class);
+
+            rWeek.setWeekInYear(week.getWeekInYear());
+            rWeek.setYear(week.getYear());
+            rWeek.setMonth(week.getMonth());
+            rWeek.setDate(week.getDate());
+            rWeek.setLabel(week.getLabel());
+
+            RealmList<RDay> rWDays = new RealmList<>();
+            for(IDayItem day : week.getDayItems()) {
+                RDay wday  = realm.where(RDay.class).equalTo("date", day.getDate()).findFirst();
+                rWDays.add(wday);
+            }
+            rWeek.setDayItems(rWDays);
+            rWeeks.add(rWeek);
+        }
+        rCal.setrWeeks(rWeeks);
+
+        realm.commitTransaction();
+
+        // events
+
+        realm.beginTransaction();
+
+        RealmList<REvent> rEvents = new RealmList<>();
+        for (CalendarEvent basicevent : doneEvents) {
+            BocconiCalendarEvent castEvent = (BocconiCalendarEvent) basicevent;
+            REvent rEvent = realm.createObject(REvent.class);
+            rEvent.setId(castEvent.getId());
+            rEvent.setColor(castEvent.getColor());
+            rEvent.setAllDay(castEvent.isAllDay());
+            rEvent.setDuration(castEvent.getDuration());
+            rEvent.setTitle(castEvent.getTitle());
+            rEvent.setDescription(castEvent.getDescription());
+            rEvent.setLocation(castEvent.getLocation());
+            Calendar startTime = castEvent.getStartTime();
+            if(startTime!= null) {
+                rEvent.setStartTime(startTime.getTime());
+            }
+
+            Calendar endTime = castEvent.getEndTime();
+            if(endTime!= null) {
+                rEvent.setEndTime(endTime.getTime());
+            }
+            rEvent.setDate(castEvent.getDate());
+
+            rEvent.setInstanceDay(castEvent.getInstanceDay().getTime());
+            rEvent.setPlaceHolder(castEvent.isPlaceHolder());
+
+            RDay eday  = realm.where(RDay.class).equalTo("date", castEvent.getDayReference().getDate()).findFirst();
+            rEvent.setDayReference(eday);
+            RWeek eweek = realm.where(RWeek.class).equalTo("date", castEvent.getWeekReference().getDate()).findFirst();
+            rEvent.setWeekReference(eweek);
+            rEvents.add(rEvent);
+        }
+        rCal.setrEvents(rEvents);
+        rCal.setLastUpdated(currentTime);
+
+        realm.commitTransaction();
+        realm.close();
     }
 }

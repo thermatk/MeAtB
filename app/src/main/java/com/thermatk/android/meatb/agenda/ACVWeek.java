@@ -1,12 +1,11 @@
-package com.thermatk.android.meatb.agenda.data;
+package com.thermatk.android.meatb.agenda;
 
 import com.github.tibolte.agendacalendarview.models.IDayItem;
 import com.github.tibolte.agendacalendarview.models.IWeekItem;
+import com.thermatk.android.meatb.data.agenda.RWeek;
 
 import java.util.Date;
 import java.util.List;
-
-import io.realm.RealmObject;
 
 /**
  * Created by thermatk on 11.03.16.
@@ -38,6 +37,14 @@ public class ACVWeek implements IWeekItem {
         this.mDayItems = original.getDayItems();
     }
 
+    public ACVWeek(RWeek persistent) {
+        this.mWeekInYear = persistent.getWeekInYear();
+        this.mYear = persistent.getYear();
+        this.mMonth = persistent.getMonth();
+        this.mDate = persistent.getDate();
+        this.mLabel = persistent.getLabel();
+        /// except for days list
+    }
     public ACVWeek(){
 
     }

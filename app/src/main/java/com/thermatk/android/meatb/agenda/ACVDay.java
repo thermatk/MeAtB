@@ -1,13 +1,12 @@
-package com.thermatk.android.meatb.agenda.data;
+package com.thermatk.android.meatb.agenda;
 
 import com.github.tibolte.agendacalendarview.CalendarManager;
 import com.github.tibolte.agendacalendarview.models.IDayItem;
 import com.github.tibolte.agendacalendarview.utils.DateHelper;
+import com.thermatk.android.meatb.data.agenda.RDay;
 
 import java.util.Calendar;
 import java.util.Date;
-
-import io.realm.RealmObject;
 
 /**
  * Created by thermatk on 11.03.16.
@@ -43,6 +42,15 @@ public class ACVDay implements IDayItem {
         this.mFirstDayOfTheMonth = original.isFirstDayOfTheMonth();
         this.mSelected = original.isSelected();
         this.mMonth = original.getMonth();
+    }
+    public ACVDay(RDay persistent) {
+        this.mDate = persistent.getDate();
+        this.mValue = persistent.getValue();
+        this.mToday = persistent.isToday();
+        this.mDayOfTheWeek = persistent.getDayOfTheWeek();
+        this.mFirstDayOfTheMonth = persistent.isFirstDayOfTheMonth();
+        this.mSelected = persistent.isSelected();
+        this.mMonth = persistent.getMonth();
     }
     // endregion
 

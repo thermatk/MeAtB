@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -60,10 +61,16 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    private void changeFragment(Fragment fragmentCurrent) {
+    private void changeFragment(final Fragment fragmentCurrent) {
+
         // TODO: no replacement of the same type fragment
         if (findViewById(R.id.content_main_frame) != null) {
-            getFragmentManager().beginTransaction().replace(R.id.content_main_frame, fragmentCurrent).commit();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    getFragmentManager().beginTransaction().replace(R.id.content_main_frame, fragmentCurrent).commit();
+                }
+            }, 200);
         }
     }
     private void drawerStart(Bundle savedInstanceState) {

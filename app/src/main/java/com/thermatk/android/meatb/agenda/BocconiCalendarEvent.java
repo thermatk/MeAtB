@@ -1,14 +1,15 @@
-package com.thermatk.android.meatb.agenda.data;
+package com.thermatk.android.meatb.agenda;
 
 import com.github.tibolte.agendacalendarview.models.CalendarEvent;
 import com.github.tibolte.agendacalendarview.models.IDayItem;
 import com.github.tibolte.agendacalendarview.models.IWeekItem;
+import com.thermatk.android.meatb.data.agenda.REvent;
 
 import java.util.Calendar;
-
-import io.realm.RealmObject;
+import java.util.Date;
 
 public class BocconiCalendarEvent implements CalendarEvent {
+
 
 
     /**
@@ -69,119 +70,11 @@ public class BocconiCalendarEvent implements CalendarEvent {
 
     private String mDate;
 
-    public long getmId() {
-        return mId;
-    }
-
-    public void setmId(long mId) {
-        this.mId = mId;
-    }
-
-    public int getmColor() {
-        return mColor;
-    }
-
-    public void setmColor(int mColor) {
-        this.mColor = mColor;
-    }
-
-    public String getmTitle() {
-        return mTitle;
-    }
-
-    public void setmTitle(String mTitle) {
-        this.mTitle = mTitle;
-    }
-
-    public String getmDescription() {
-        return mDescription;
-    }
-
-    public void setmDescription(String mDescription) {
-        this.mDescription = mDescription;
-    }
-
-    public String getmLocation() {
-        return mLocation;
-    }
-
-    public void setmLocation(String mLocation) {
-        this.mLocation = mLocation;
-    }
-
-    public Calendar getmInstanceDay() {
-        return mInstanceDay;
-    }
-
-    public void setmInstanceDay(Calendar mInstanceDay) {
-        this.mInstanceDay = mInstanceDay;
-    }
-
-    public Calendar getmStartTime() {
-        return mStartTime;
-    }
-
-    public void setmStartTime(Calendar mStartTime) {
-        this.mStartTime = mStartTime;
-    }
-
-    public Calendar getmEndTime() {
-        return mEndTime;
-    }
-
-    public void setmEndTime(Calendar mEndTime) {
-        this.mEndTime = mEndTime;
-    }
-
-    public boolean ismAllDay() {
-        return mAllDay;
-    }
-
-    public void setmAllDay(boolean mAllDay) {
-        this.mAllDay = mAllDay;
-    }
-
-    public boolean ismPlaceHolder() {
-        return mPlaceHolder;
-    }
-
-    public void setmPlaceHolder(boolean mPlaceHolder) {
-        this.mPlaceHolder = mPlaceHolder;
-    }
-
-    public String getmDuration() {
-        return mDuration;
-    }
-
-    public void setmDuration(String mDuration) {
-        this.mDuration = mDuration;
-    }
-
-    public IDayItem getmDayReference() {
-        return mDayReference;
-    }
-
-    public void setmDayReference(IDayItem mDayReference) {
-        this.mDayReference = (ACVDay) mDayReference;
-    }
-
-    public IWeekItem getmWeekReference() {
-        return mWeekReference;
-    }
-
-    public void setmWeekReference(IWeekItem mWeekReference) {
-        this.mWeekReference = (ACVWeek) mWeekReference;
-    }
-
-    public String getmDate() {
-        return mDate;
-    }
-
-    public void setmDate(String mDate) {
-        this.mDate = mDate;
-    }
     // region Constructors
 
+    public BocconiCalendarEvent () {
+
+    }
     public BocconiCalendarEvent(long id, int color, String title, String description, String location, long dateStart, long dateEnd, int allDay, String duration, String dateText) {
 
         this.mId = id;
@@ -223,6 +116,39 @@ public class BocconiCalendarEvent implements CalendarEvent {
         this.mStartTime = calendarEvent.getStartTime();
         this.mEndTime = calendarEvent.getEndTime();
         this.mDate = calendarEvent.getDate();
+        this.mInstanceDay = calendarEvent.getInstanceDay();
+        this.mPlaceHolder = calendarEvent.isPlaceHolder();
+        this.mDayReference = (ACVDay) calendarEvent.getDayReference();
+        this.mWeekReference = (ACVWeek) calendarEvent.getWeekReference();
+    }
+
+
+    public BocconiCalendarEvent(REvent calendarEvent) {
+
+        this.mId = calendarEvent.getId();
+        this.mColor = calendarEvent.getColor();
+        this.mAllDay = calendarEvent.isAllDay();
+        this.mDuration = calendarEvent.getDuration();
+        this.mTitle = calendarEvent.getTitle();
+        this.mDescription = calendarEvent.getDescription();
+        this.mLocation = calendarEvent.getLocation();
+        this.mDate = calendarEvent.getDate();
+        Date start = calendarEvent.getStartTime();
+        if(start!=null) {
+            this.mStartTime = Calendar.getInstance();
+            this.mStartTime.setTime(start);
+        }
+        Date end = calendarEvent.getEndTime();
+        if(end!=null) {
+            this.mEndTime = Calendar.getInstance();
+            this.mEndTime.setTime(end);
+        }
+
+        Date day = calendarEvent.getInstanceDay();
+        this.mInstanceDay = Calendar.getInstance();
+        this.mInstanceDay.setTime(day);
+        this.mPlaceHolder = calendarEvent.isPlaceHolder();
+        //////// set references outside
     }
 
     // endregion

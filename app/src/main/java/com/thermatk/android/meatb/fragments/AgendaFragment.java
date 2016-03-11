@@ -94,6 +94,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         RealmResults<EventDay> days = realm.allObjects(EventDay.class);
         if (days.size() == 0) {
             mAgendaCalendarView.setVisibility(View.INVISIBLE);
+            // show progress
             sendRequest();
             /// TODO: callback, with RealmChangeListener?
         } else {

@@ -3,9 +3,12 @@ package com.github.tibolte.agendacalendarview;
 import com.github.tibolte.agendacalendarview.agenda.AgendaAdapter;
 import com.github.tibolte.agendacalendarview.agenda.AgendaView;
 import com.github.tibolte.agendacalendarview.calendar.CalendarView;
+import com.github.tibolte.agendacalendarview.models.BaseCalendarEvent;
 import com.github.tibolte.agendacalendarview.models.CalendarEvent;
+import com.github.tibolte.agendacalendarview.models.DayItem;
 import com.github.tibolte.agendacalendarview.models.IDayItem;
 import com.github.tibolte.agendacalendarview.models.IWeekItem;
+import com.github.tibolte.agendacalendarview.models.WeekItem;
 import com.github.tibolte.agendacalendarview.render.DefaultEventRenderer;
 import com.github.tibolte.agendacalendarview.render.EventRenderer;
 import com.github.tibolte.agendacalendarview.utils.BusProvider;
@@ -189,10 +192,10 @@ public class AgendaCalendarView extends FrameLayout implements StickyListHeaders
 
     // region Public methods
 
-    public void init(List<CalendarEvent> eventList, Calendar minDate, Calendar maxDate, Locale locale, CalendarPickerController calendarPickerController) {
+    public void init(List<CalendarEvent> eventList, Calendar minDate, Calendar maxDate, Locale locale, CalendarPickerController calendarPickerController, IWeekItem cleanWeek, IDayItem cleanDay) {
         mCalendarPickerController = calendarPickerController;
 
-        CalendarManager.getInstance(getContext()).buildCal(minDate, maxDate, locale);
+        CalendarManager.getInstance(getContext()).buildCal(minDate, maxDate, locale, cleanDay, cleanWeek);
 
         // Feed our views with weeks list and events
         mCalendarView.init(CalendarManager.getInstance(getContext()), mCalendarDayTextColor, mCalendarCurrentDayColor, mCalendarPastDayTextColor);
@@ -202,7 +205,7 @@ public class AgendaCalendarView extends FrameLayout implements StickyListHeaders
         mAgendaView.getAgendaListView().setAdapter(agendaAdapter);
         mAgendaView.getAgendaListView().setOnStickyHeaderChangedListener(this);
 
-        CalendarManager.getInstance().loadEvents(eventList);
+        CalendarManager.getInstance().loadEvents(eventList, new BaseCalendarEvent());
         BusProvider.getInstance().send(new Events.EventsFetched());
         Log.d(LOG_TAG, "CalendarEventTask finished");
 

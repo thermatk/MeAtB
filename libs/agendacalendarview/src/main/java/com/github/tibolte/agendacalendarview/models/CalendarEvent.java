@@ -4,6 +4,15 @@ import java.util.Calendar;
 
 public interface CalendarEvent {
 
+
+    void setPlaceholder(boolean placeholder);
+
+    boolean isPlaceholder();
+
+    public String getLocation();
+
+    public void setLocation(String mLocation);
+
     long getId();
 
     void setId(long mId);

@@ -1,12 +1,12 @@
 package com.thermatk.android.meatb.agenda;
 
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.tibolte.agendacalendarview.render.EventRenderer;
 import com.thermatk.android.meatb.R;
+import com.thermatk.android.meatb.agenda.data.BocconiCalendarEvent;
 
 public class BocconiEventRenderer extends EventRenderer<BocconiCalendarEvent> {
 

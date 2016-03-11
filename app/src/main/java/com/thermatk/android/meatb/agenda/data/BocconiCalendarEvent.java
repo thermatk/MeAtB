@@ -1,11 +1,15 @@
-package com.github.tibolte.agendacalendarview.models;
+package com.thermatk.android.meatb.agenda.data;
+
+import com.github.tibolte.agendacalendarview.models.CalendarEvent;
+import com.github.tibolte.agendacalendarview.models.IDayItem;
+import com.github.tibolte.agendacalendarview.models.IWeekItem;
 
 import java.util.Calendar;
 
-/**
- * Event model class containing the information to be displayed on the agenda view.
- */
-public class BaseCalendarEvent implements CalendarEvent {
+import io.realm.RealmObject;
+
+public class BocconiCalendarEvent implements CalendarEvent {
+
 
     /**
      * Id of the event.
@@ -49,11 +53,6 @@ public class BaseCalendarEvent implements CalendarEvent {
      */
     private boolean mPlaceHolder;
     /**
-     * Tells if this BaseCalendarEvent instance is used as a forecast information holder in the agenda
-     * view.
-     */
-    private boolean mWeather;
-    /**
      * Duration of the event.
      */
     private String mDuration;
@@ -61,37 +60,130 @@ public class BaseCalendarEvent implements CalendarEvent {
      * References to a DayItem instance for that event, used to link interaction between the
      * calendar view and the agenda view.
      */
-    private IDayItem mDayReference;
+    private ACVDay mDayReference;
     /**
      * References to a WeekItem instance for that event, used to link interaction between the
      * calendar view and the agenda view.
      */
-    private IWeekItem mWeekReference;
-    /**
-     * Weather icon string returned by the Dark Sky API.
-     */
-    private String mWeatherIcon;
-    /**
-     * Temperature value returned by the Dark Sky API.
-     */
-    private double mTemperature;
+    private ACVWeek mWeekReference;
 
-    // region Constructor
+    private String mDate;
 
-    /**
-     * Initializes the event
-     *
-     * @param id          The id of the event.
-     * @param color       The color of the event.
-     * @param title       The title of the event.
-     * @param description The description of the event.
-     * @param location    The location of the event.
-     * @param dateStart   The start date of the event.
-     * @param dateEnd     The end date of the event.
-     * @param allDay      Int that can be equal to 0 or 1.
-     * @param duration    The duration of the event in RFC2445 format.
-     */
-    public BaseCalendarEvent(long id, int color, String title, String description, String location, long dateStart, long dateEnd, int allDay, String duration) {
+    public long getmId() {
+        return mId;
+    }
+
+    public void setmId(long mId) {
+        this.mId = mId;
+    }
+
+    public int getmColor() {
+        return mColor;
+    }
+
+    public void setmColor(int mColor) {
+        this.mColor = mColor;
+    }
+
+    public String getmTitle() {
+        return mTitle;
+    }
+
+    public void setmTitle(String mTitle) {
+        this.mTitle = mTitle;
+    }
+
+    public String getmDescription() {
+        return mDescription;
+    }
+
+    public void setmDescription(String mDescription) {
+        this.mDescription = mDescription;
+    }
+
+    public String getmLocation() {
+        return mLocation;
+    }
+
+    public void setmLocation(String mLocation) {
+        this.mLocation = mLocation;
+    }
+
+    public Calendar getmInstanceDay() {
+        return mInstanceDay;
+    }
+
+    public void setmInstanceDay(Calendar mInstanceDay) {
+        this.mInstanceDay = mInstanceDay;
+    }
+
+    public Calendar getmStartTime() {
+        return mStartTime;
+    }
+
+    public void setmStartTime(Calendar mStartTime) {
+        this.mStartTime = mStartTime;
+    }
+
+    public Calendar getmEndTime() {
+        return mEndTime;
+    }
+
+    public void setmEndTime(Calendar mEndTime) {
+        this.mEndTime = mEndTime;
+    }
+
+    public boolean ismAllDay() {
+        return mAllDay;
+    }
+
+    public void setmAllDay(boolean mAllDay) {
+        this.mAllDay = mAllDay;
+    }
+
+    public boolean ismPlaceHolder() {
+        return mPlaceHolder;
+    }
+
+    public void setmPlaceHolder(boolean mPlaceHolder) {
+        this.mPlaceHolder = mPlaceHolder;
+    }
+
+    public String getmDuration() {
+        return mDuration;
+    }
+
+    public void setmDuration(String mDuration) {
+        this.mDuration = mDuration;
+    }
+
+    public IDayItem getmDayReference() {
+        return mDayReference;
+    }
+
+    public void setmDayReference(IDayItem mDayReference) {
+        this.mDayReference = (ACVDay) mDayReference;
+    }
+
+    public IWeekItem getmWeekReference() {
+        return mWeekReference;
+    }
+
+    public void setmWeekReference(IWeekItem mWeekReference) {
+        this.mWeekReference = (ACVWeek) mWeekReference;
+    }
+
+    public String getmDate() {
+        return mDate;
+    }
+
+    public void setmDate(String mDate) {
+        this.mDate = mDate;
+    }
+    // region Constructors
+
+    public BocconiCalendarEvent(long id, int color, String title, String description, String location, long dateStart, long dateEnd, int allDay, String duration, String dateText) {
+
         this.mId = id;
         this.mColor = color;
         this.mAllDay = (allDay == 1);
@@ -104,23 +196,11 @@ public class BaseCalendarEvent implements CalendarEvent {
         this.mStartTime.setTimeInMillis(dateStart);
         this.mEndTime = Calendar.getInstance();
         this.mEndTime.setTimeInMillis(dateEnd);
+        this.mDate = dateText;
     }
 
-    public BaseCalendarEvent() {
+    public BocconiCalendarEvent(String title, String description, String location, int color, Calendar startTime, Calendar endTime, boolean allDay, String dateText) {
 
-    }
-
-    /**
-     * Initializes the event
-     * @param title The title of the event.
-     * @param description The description of the event.
-     * @param location The location of the event.
-     * @param color The color of the event (for display in the app).
-     * @param startTime The start time of the event.
-     * @param endTime The end time of the event.
-     * @param allDay Indicates if the event lasts the whole day.
-     */
-    public BaseCalendarEvent(String title, String description, String location, int color, Calendar startTime, Calendar endTime, boolean allDay) {
         this.mTitle = title;
         this.mDescription = description;
         this.mLocation = location;
@@ -128,9 +208,11 @@ public class BaseCalendarEvent implements CalendarEvent {
         this.mStartTime = startTime;
         this.mEndTime = endTime;
         this.mAllDay = allDay;
+        this.mDate = dateText;
     }
 
-    public BaseCalendarEvent(BaseCalendarEvent calendarEvent) {
+    public BocconiCalendarEvent(BocconiCalendarEvent calendarEvent) {
+
         this.mId = calendarEvent.getId();
         this.mColor = calendarEvent.getColor();
         this.mAllDay = calendarEvent.isAllDay();
@@ -140,11 +222,23 @@ public class BaseCalendarEvent implements CalendarEvent {
         this.mLocation = calendarEvent.getLocation();
         this.mStartTime = calendarEvent.getStartTime();
         this.mEndTime = calendarEvent.getEndTime();
+        this.mDate = calendarEvent.getDate();
     }
 
     // endregion
 
-    // region Getters/Setters
+    // region Public methods
+    public String getDate() {
+        return mDate;
+    }
+
+    public void setDate(String dateText) {
+        this.mDate = dateText;
+    }
+
+    // endregion
+
+    // region Class - BaseCalendarEvent
 
     public int getColor() {
         return mColor;
@@ -245,20 +339,12 @@ public class BaseCalendarEvent implements CalendarEvent {
         this.mPlaceHolder = mPlaceHolder;
     }
 
-    public boolean isWeather() {
-        return mWeather;
-    }
-
-    public void setWeather(boolean mWeather) {
-        this.mWeather = mWeather;
-    }
-
     public IDayItem getDayReference() {
         return mDayReference;
     }
 
     public void setDayReference(IDayItem mDayReference) {
-        this.mDayReference = mDayReference;
+        this.mDayReference = (ACVDay) mDayReference;
     }
 
     public IWeekItem getWeekReference() {
@@ -266,28 +352,7 @@ public class BaseCalendarEvent implements CalendarEvent {
     }
 
     public void setWeekReference(IWeekItem mWeekReference) {
-        this.mWeekReference = mWeekReference;
-    }
-
-    public String getWeatherIcon() {
-        return mWeatherIcon;
-    }
-
-    public void setWeatherIcon(String mWeatherIcon) {
-        this.mWeatherIcon = mWeatherIcon;
-    }
-
-    public double getTemperature() {
-        return mTemperature;
-    }
-
-    public void setTemperature(double mTemperature) {
-        this.mTemperature = mTemperature;
-    }
-
-    @Override
-    public CalendarEvent copy() {
-        return new BaseCalendarEvent(this);
+        this.mWeekReference = (ACVWeek) mWeekReference;
     }
 
     // endregion
@@ -301,4 +366,11 @@ public class BaseCalendarEvent implements CalendarEvent {
                 + mInstanceDay.getTime()
                 + "}";
     }
+
+    @Override
+    public CalendarEvent copy() {
+        return new BocconiCalendarEvent(this);
+    }
+
+    // endregion
 }

@@ -1,15 +1,19 @@
-package com.github.tibolte.agendacalendarview.models;
+package com.thermatk.android.meatb.agenda.data;
 
 import com.github.tibolte.agendacalendarview.CalendarManager;
+import com.github.tibolte.agendacalendarview.models.IDayItem;
 import com.github.tibolte.agendacalendarview.utils.DateHelper;
 
 import java.util.Calendar;
 import java.util.Date;
 
+import io.realm.RealmObject;
+
 /**
- * Day model class.
+ * Created by thermatk on 11.03.16.
  */
-public class DayItem implements IDayItem {
+public class ACVDay implements IDayItem {
+
     private Date mDate;
     private int mValue;
     private int mDayOfTheWeek;
@@ -20,17 +24,17 @@ public class DayItem implements IDayItem {
 
     // region Constructor
 
-    public DayItem(Date date, int value, boolean today, String month) {
+    public ACVDay(Date date, int value, boolean today, String month) {
         this.mDate = date;
         this.mValue = value;
         this.mToday = today;
         this.mMonth = month;
     }
     // only for cleanDay
-    public DayItem() {
+    public ACVDay() {
 
     }
-    public DayItem(DayItem original) {
+    public ACVDay(ACVDay original) {
 
         this.mDate = original.getDate();
         this.mValue = original.getValue();
@@ -128,8 +132,6 @@ public class DayItem implements IDayItem {
 
     @Override
     public IDayItem copy() {
-        return new DayItem(this);
+        return new ACVDay(this);
     }
-
-    // endregion
 }

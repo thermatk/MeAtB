@@ -2,11 +2,8 @@ package com.thermatk.android.meatb.fragments;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.format.DateFormat;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +15,9 @@ import com.github.tibolte.agendacalendarview.models.CalendarEvent;
 import com.github.tibolte.agendacalendarview.models.IDayItem;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
-import com.thermatk.android.meatb.agenda.BocconiCalendarEvent;
+import com.thermatk.android.meatb.agenda.data.ACVDay;
+import com.thermatk.android.meatb.agenda.data.ACVWeek;
+import com.thermatk.android.meatb.agenda.data.BocconiCalendarEvent;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.agenda.BocconiEventRenderer;
@@ -32,7 +31,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -116,7 +114,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         // TODO: makeasync
         trueList(eventList);
         Log.d(LogConst.LOG, "Events: " + Integer.toString(eventList.size()));
-        mAgendaCalendarView.init(eventList, minDate, maxDate, Locale.ENGLISH, this); // TODO: LOCALE.getDefault()
+        mAgendaCalendarView.init(eventList, minDate, maxDate, Locale.ENGLISH, this, new ACVWeek(), new ACVDay()); // TODO: LOCALE.getDefault()
         mAgendaCalendarView.addEventRenderer(new BocconiEventRenderer());
 
     }
@@ -160,7 +158,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         minDate.add(Calendar.DAY_OF_MONTH, -2);
         maxDate.add(Calendar.MONTH, 1);
 
-        mAgendaCalendarView.init(new ArrayList<CalendarEvent>(), minDate, maxDate, Locale.ENGLISH, this);
+        mAgendaCalendarView.init(new ArrayList<CalendarEvent>(), minDate, maxDate, Locale.ENGLISH, this, new ACVWeek(), new ACVDay());
         JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {

@@ -1,12 +1,18 @@
-package com.github.tibolte.agendacalendarview.models;
+package com.thermatk.android.meatb.agenda.data;
+
+import com.github.tibolte.agendacalendarview.models.IDayItem;
+import com.github.tibolte.agendacalendarview.models.IWeekItem;
 
 import java.util.Date;
 import java.util.List;
 
+import io.realm.RealmObject;
+
 /**
- * Week model class.
+ * Created by thermatk on 11.03.16.
  */
-public class WeekItem implements IWeekItem {
+public class ACVWeek implements IWeekItem {
+
     private int mWeekInYear;
     private int mYear;
     private int mMonth;
@@ -16,14 +22,14 @@ public class WeekItem implements IWeekItem {
 
     // region Constructor
 
-    public WeekItem(int weekInYear, int year, Date date, String label, int month) {
+    public ACVWeek(int weekInYear, int year, Date date, String label, int month) {
         this.mWeekInYear = weekInYear;
         this.mYear = year;
         this.mDate = date;
         this.mLabel = label;
         this.mMonth = month;
     }
-    public WeekItem(WeekItem original) {
+    public ACVWeek(ACVWeek original) {
         this.mWeekInYear = original.getWeekInYear();
         this.mYear = original.getYear();
         this.mMonth = original.getMonth();
@@ -32,7 +38,7 @@ public class WeekItem implements IWeekItem {
         this.mDayItems = original.getDayItems();
     }
 
-    public WeekItem(){
+    public ACVWeek(){
 
     }
 
@@ -90,7 +96,7 @@ public class WeekItem implements IWeekItem {
 
     @Override
     public IWeekItem copy() {
-        return new WeekItem(this);
+        return new ACVWeek(this);
     }
 
     // endregion

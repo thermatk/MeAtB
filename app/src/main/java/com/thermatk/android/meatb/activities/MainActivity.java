@@ -5,11 +5,14 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.Fade;
+import android.transition.Slide;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -52,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
             setContentView(R.layout.activity_main);
             drawerStart(savedInstanceState);
             if (savedInstanceState == null) {
-                RegisterAttendanceFragment firstFragment = new RegisterAttendanceFragment();
+                AgendaFragment firstFragment = new AgendaFragment();
                 firstFragment.setArguments(getIntent().getExtras());
 
                 if (findViewById(R.id.content_main_frame) != null) {
@@ -68,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    setupWindowAnimations(fragmentCurrent);
                     getFragmentManager().beginTransaction().replace(R.id.content_main_frame, fragmentCurrent).commit();
                 }
             }, 200);
@@ -136,12 +140,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addDrawerItems(DrawerBuilder resultBuilder) {
-        PrimaryDrawerItem profileDrawerItem = new PrimaryDrawerItem().withName("Profile").withIcon(GoogleMaterial.Icon.gmd_perm_identity)
+        PrimaryDrawerItem profileDrawerItem = new PrimaryDrawerItem().withName("Agenda(S)").withIcon(GoogleMaterial.Icon.gmd_perm_identity)
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         changeFragment(new ProfileFragment());
-                        setTitle("Profile");
+                        setTitle("Agenda(S)");
                         return false;
                     }
                 });
@@ -154,12 +158,12 @@ public class MainActivity extends AppCompatActivity {
                         return false;
                     }
                 });
-        PrimaryDrawerItem agendaDrawerItem = new PrimaryDrawerItem().withName("Agenda").withIcon(GoogleMaterial.Icon.gmd_date_range)
+        PrimaryDrawerItem agendaDrawerItem = new PrimaryDrawerItem().withName("Agenda(AS)").withIcon(GoogleMaterial.Icon.gmd_date_range)
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         changeFragment(new AgendaFragment());
-                        setTitle("Agenda");
+                        setTitle("Agenda(AS)");
                         return false;
                     }
                 });
@@ -176,5 +180,20 @@ public class MainActivity extends AppCompatActivity {
         boolean isFirstLaunch = mSharedPreferences.getBoolean("isFirstLaunch", true);
         Log.i(LogConst.LOG, "isFirstLaunch");
         return isFirstLaunch;
+    }
+
+
+
+    private void setupWindowAnimations(Fragment fragment) {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Fade fade = null;
+            fade = new Fade();
+            fade.setDuration(1000);
+            fragment.setEnterTransition(fade);
+
+            Slide slide = new Slide();
+            slide.setDuration(1000);
+            fragment.setReturnTransition(slide);
+         }
     }
 }

@@ -228,6 +228,10 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
     private void constructFromRealm() {
 
 
+        mLoadEvents = new ArrayList<>();
+        mLoadDays = new ArrayList<>();
+        mLoadWeeks = new ArrayList<>();
+
         Realm realm = Realm.getDefaultInstance();
         // days
         RealmResults<RDay> rDays = realm.allObjects(RDay.class);

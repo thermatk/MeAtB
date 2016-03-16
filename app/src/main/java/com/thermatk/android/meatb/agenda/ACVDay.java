@@ -16,7 +16,6 @@ public class ACVDay implements IDayItem {
     private Date mDate;
     private int mValue;
     private int mDayOfTheWeek;
-    private boolean mToday;
     private boolean mFirstDayOfTheMonth;
     private boolean mSelected;
     private String mMonth;
@@ -26,7 +25,6 @@ public class ACVDay implements IDayItem {
     public ACVDay(Date date, int value, boolean today, String month) {
         this.mDate = date;
         this.mValue = value;
-        this.mToday = today;
         this.mMonth = month;
     }
     // only for cleanDay
@@ -37,7 +35,6 @@ public class ACVDay implements IDayItem {
 
         this.mDate = original.getDate();
         this.mValue = original.getValue();
-        this.mToday = original.isToday();
         this.mDayOfTheWeek = original.getDayOftheWeek();
         this.mFirstDayOfTheMonth = original.isFirstDayOfTheMonth();
         this.mSelected = original.isSelected();
@@ -46,7 +43,6 @@ public class ACVDay implements IDayItem {
     public ACVDay(RDay persistent) {
         this.mDate = persistent.getDate();
         this.mValue = persistent.getValue();
-        this.mToday = persistent.isToday();
         this.mDayOfTheWeek = persistent.getDayOfTheWeek();
         this.mFirstDayOfTheMonth = persistent.isFirstDayOfTheMonth();
         this.mSelected = persistent.isSelected();
@@ -70,14 +66,6 @@ public class ACVDay implements IDayItem {
 
     public void setValue(int value) {
         this.mValue = value;
-    }
-
-    public boolean isToday() {
-        return mToday;
-    }
-
-    public void setToday(boolean today) {
-        this.mToday = today;
     }
 
     public boolean isSelected() {
@@ -119,7 +107,6 @@ public class ACVDay implements IDayItem {
         this.mDate = date;
 
         this.mValue = calendar.get(Calendar.DAY_OF_MONTH);
-        this.mToday = DateHelper.sameDate(calendar, CalendarManager.getInstance().getToday());
         this.mMonth = CalendarManager.getInstance().getMonthHalfNameFormat().format(date);
         if (this.mValue == 1) {
             this.mFirstDayOfTheMonth = true;

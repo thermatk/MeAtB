@@ -216,7 +216,6 @@ public class DataWriter {
             RDay rDay = realm.createObject(RDay.class);
             rDay.setDate(day.getDate());
             rDay.setValue(day.getValue());
-            rDay.setToday(day.isToday());
             rDay.setDayOfTheWeek(day.getDayOftheWeek());
             rDay.setFirstDayOfTheMonth(day.isFirstDayOfTheMonth());
             rDay.setSelected(day.isSelected());

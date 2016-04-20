@@ -101,23 +101,10 @@ public class ACVWeek implements IWeekItem {
         this.mDayItems = dayItems;
     }
 
-    @Override
-    public IWeekItem copy() {
-        return new ACVWeek(this);
-    }
-
     // endregion
 
     @Override
-    public String toString() {
-        return "WeekItem{"
-                + "label='"
-                + mLabel
-                + '\''
-                + ", weekInYear="
-                + mWeekInYear
-                + ", year="
-                + mYear
-                + '}';
+    public IWeekItem copy() {
+        return new ACVWeek(this);
     }
 }

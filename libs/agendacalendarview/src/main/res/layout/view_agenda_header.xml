@@ -29,7 +29,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginTop="5dp"
-                android:textSize="20dp" />
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/view_agenda_day_of_week"
@@ -37,7 +37,7 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="5dp"
-                android:textSize="10dp" />
+                android:textSize="10sp" />
 
         </LinearLayout>
 

@@ -3,9 +3,6 @@ package com.thermatk.android.meatb.data.agenda;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 
-/**
- * Created by thermatk on 11.03.16.
- */
 public class RCal extends RealmObject {
     public RealmList<RDay> getrDays() {
         return rDays;

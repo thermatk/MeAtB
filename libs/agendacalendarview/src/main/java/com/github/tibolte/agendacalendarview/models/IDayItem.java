@@ -1,6 +1,5 @@
 package com.github.tibolte.agendacalendarview.models;
 
-import java.util.Calendar;
 import java.util.Date;
 
 public interface IDayItem {

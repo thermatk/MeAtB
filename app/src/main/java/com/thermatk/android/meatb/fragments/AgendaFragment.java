@@ -247,7 +247,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         for (RWeek rWeek : rWeeks) {
             ACVWeek week = new ACVWeek(rWeek);
             List<IDayItem> daysWeek = new ArrayList<>();
-            for(RDay rDay : rWeek.getDayItems()) {
+            for(RDay rDay : rWeek.getDayItemsR()) {
                 daysWeek.add(rDay);
             }
             week.setDayItems(daysWeek);

@@ -1,16 +1,10 @@
 package com.thermatk.android.meatb.fragments;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.text.format.DateFormat;
-import android.transition.Fade;
-import android.transition.Slide;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,13 +17,8 @@ import com.github.tibolte.agendacalendarview.models.CalendarEvent;
 import com.github.tibolte.agendacalendarview.models.IDayItem;
 import com.github.tibolte.agendacalendarview.models.IWeekItem;
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.prolificinteractive.materialcalendarview.CalendarDay;
-import com.prolificinteractive.materialcalendarview.DayViewDecorator;
-import com.prolificinteractive.materialcalendarview.DayViewFacade;
-import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
-import com.thermatk.android.meatb.adapter.BocconiRealmRecyclerViewAdapter;
 import com.thermatk.android.meatb.agenda.ACVDay;
 import com.thermatk.android.meatb.agenda.ACVWeek;
 import com.thermatk.android.meatb.agenda.BocconiCalendarEvent;
@@ -37,9 +26,6 @@ import com.thermatk.android.meatb.agenda.BocconiEventRenderer;
 import com.thermatk.android.meatb.data.AgendaEvent;
 import com.thermatk.android.meatb.data.DataWriter;
 import com.thermatk.android.meatb.data.EventDay;
-import com.thermatk.android.meatb.data.agenda.RDay;
-import com.thermatk.android.meatb.data.agenda.REvent;
-import com.thermatk.android.meatb.data.agenda.RWeek;
 import com.thermatk.android.meatb.yabAPIClient;
 
 import org.json.JSONArray;
@@ -47,11 +33,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import co.moonmonkeylabs.realmrecyclerview.RealmRecyclerView;
 import cz.msebera.android.httpclient.Header;
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -167,7 +151,7 @@ public class ProfileFragment extends Fragment implements CalendarPickerControlle
         minDate.add(Calendar.DAY_OF_MONTH, -2);
         maxDate.add(Calendar.MONTH, 1);
 
-        mAgendaCalendarView.init(new ArrayList<CalendarEvent>(), minDate, maxDate, Locale.ENGLISH, this, new ACVWeek(), new ACVDay());
+        mAgendaCalendarView.init(new ArrayList<CalendarEvent>(), minDate, maxDate, Locale.ENGLISH, this, new ACVWeek(), new ACVDay(), new BocconiCalendarEvent());
         JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
@@ -280,7 +264,7 @@ public class ProfileFragment extends Fragment implements CalendarPickerControlle
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
             //tvInfo.setText("End");
-            mAgendaCalendarView.init(mLoadEvents,minDate,maxDate,Locale.ENGLISH,pickerCallback, new ACVWeek(), new ACVDay());
+            mAgendaCalendarView.init(mLoadEvents,minDate,maxDate,Locale.ENGLISH,pickerCallback, new ACVWeek(), new ACVDay(), new BocconiCalendarEvent());
             mAgendaCalendarView.addEventRenderer(new BocconiEventRenderer());
 
         }

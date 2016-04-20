@@ -1,9 +1,5 @@
 package com.github.tibolte.agendacalendarview.models;
 
-import com.github.tibolte.agendacalendarview.CalendarManager;
-import com.github.tibolte.agendacalendarview.utils.DateHelper;
-
-import java.util.Calendar;
 import java.util.Date;
 
 /**

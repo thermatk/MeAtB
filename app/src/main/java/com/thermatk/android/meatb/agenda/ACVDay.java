@@ -5,9 +5,6 @@ import com.thermatk.android.meatb.data.agenda.RDay;
 
 import java.util.Date;
 
-/**
- * Created by thermatk on 11.03.16.
- */
 public class ACVDay implements IDayItem {
 
     private Date mDate;

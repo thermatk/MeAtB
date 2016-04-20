@@ -1,15 +1,10 @@
 package com.thermatk.android.meatb.data.agenda;
 
-import com.thermatk.android.meatb.agenda.ACVDay;
-import com.thermatk.android.meatb.agenda.ACVWeek;
-
 import java.util.Date;
 
 import io.realm.RealmObject;
 
-/**
- * Created by thermatk on 11.03.16.
- */
+
 public class REvent extends RealmObject {
     public long getId() {
         return id;

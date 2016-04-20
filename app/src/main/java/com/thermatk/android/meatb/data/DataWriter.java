@@ -1,7 +1,6 @@
 package com.thermatk.android.meatb.data;
 
 import android.text.format.DateFormat;
-import android.util.Log;
 
 import com.github.tibolte.agendacalendarview.models.CalendarEvent;
 import com.github.tibolte.agendacalendarview.models.IDayItem;
@@ -23,8 +22,6 @@ import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmList;
-import io.realm.RealmObject;
-import io.realm.RealmResults;
 
 public class DataWriter {
     public static void writeInitData(JSONObject rawJSON) {
@@ -240,7 +237,7 @@ public class DataWriter {
                 RDay wday  = realm.where(RDay.class).equalTo("date", day.getDate()).findFirst();
                 rWDays.add(wday);
             }
-            rWeek.setDayItems(rWDays);
+            rWeek.setDayItemsR(rWDays);
             rWeeks.add(rWeek);
         }
         rCal.setrWeeks(rWeeks);

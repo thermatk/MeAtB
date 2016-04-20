@@ -3,15 +3,14 @@ package com.thermatk.android.meatb.data.agenda;
 import com.github.tibolte.agendacalendarview.models.IDayItem;
 import com.github.tibolte.agendacalendarview.models.IWeekItem;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
 
-/**
- * Created by thermatk on 11.03.16.
- */
 public class RWeek extends RealmObject implements IWeekItem {
     public int getWeekInYear() {
         return weekInYear;
@@ -53,12 +52,27 @@ public class RWeek extends RealmObject implements IWeekItem {
         this.label = label;
     }
 
-    public RealmList<RDay> getDayItems() {
-        return dayItems;
+
+    public List<IDayItem> getDayItems() {
+        return new ArrayList<IDayItem>(dayItemsR);
     }
 
-    public void setDayItems(RealmList<RDay> dayItems) {
-        this.dayItems = dayItems;
+    public RealmList<RDay> getDayItemsR() {
+        return dayItemsR;
+    }
+    @Override
+    public void setDayItems(List<IDayItem> dayItems) {
+        this.dayItemsR = new RealmList<>((RDay[])dayItems.toArray());
+
+    }
+
+    @Override
+    public IWeekItem copy() {
+        return new RWeek(this);
+    }
+
+    public void setDayItemsR(RealmList<RDay> dayItemsR) {
+        this.dayItemsR = dayItemsR;
     }
 
     private int weekInYear;
@@ -67,5 +81,18 @@ public class RWeek extends RealmObject implements IWeekItem {
     private Date date;
     private String label;
 
-    private RealmList<RDay> dayItems;
+    private RealmList<RDay> dayItemsR;
+
+    public RWeek (RWeek original) {
+
+        this.weekInYear = original.getWeekInYear();
+        this.year = original.getYear();
+        this.month = original.getMonth();
+        this.date = original.getDate();
+        this.label = original.getLabel();
+        this.dayItemsR = original.getDayItemsR();
+    }
+    public RWeek () {
+
+    }
 }

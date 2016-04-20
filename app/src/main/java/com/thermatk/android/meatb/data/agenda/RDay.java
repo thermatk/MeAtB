@@ -6,9 +6,6 @@ import java.util.Date;
 
 import io.realm.RealmObject;
 
-/**
- * Created by thermatk on 11.03.16.
- */
 public class RDay extends RealmObject implements IDayItem {
 
 
@@ -34,6 +31,11 @@ public class RDay extends RealmObject implements IDayItem {
 
     public void setDayOfTheWeek(int dayOfTheWeek) {
         this.dayOfTheWeek = dayOfTheWeek;
+    }
+
+    @Override
+    public IDayItem copy() {
+        return new RDay(this);
     }
 
     public boolean isToday() {
@@ -75,4 +77,17 @@ public class RDay extends RealmObject implements IDayItem {
     private boolean firstDayOfTheMonth;
     private boolean selected;
     private String month;
+
+    public RDay () {
+
+    }
+    public RDay(RDay original) {
+        this.date = original.getDate();
+        this.value = original.getValue();
+        this.dayOfTheWeek = original.getDayOfTheWeek();
+        this.today = original.isToday();
+        this.firstDayOfTheMonth = original.isFirstDayOfTheMonth();
+        this.selected = original.isSelected();
+        this.month = original.getMonth();
+    }
 }

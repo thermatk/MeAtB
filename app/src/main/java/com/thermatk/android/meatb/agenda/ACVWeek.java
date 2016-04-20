@@ -7,9 +7,6 @@ import com.thermatk.android.meatb.data.agenda.RWeek;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by thermatk on 11.03.16.
- */
 public class ACVWeek implements IWeekItem {
 
     private int mWeekInYear;

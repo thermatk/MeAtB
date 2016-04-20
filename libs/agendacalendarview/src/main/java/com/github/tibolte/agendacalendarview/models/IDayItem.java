@@ -27,15 +27,11 @@ public interface IDayItem {
 
     void setMonth(String month);
 
-    int getDayOftheWeek();
+    int getDayOfTheWeek();
 
-    void setDayOftheWeek(int mDayOftheWeek);
+    void setDayOfTheWeek(int mDayOftheWeek);
 
     // endregion
-
-    void buildDayItemFromCal(Calendar calendar);
-
-    String toString();
 
     IDayItem copy();
 

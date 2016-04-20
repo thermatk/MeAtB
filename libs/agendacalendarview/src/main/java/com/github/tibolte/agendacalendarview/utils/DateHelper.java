@@ -2,6 +2,7 @@ package com.github.tibolte.agendacalendarview.utils;
 
 import com.github.tibolte.agendacalendarview.CalendarManager;
 import com.github.tibolte.agendacalendarview.R;
+import com.github.tibolte.agendacalendarview.models.IDayItem;
 import com.github.tibolte.agendacalendarview.models.IWeekItem;
 
 import android.content.Context;
@@ -129,6 +130,17 @@ public class DateHelper {
             yearLessDate = yearLessDate.substring(0, yearLessDate.length() - 1);
         }
         return yearLessDate;
+    }
+
+    public static void buildDayItemFromCal(Calendar calendar, IDayItem dayItem) {
+        Date date = calendar.getTime();
+        dayItem.setDate(date);
+
+        dayItem.setValue(calendar.get(Calendar.DAY_OF_MONTH));
+        dayItem.setMonth(CalendarManager.getInstance().getMonthHalfNameFormat().format(date));
+        if (dayItem.getValue() == 1) {
+            dayItem.setFirstDayOfTheMonth(true);
+        }
     }
 
     // endregion

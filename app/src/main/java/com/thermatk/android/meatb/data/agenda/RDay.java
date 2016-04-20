@@ -1,5 +1,7 @@
 package com.thermatk.android.meatb.data.agenda;
 
+import com.github.tibolte.agendacalendarview.models.IDayItem;
+
 import java.util.Date;
 
 import io.realm.RealmObject;
@@ -7,7 +9,7 @@ import io.realm.RealmObject;
 /**
  * Created by thermatk on 11.03.16.
  */
-public class RDay extends RealmObject {
+public class RDay extends RealmObject implements IDayItem {
 
 
     public Date getDate() {

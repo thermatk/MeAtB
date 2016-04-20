@@ -1,6 +1,7 @@
 package com.thermatk.android.meatb.data.agenda;
 
 import com.github.tibolte.agendacalendarview.models.IDayItem;
+import com.github.tibolte.agendacalendarview.models.IWeekItem;
 
 import java.util.Date;
 import java.util.List;
@@ -11,7 +12,7 @@ import io.realm.RealmObject;
 /**
  * Created by thermatk on 11.03.16.
  */
-public class RWeek extends RealmObject {
+public class RWeek extends RealmObject implements IWeekItem {
     public int getWeekInYear() {
         return weekInYear;
     }

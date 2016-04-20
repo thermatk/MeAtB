@@ -156,7 +156,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         minDate.add(Calendar.DAY_OF_MONTH, -2);
         maxDate.add(Calendar.MONTH, 1);
 
-        mAgendaCalendarView.init(new ArrayList<CalendarEvent>(), minDate, maxDate, Locale.ENGLISH, this, new ACVWeek(), new ACVDay());
+        mAgendaCalendarView.init(new ArrayList<CalendarEvent>(), minDate, maxDate, Locale.ENGLISH, this, new ACVWeek(), new ACVDay(),new BocconiCalendarEvent());
         JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
@@ -235,11 +235,9 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         Realm realm = Realm.getDefaultInstance();
         // days
         RealmResults<RDay> rDays = realm.allObjects(RDay.class);
-        HashMap<Long,Integer> mapDays = new HashMap<>();
         int pos = 0;
         for(RDay rDay : rDays) {
-            mLoadDays.add(new ACVDay(rDay));
-            mapDays.put(rDay.getDate().getTime(),pos);
+            mLoadDays.add(rDay);
             pos++;
         }
         // weeks
@@ -250,8 +248,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
             ACVWeek week = new ACVWeek(rWeek);
             List<IDayItem> daysWeek = new ArrayList<>();
             for(RDay rDay : rWeek.getDayItems()) {
-                int posDay = mapDays.get(rDay.getDate().getTime()); // can't happen that it's not there, can it?
-                daysWeek.add(mLoadDays.get(posDay));
+                daysWeek.add(rDay);
             }
             week.setDayItems(daysWeek);
             mLoadWeeks.add(week);
@@ -263,8 +260,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         RealmResults<REvent> rEvents = realm.allObjects(REvent.class);
         for (REvent rEvent : rEvents) {
             BocconiCalendarEvent event = new BocconiCalendarEvent(rEvent);
-            int posDay = mapDays.get(rEvent.getDayReference().getDate().getTime());
-            event.setDayReference(mLoadDays.get(posDay));
+            event.setDayReference(rEvent.getDayReference());
             int posWeek = mapWeeks.get(rEvent.getWeekReference().getDate().getTime());
             event.setWeekReference(mLoadWeeks.get(posWeek));
             mLoadEvents.add(event);

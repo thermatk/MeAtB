@@ -6,9 +6,6 @@ import android.util.Log;
 import com.github.tibolte.agendacalendarview.models.CalendarEvent;
 import com.github.tibolte.agendacalendarview.models.IDayItem;
 import com.github.tibolte.agendacalendarview.models.IWeekItem;
-import com.thermatk.android.meatb.LogConst;
-import com.thermatk.android.meatb.agenda.ACVDay;
-import com.thermatk.android.meatb.agenda.ACVWeek;
 import com.thermatk.android.meatb.agenda.BocconiCalendarEvent;
 import com.thermatk.android.meatb.data.agenda.RCal;
 import com.thermatk.android.meatb.data.agenda.RDay;
@@ -216,7 +213,7 @@ public class DataWriter {
             RDay rDay = realm.createObject(RDay.class);
             rDay.setDate(day.getDate());
             rDay.setValue(day.getValue());
-            rDay.setDayOfTheWeek(day.getDayOftheWeek());
+            rDay.setDayOfTheWeek(day.getDayOfTheWeek());
             rDay.setFirstDayOfTheMonth(day.isFirstDayOfTheMonth());
             rDay.setSelected(day.isSelected());
             rDay.setMonth(day.getMonth());

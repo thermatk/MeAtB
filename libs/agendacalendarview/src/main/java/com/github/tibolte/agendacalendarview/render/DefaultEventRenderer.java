@@ -6,17 +6,17 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.tibolte.agendacalendarview.R;
-import com.github.tibolte.agendacalendarview.models.BaseCalendarEvent;
+import com.github.tibolte.agendacalendarview.models.CalendarEvent;
 
 /**
  * Class helping to inflate our default layout in the AgendaAdapter
  */
-public class DefaultEventRenderer extends EventRenderer<BaseCalendarEvent> {
+public class DefaultEventRenderer extends EventRenderer<CalendarEvent> {
 
     // region class - EventRenderer
 
     @Override
-    public void render(@NonNull View view, @NonNull BaseCalendarEvent event) {
+    public void render(@NonNull View view, @NonNull CalendarEvent event) {
         TextView txtTitle = (TextView) view.findViewById(R.id.view_agenda_event_title);
         TextView txtLocation = (TextView) view.findViewById(R.id.view_agenda_event_location);
         LinearLayout descriptionContainer = (LinearLayout) view.findViewById(R.id.view_agenda_event_description_container);

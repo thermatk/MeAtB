@@ -241,7 +241,7 @@ public class CalendarManager {
         Log.d(LOG_TAG, String.format("Buiding row week starting at %s", cal.getTime()));
         for (int c = 0; c < 7; c++) {
             IDayItem dayItem = mCleanDay.copy();
-            dayItem.buildDayItemFromCal(cal);
+            DateHelper.buildDayItemFromCal(cal, dayItem);
             dayItems.add(dayItem);
             cal.add(Calendar.DATE, 1);
         }

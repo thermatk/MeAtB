@@ -282,17 +282,6 @@ public class BocconiCalendarEvent implements CalendarEvent {
     }
 
     // endregion
-
-    @Override
-    public String toString() {
-        return "BaseCalendarEvent{"
-                + "title='"
-                + mTitle
-                + ", instanceDay= "
-                + mInstanceDay.getTime()
-                + "}";
-    }
-
     @Override
     public CalendarEvent copy() {
         return new BocconiCalendarEvent(this);

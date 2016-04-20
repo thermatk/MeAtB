@@ -41,5 +41,9 @@ public interface CalendarEvent {
 
     void setWeekReference(IWeekItem mWeekReference);
 
+
+    int getColor();
+
+    void setColor(int mColor);
     CalendarEvent copy();
 }

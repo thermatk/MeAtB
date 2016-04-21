@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             setContentView(R.layout.activity_main);
             drawerStart(savedInstanceState);
             if (savedInstanceState == null) {
-                AgendaFragment firstFragment = new AgendaFragment();
+                ProfileFragment firstFragment = new ProfileFragment();
                 firstFragment.setArguments(getIntent().getExtras());
 
                 if (findViewById(R.id.content_main_frame) != null) {
@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addDrawerItems(DrawerBuilder resultBuilder) {
-        PrimaryDrawerItem profileDrawerItem = new PrimaryDrawerItem().withName("Agenda(S)").withIcon(GoogleMaterial.Icon.gmd_perm_identity)
+        PrimaryDrawerItem profileDrawerItem = new PrimaryDrawerItem().withName("Profile").withIcon(GoogleMaterial.Icon.gmd_perm_identity)
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                         return false;
                     }
                 });
-        PrimaryDrawerItem agendaDrawerItem = new PrimaryDrawerItem().withName("Agenda(AS)").withIcon(GoogleMaterial.Icon.gmd_date_range)
+        PrimaryDrawerItem agendaDrawerItem = new PrimaryDrawerItem().withName("Agenda").withIcon(GoogleMaterial.Icon.gmd_date_range)
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {

@@ -1,11 +1,16 @@
 package com.thermatk.android.meatb.data.agenda;
 
+import com.github.tibolte.agendacalendarview.models.CalendarEvent;
+import com.github.tibolte.agendacalendarview.models.IDayItem;
+import com.github.tibolte.agendacalendarview.models.IWeekItem;
+
+import java.util.Calendar;
 import java.util.Date;
 
 import io.realm.RealmObject;
 
 
-public class REvent extends RealmObject {
+public class REvent extends RealmObject implements CalendarEvent {
     public long getId() {
         return id;
     }
@@ -46,28 +51,28 @@ public class REvent extends RealmObject {
         this.location = location;
     }
 
-    public Date getInstanceDay() {
-        return instanceDay;
+    public Date getInstanceDayD() {
+        return instanceDayD;
     }
 
-    public void setInstanceDay(Date instanceDay) {
-        this.instanceDay = instanceDay;
+    public void setInstanceDayD(Date instanceDay) {
+        this.instanceDayD = instanceDay;
     }
 
-    public Date getStartTime() {
-        return startTime;
+    public Date getStartTimeD() {
+        return startTimeD;
     }
 
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
+    public void setStartTimeD(Date startTime) {
+        this.startTimeD = startTime;
     }
 
-    public Date getEndTime() {
-        return endTime;
+    public Date getEndTimeD() {
+        return endTimeD;
     }
 
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
+    public void setEndTimeD(Date endTime) {
+        this.endTimeD = endTime;
     }
 
     public boolean isAllDay() {
@@ -78,12 +83,12 @@ public class REvent extends RealmObject {
         this.allDay = allDay;
     }
 
-    public boolean isPlaceHolder() {
-        return placeHolder;
+    public boolean isPlaceholder() {
+        return placeholder;
     }
 
-    public void setPlaceHolder(boolean placeHolder) {
-        this.placeHolder = placeHolder;
+    public void setPlaceholder(boolean placeHolder) {
+        this.placeholder = placeHolder;
     }
 
     public String getDuration() {
@@ -94,20 +99,20 @@ public class REvent extends RealmObject {
         this.duration = duration;
     }
 
-    public RDay getDayReference() {
-        return dayReference;
+    public RDay getDayReferenceR() {
+        return dayReferenceR;
     }
 
-    public void setDayReference(RDay dayReference) {
-        this.dayReference = dayReference;
+    public void setDayReferenceR(RDay dayReference) {
+        this.dayReferenceR = dayReference;
     }
 
-    public RWeek getWeekReference() {
-        return weekReference;
+    public RWeek getWeekReferenceR() {
+        return weekReferenceR;
     }
 
-    public void setWeekReference(RWeek weekReference) {
-        this.weekReference = weekReference;
+    public void setWeekReferenceR(RWeek weekReference) {
+        this.weekReferenceR = weekReference;
     }
 
     public String getDate() {
@@ -127,15 +132,97 @@ public class REvent extends RealmObject {
     private String description;
 
     private String location;
-    private Date instanceDay;
-    private Date startTime;
-    private Date endTime;
+    private Date instanceDayD;
+    private Date startTimeD;
+    private Date endTimeD;
     private boolean allDay;
-    private boolean placeHolder;
+    private boolean placeholder;
     private String duration;
-    private RDay dayReference;
-    private RWeek weekReference;
+    private RDay dayReferenceR;
+    private RWeek weekReferenceR;
 
     private String date;
+
+
+    public IDayItem getDayReference() {
+        return dayReferenceR;
+    }
+
+    public void setDayReference(IDayItem mDayReference) {
+        this.dayReferenceR = (RDay) mDayReference;
+    }
+
+    public IWeekItem getWeekReference() {
+        return weekReferenceR;
+    }
+
+    public void setWeekReference(IWeekItem mWeekReference) {
+        this.weekReferenceR = (RWeek) mWeekReference;
+    }
+
+    // endregion
+    @Override
+    public CalendarEvent copy() {
+        return new REvent(this);
+    }
+
+    public REvent() {
+
+    }
+    public REvent(REvent original) {
+
+        this.id = original.getId();
+        this.color = original.getColor();
+        this.allDay = original.isAllDay();
+        this.duration = original.getDuration();
+        this.title = original.getTitle();
+        this.description = original.getDescription();
+        this.location = original.getLocation();
+        this.startTimeD = original.getStartTimeD();
+        this.endTimeD = original.getEndTimeD();
+        this.date = original.getDate();
+        this.instanceDayD = original.getInstanceDayD();
+        this.placeholder = original.isPlaceholder();
+        this.dayReferenceR = original.getDayReferenceR();
+        this.weekReferenceR = original.getWeekReferenceR();
+    }
+
+
+
+    public Calendar getStartTime() {
+        Calendar cStartTime = Calendar.getInstance();
+
+        cStartTime.setTime(startTimeD);
+        return cStartTime;
+    }
+
+    public Calendar getEndTime() {
+        Calendar cEndTime = Calendar.getInstance();
+
+        cEndTime.setTime(endTimeD);
+        return cEndTime;
+    }
+
+    public void setStartTime(Calendar mStartTime) {
+        this.startTimeD = mStartTime.getTime();
+    }
+
+
+    public void setEndTime(Calendar mEndTime) {
+        this.endTimeD = mEndTime.getTime();
+
+    }
+
+    public Calendar getInstanceDay() {
+        Calendar cInstanceDay = Calendar.getInstance();
+
+        cInstanceDay.setTime(instanceDayD);
+        return cInstanceDay;
+    }
+
+    public void setInstanceDay(Calendar mInstanceDay) {
+        this.instanceDayD = mInstanceDay.getTime();
+    }
+
 
 }

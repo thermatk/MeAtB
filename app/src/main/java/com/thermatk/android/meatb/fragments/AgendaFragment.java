@@ -37,12 +37,12 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 
@@ -52,8 +52,6 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
     List<CalendarEvent> mLoadEvents = new ArrayList<>();
     List<IDayItem> mLoadDays = new ArrayList<>();
     List<IWeekItem> mLoadWeeks = new ArrayList<>();
-
-    LoadDataTask lt;
 
     Realm realm;
     AgendaCalendarView mAgendaCalendarView;
@@ -99,7 +97,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
             /// TODO: callback, with RealmChangeListener?
         } else {
             /////
-            fillView();
+            doStart();
         }
 
         ////
@@ -107,15 +105,6 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         return rootView;
     }
 
-
-
-    private void fillView(){
-        ///////////
-
-        lt = new LoadDataTask(this);
-        lt.execute();
-
-    }
     private void trueList(List<CalendarEvent> eventList) {
         /////
 
@@ -192,7 +181,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
                 List<IWeekItem> readyWeeks = calendarManager.getWeeks();
                 DataWriter.writeAgendaCalendarViewPersistence(readyEvents, readyDays, readyWeeks);
                 mAgendaCalendarView.setVisibility(View.VISIBLE);
-                fillView();
+                doStart();
             }
 
             @Override
@@ -225,81 +214,37 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
 
     }
 
+    public void doStart() {
 
+        final CalendarPickerController pickerController = this;
 
-    private void constructFromRealm() {
-
-        // TODO: kill the threadsafe classes and use realm freeze which will eventually be released
-        mLoadEvents = new ArrayList<>();
-        mLoadDays = new ArrayList<>();
-        mLoadWeeks = new ArrayList<>();
-
-        Realm realm = Realm.getDefaultInstance();
-        // days
-        RealmResults<RDay> rDays = realm.allObjects(RDay.class);
-        HashMap<Long,Integer> mapDays = new HashMap<>();
-        int pos = 0;
-        for(RDay rDay : rDays) {
-            mLoadDays.add(new ACVDay(rDay));
-            mapDays.put(rDay.getDate().getTime(),pos);
-            pos++;
-        }
-        // weeks
-        RealmResults<RWeek> rWeeks = realm.allObjects(RWeek.class);
-        HashMap<Long,Integer> mapWeeks = new HashMap<>();
-        pos = 0;
-        for (RWeek rWeek : rWeeks) {
-            ACVWeek week = new ACVWeek(rWeek);
-            List<IDayItem> daysWeek = new ArrayList<>();
-            for(RDay rDay : rWeek.getDayItemsR()) {
-                int posDay = mapDays.get(rDay.getDate().getTime()); // can't happen that it's not there, can it?
-                daysWeek.add(mLoadDays.get(posDay));
+        final RealmResults<RDay> rDays = realm.where(RDay.class).findAllAsync();
+        rDays.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                mLoadDays.addAll(rDays);
+                rDays.removeChangeListeners();
+                final RealmResults<RWeek> rWeeks = realm.where(RWeek.class).findAllAsync();
+                rWeeks.addChangeListener(new RealmChangeListener() {
+                    @Override
+                    public void onChange() {
+                        mLoadWeeks.addAll(rWeeks);
+                        rWeeks.removeChangeListeners();
+                        final RealmResults<REvent> rEvents = realm.where(REvent.class).findAllAsync();
+                        rEvents.addChangeListener(new RealmChangeListener() {
+                            @Override
+                            public void onChange() {
+                                mLoadEvents.addAll(rEvents);
+                                rEvents.removeChangeListeners();
+                                //////
+                                mAgendaCalendarView.init(Locale.ENGLISH, mLoadWeeks, mLoadDays, mLoadEvents, pickerController); // TODO: LOCALE.getDefault()
+                                mAgendaCalendarView.addEventRenderer(new BocconiEventRenderer());
+                            }
+                        });
+                    }
+                });
             }
-            week.setDayItems(daysWeek);
-            mLoadWeeks.add(week);
-            mapWeeks.put(rWeek.getDate().getTime(),pos);
-            pos++;
-        }
-        // events
-
-        RealmResults<REvent> rEvents = realm.allObjects(REvent.class);
-        for (REvent rEvent : rEvents) {
-            BocconiCalendarEvent event = new BocconiCalendarEvent(rEvent);
-            int posDay = mapDays.get(rEvent.getDayReference().getDate().getTime());
-            event.setDayReference(mLoadDays.get(posDay));
-            int posWeek = mapWeeks.get(rEvent.getWeekReference().getDate().getTime());
-            event.setWeekReference(mLoadWeeks.get(posWeek));
-            mLoadEvents.add(event);
-        }
-        realm.close();
+        });
     }
 
-    class LoadDataTask extends AsyncTask<Void, Void, Void> {
-        private CalendarPickerController pickerCallback;
-
-        public LoadDataTask(CalendarPickerController picker) {
-            pickerCallback = picker;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            //tvInfo.setText("Begin"); possibly show progress
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            constructFromRealm();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
-            //tvInfo.setText("End");
-            mAgendaCalendarView.init(Locale.ENGLISH, mLoadWeeks, mLoadDays, mLoadEvents, pickerCallback); // TODO: LOCALE.getDefault()
-            mAgendaCalendarView.addEventRenderer(new BocconiEventRenderer());
-
-        }
-    }
 }

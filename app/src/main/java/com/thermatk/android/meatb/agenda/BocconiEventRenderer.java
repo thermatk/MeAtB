@@ -7,17 +7,18 @@ import android.widget.TextView;
 import com.github.tibolte.agendacalendarview.render.EventRenderer;
 import com.thermatk.android.meatb.R;
 
-public class BocconiEventRenderer extends EventRenderer<BocconiCalendarEvent> {
+import io.realm.REventRealmProxy;
+
+public class BocconiEventRenderer extends EventRenderer<REventRealmProxy> {
 
     // region Class - EventRenderer
 
     @Override
-    public void render(View view, BocconiCalendarEvent event) {
+    public void render(View view, REventRealmProxy event) {
         TextView txtDate = (TextView) view.findViewById(R.id.view_agenda_event_time);
         TextView txtTitle = (TextView) view.findViewById(com.github.tibolte.agendacalendarview.R.id.view_agenda_event_title);
         TextView txtLocation = (TextView) view.findViewById(com.github.tibolte.agendacalendarview.R.id.view_agenda_event_location);
         LinearLayout descriptionContainer = (LinearLayout) view.findViewById(com.github.tibolte.agendacalendarview.R.id.view_agenda_event_description_container);
-        LinearLayout locationContainer = (LinearLayout) view.findViewById(com.github.tibolte.agendacalendarview.R.id.view_agenda_event_location_container);
 
         descriptionContainer.setVisibility(View.VISIBLE);
 
@@ -28,10 +29,10 @@ public class BocconiEventRenderer extends EventRenderer<BocconiCalendarEvent> {
         txtTitle.setText(event.getTitle());
         txtLocation.setText(event.getLocation());
         if (event.getLocation().length() > 0) {
-            locationContainer.setVisibility(View.VISIBLE);
+            txtLocation.setVisibility(View.VISIBLE);
             txtLocation.setText(event.getLocation());
         } else {
-            locationContainer.setVisibility(View.GONE);
+            txtLocation.setVisibility(View.GONE);
         }
 
         if (event.getTitle().equals(view.getResources().getString(com.github.tibolte.agendacalendarview.R.string.agenda_event_no_events))) {
@@ -49,8 +50,8 @@ public class BocconiEventRenderer extends EventRenderer<BocconiCalendarEvent> {
     }
 
     @Override
-    public Class<BocconiCalendarEvent> getRenderType() {
-        return BocconiCalendarEvent.class;
+    public Class<REventRealmProxy> getRenderType() {
+        return REventRealmProxy.class;
     }
 
     // endregion

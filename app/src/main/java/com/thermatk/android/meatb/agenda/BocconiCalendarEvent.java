@@ -133,21 +133,21 @@ public class BocconiCalendarEvent implements CalendarEvent {
         this.mDescription = calendarEvent.getDescription();
         this.mLocation = calendarEvent.getLocation();
         this.mDate = calendarEvent.getDate();
-        Date start = calendarEvent.getStartTime();
+        Date start = calendarEvent.getStartTimeD();
         if(start!=null) {
             this.mStartTime = Calendar.getInstance();
             this.mStartTime.setTime(start);
         }
-        Date end = calendarEvent.getEndTime();
+        Date end = calendarEvent.getEndTimeD();
         if(end!=null) {
             this.mEndTime = Calendar.getInstance();
             this.mEndTime.setTime(end);
         }
 
-        Date day = calendarEvent.getInstanceDay();
+        Date day = calendarEvent.getInstanceDayD();
         this.mInstanceDay = Calendar.getInstance();
         this.mInstanceDay.setTime(day);
-        this.mPlaceHolder = calendarEvent.isPlaceHolder();
+        this.mPlaceHolder = calendarEvent.isPlaceholder();
         //////// set references outside
     }
 

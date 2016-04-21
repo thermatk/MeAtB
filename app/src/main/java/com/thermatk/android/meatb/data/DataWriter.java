@@ -261,17 +261,17 @@ public class DataWriter {
             rEvent.setLocation(castEvent.getLocation());
             Calendar startTime = castEvent.getStartTime();
             if(startTime!= null) {
-                rEvent.setStartTime(startTime.getTime());
+                rEvent.setStartTimeD(startTime.getTime());
             }
 
             Calendar endTime = castEvent.getEndTime();
             if(endTime!= null) {
-                rEvent.setEndTime(endTime.getTime());
+                rEvent.setEndTimeD(endTime.getTime());
             }
             rEvent.setDate(castEvent.getDate());
 
-            rEvent.setInstanceDay(castEvent.getInstanceDay().getTime());
-            rEvent.setPlaceHolder(castEvent.isPlaceHolder());
+            rEvent.setInstanceDayD(castEvent.getInstanceDay().getTime());
+            rEvent.setPlaceholder(castEvent.isPlaceHolder());
 
             RDay eday  = realm.where(RDay.class).equalTo("date", castEvent.getDayReference().getDate()).findFirst();
             rEvent.setDayReference(eday);

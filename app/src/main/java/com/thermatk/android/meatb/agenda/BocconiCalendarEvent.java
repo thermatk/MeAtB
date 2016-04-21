@@ -3,7 +3,6 @@ package com.thermatk.android.meatb.agenda;
 import com.github.tibolte.agendacalendarview.models.CalendarEvent;
 import com.github.tibolte.agendacalendarview.models.IDayItem;
 import com.github.tibolte.agendacalendarview.models.IWeekItem;
-import com.thermatk.android.meatb.data.agenda.RDay;
 import com.thermatk.android.meatb.data.agenda.REvent;
 
 import java.util.Calendar;
@@ -62,7 +61,7 @@ public class BocconiCalendarEvent implements CalendarEvent {
      * References to a DayItem instance for that event, used to link interaction between the
      * calendar view and the agenda view.
      */
-    private RDay mDayReference;
+    private ACVDay mDayReference;
     /**
      * References to a WeekItem instance for that event, used to link interaction between the
      * calendar view and the agenda view.
@@ -119,7 +118,7 @@ public class BocconiCalendarEvent implements CalendarEvent {
         this.mDate = calendarEvent.getDate();
         this.mInstanceDay = calendarEvent.getInstanceDay();
         this.mPlaceHolder = calendarEvent.isPlaceHolder();
-        this.mDayReference = (RDay) calendarEvent.getDayReference();
+        this.mDayReference = (ACVDay) calendarEvent.getDayReference();
         this.mWeekReference = (ACVWeek) calendarEvent.getWeekReference();
     }
 
@@ -271,7 +270,7 @@ public class BocconiCalendarEvent implements CalendarEvent {
     }
 
     public void setDayReference(IDayItem mDayReference) {
-        this.mDayReference = (RDay) mDayReference;
+        this.mDayReference = (ACVDay) mDayReference;
     }
 
     public IWeekItem getWeekReference() {

@@ -225,9 +225,11 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
 
     }
 
+
+
     private void constructFromRealm() {
 
-
+        // TODO: kill the threadsafe classes and use realm freeze which will eventually be released
         mLoadEvents = new ArrayList<>();
         mLoadDays = new ArrayList<>();
         mLoadWeeks = new ArrayList<>();
@@ -235,9 +237,11 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         Realm realm = Realm.getDefaultInstance();
         // days
         RealmResults<RDay> rDays = realm.allObjects(RDay.class);
+        HashMap<Long,Integer> mapDays = new HashMap<>();
         int pos = 0;
         for(RDay rDay : rDays) {
-            mLoadDays.add(rDay);
+            mLoadDays.add(new ACVDay(rDay));
+            mapDays.put(rDay.getDate().getTime(),pos);
             pos++;
         }
         // weeks
@@ -248,7 +252,8 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
             ACVWeek week = new ACVWeek(rWeek);
             List<IDayItem> daysWeek = new ArrayList<>();
             for(RDay rDay : rWeek.getDayItemsR()) {
-                daysWeek.add(rDay);
+                int posDay = mapDays.get(rDay.getDate().getTime()); // can't happen that it's not there, can it?
+                daysWeek.add(mLoadDays.get(posDay));
             }
             week.setDayItems(daysWeek);
             mLoadWeeks.add(week);
@@ -260,14 +265,14 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         RealmResults<REvent> rEvents = realm.allObjects(REvent.class);
         for (REvent rEvent : rEvents) {
             BocconiCalendarEvent event = new BocconiCalendarEvent(rEvent);
-            event.setDayReference(rEvent.getDayReference());
+            int posDay = mapDays.get(rEvent.getDayReference().getDate().getTime());
+            event.setDayReference(mLoadDays.get(posDay));
             int posWeek = mapWeeks.get(rEvent.getWeekReference().getDate().getTime());
             event.setWeekReference(mLoadWeeks.get(posWeek));
             mLoadEvents.add(event);
         }
         realm.close();
     }
-
 
     class LoadDataTask extends AsyncTask<Void, Void, Void> {
         private CalendarPickerController pickerCallback;

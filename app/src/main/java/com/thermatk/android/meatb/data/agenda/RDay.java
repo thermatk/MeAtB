@@ -5,6 +5,7 @@ import com.github.tibolte.agendacalendarview.models.IDayItem;
 import java.util.Date;
 
 import io.realm.RealmObject;
+import io.realm.annotations.Ignore;
 
 public class RDay extends RealmObject implements IDayItem {
 
@@ -55,11 +56,11 @@ public class RDay extends RealmObject implements IDayItem {
     }
 
     public boolean isSelected() {
-        return selected;
+        return selectedv;
     }
 
     public void setSelected(boolean selected) {
-        this.selected = selected;
+        this.selectedv = selected;
     }
 
     public String getMonth() {
@@ -75,8 +76,10 @@ public class RDay extends RealmObject implements IDayItem {
     private int dayOfTheWeek;
     private boolean today;
     private boolean firstDayOfTheMonth;
-    private boolean selected;
     private String month;
+
+    @Ignore
+    private boolean selectedv;
 
     public RDay () {
 
@@ -87,7 +90,7 @@ public class RDay extends RealmObject implements IDayItem {
         this.dayOfTheWeek = original.getDayOfTheWeek();
         this.today = original.isToday();
         this.firstDayOfTheMonth = original.isFirstDayOfTheMonth();
-        this.selected = original.isSelected();
+        this.selectedv = original.isSelected();
         this.month = original.getMonth();
     }
 }

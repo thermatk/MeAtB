@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         changeFragment(new ProfileFragment());
-                        setTitle("Agenda(S)");
+                        setTitle("Profile");
                         return false;
                     }
                 });
@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         changeFragment(new AgendaFragment());
-                        setTitle("Agenda(AS)");
+                        setTitle("Agenda");
                         return false;
                     }
                 });

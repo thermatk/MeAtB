@@ -2,7 +2,7 @@ package com.thermatk.android.meatb.fragments;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.os.AsyncTask;
+import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -75,29 +75,31 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_agenda, container, false);
         mAgendaCalendarView = (AgendaCalendarView) rootView.findViewById(R.id.agenda_calendar_view);
-        /*Button mSignInButton = (Button) rootView.findViewById(R.id.button);
-        mSignInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sendRequest();
-            }
-        });*/
-        // TODO: RealmChangeListener
-        // TODO: call populate database
+
 
 
         realm = Realm.getDefaultInstance();
-        //// check if first time in agenda
 
-        RealmResults<EventDay> days = realm.allObjects(EventDay.class);
-        if (days.size() == 0) {
-            mAgendaCalendarView.setVisibility(View.INVISIBLE);
-            // show progress
-            sendRequest();
-            /// TODO: callback, with RealmChangeListener?
+
+        setRetainInstance(true);
+
+        if(mLoadEvents.size()>0) {
+            populateView();
         } else {
-            /////
-            doStart();
+            // TODO: RealmChangeListener
+            // TODO: call populate database
+            //// check if first time in agenda
+
+            RealmResults<EventDay> days = realm.allObjects(EventDay.class);
+            if (days.size() == 0) {
+                mAgendaCalendarView.setVisibility(View.INVISIBLE);
+                // show progress
+                sendRequest();
+                /// TODO: callback, with RealmChangeListener?
+            } else {
+                /////
+                getData();
+            }
         }
 
         ////
@@ -137,6 +139,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
             return context.getResources().getColor(id);
         }
     }
+
     public void sendRequest() {
 
         Calendar minDate = Calendar.getInstance();
@@ -181,7 +184,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
                 List<IWeekItem> readyWeeks = calendarManager.getWeeks();
                 DataWriter.writeAgendaCalendarViewPersistence(readyEvents, readyDays, readyWeeks);
                 mAgendaCalendarView.setVisibility(View.VISIBLE);
-                doStart();
+                getData();
             }
 
             @Override
@@ -214,10 +217,18 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
 
     }
 
-    public void doStart() {
+    public void populateView() {
+        mAgendaCalendarView.init(Locale.ENGLISH, mLoadWeeks, mLoadDays, mLoadEvents, this); // TODO: LOCALE.getDefault()
+        mAgendaCalendarView.addEventRenderer(new BocconiEventRenderer());
 
-        final CalendarPickerController pickerController = this;
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+        // TODO: kill orientation workaround and switch to AsyncTask when realm releases freeze 1
+    }
 
+    public void getData() {
+
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+        // TODO: kill orientation workaround and switch to AsyncTask when realm releases freeze 2
         final RealmResults<RDay> rDays = realm.where(RDay.class).findAllAsync();
         rDays.addChangeListener(new RealmChangeListener() {
             @Override
@@ -237,8 +248,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
                                 mLoadEvents.addAll(rEvents);
                                 rEvents.removeChangeListeners();
                                 //////
-                                mAgendaCalendarView.init(Locale.ENGLISH, mLoadWeeks, mLoadDays, mLoadEvents, pickerController); // TODO: LOCALE.getDefault()
-                                mAgendaCalendarView.addEventRenderer(new BocconiEventRenderer());
+                                populateView();
                             }
                         });
                     }

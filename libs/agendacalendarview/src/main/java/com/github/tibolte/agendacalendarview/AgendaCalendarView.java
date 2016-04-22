@@ -176,7 +176,7 @@ public class AgendaCalendarView extends FrameLayout implements StickyListHeaders
 
     @Override
     public void onStickyHeaderChanged(StickyListHeadersListView stickyListHeadersListView, View header, int position, long headerId) {
-        Log.d(LOG_TAG, String.format("onStickyHeaderChanged, position = %d, headerId = %d", position, headerId));
+        //Log.d(LOG_TAG, String.format("onStickyHeaderChanged, position = %d, headerId = %d", position, headerId));
 
         if (CalendarManager.getInstance().getEvents().size() > 0) {
             CalendarEvent event = CalendarManager.getInstance().getEvents().get(position);
@@ -206,7 +206,7 @@ public class AgendaCalendarView extends FrameLayout implements StickyListHeaders
 
         CalendarManager.getInstance().loadEvents(eventList, cleanEvent);
         BusProvider.getInstance().send(new Events.EventsFetched());
-        Log.d(LOG_TAG, "CalendarEventTask finished");
+        //Log.d(LOG_TAG, "CalendarEventTask finished");
 
         // add default event renderer
         addEventRenderer(new DefaultEventRenderer());
@@ -227,7 +227,7 @@ public class AgendaCalendarView extends FrameLayout implements StickyListHeaders
 
         // notify that actually everything is loaded
         BusProvider.getInstance().send(new Events.EventsFetched());
-        Log.d(LOG_TAG, "CalendarEventTask finished");
+        //Log.d(LOG_TAG, "CalendarEventTask finished");
 
         // add default event renderer
         addEventRenderer(new DefaultEventRenderer());

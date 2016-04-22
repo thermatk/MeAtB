@@ -192,7 +192,7 @@ public class CalendarView extends LinearLayout {
      */
     private void setUpAdapter(Calendar today, List<IWeekItem> weeks, int dayTextColor, int currentDayTextColor, int pastDayTextColor) {
         if (mWeeksAdapter == null) {
-            Log.d(LOG_TAG, "Setting adapter with today's calendar: " + today.toString());
+            //Log.d(LOG_TAG, "Setting adapter with today's calendar: " + today.toString());
             mWeeksAdapter = new WeeksAdapter(getContext(), today, dayTextColor, currentDayTextColor, pastDayTextColor);
             mListViewWeeks.setAdapter(mWeeksAdapter);
         }

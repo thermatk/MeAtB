@@ -1,5 +1,6 @@
 package com.thermatk.android.meatb.fragments;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
@@ -221,14 +222,12 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         mAgendaCalendarView.init(Locale.ENGLISH, mLoadWeeks, mLoadDays, mLoadEvents, this); // TODO: LOCALE.getDefault()
         mAgendaCalendarView.addEventRenderer(new BocconiEventRenderer());
 
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
-        // TODO: kill orientation workaround and switch to AsyncTask when realm releases freeze 1
     }
 
     public void getData() {
-
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
-        // TODO: kill orientation workaround and switch to AsyncTask when realm releases freeze 2
+        final Activity mActivity = getActivity();
+        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+        // TODO: kill orientation workaround and switch to AsyncTask when realm releases freeze
         final RealmResults<RDay> rDays = realm.where(RDay.class).findAllAsync();
         rDays.addChangeListener(new RealmChangeListener() {
             @Override
@@ -249,12 +248,20 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
                                 rEvents.removeChangeListeners();
                                 //////
                                 populateView();
+                                mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
                             }
                         });
                     }
                 });
             }
         });
+    }
+
+    public void getDataSync() {
+        mLoadDays.addAll(realm.allObjects(RDay.class));
+        mLoadWeeks.addAll(realm.allObjects(RWeek.class));
+        mLoadEvents.addAll(realm.allObjects(REvent.class));
+        populateView();
     }
 
 }

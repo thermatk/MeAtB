@@ -176,7 +176,6 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isFirstLaunch() {
         boolean isFirstLaunch = mSharedPreferences.getBoolean("isFirstLaunch", true);
-        Log.i(LogConst.LOG, "isFirstLaunch");
         return isFirstLaunch;
     }
 

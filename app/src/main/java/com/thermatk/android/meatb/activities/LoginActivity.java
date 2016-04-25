@@ -23,7 +23,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.thermatk.android.meatb.data.DataWriter;
+import com.thermatk.android.meatb.data.DataUtilities;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.yabAPIClient;
@@ -154,7 +154,7 @@ public class LoginActivity extends AppCompatActivity{
                         editor.putString("bocconipassword", password);
                         editor.apply();
                         // TODO: Save profile info
-                        DataWriter.writeInitData(response);
+                        DataUtilities.writeInitData(response);
                         ////
                         Log.i(LogConst.LOG, "AuthRequest success, login state 1");
                         finish();

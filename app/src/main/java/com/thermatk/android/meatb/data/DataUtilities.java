@@ -1,10 +1,13 @@
 package com.thermatk.android.meatb.data;
 
+import android.content.Context;
+import android.os.Build;
 import android.text.format.DateFormat;
 
 import com.github.tibolte.agendacalendarview.models.CalendarEvent;
 import com.github.tibolte.agendacalendarview.models.IDayItem;
 import com.github.tibolte.agendacalendarview.models.IWeekItem;
+import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.agenda.BocconiCalendarEvent;
 import com.thermatk.android.meatb.data.agenda.RCal;
 import com.thermatk.android.meatb.data.agenda.RDay;
@@ -22,8 +25,9 @@ import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmList;
+import io.realm.RealmResults;
 
-public class DataWriter {
+public class DataUtilities {
     public static void writeInitData(JSONObject rawJSON) {
         // TODO: make async https://realm.io/docs/java/latest/#asynchronous-transactions
         String firstname = null;
@@ -189,6 +193,35 @@ public class DataWriter {
         return Long.parseLong(dateAPI.substring(dateAPI.indexOf('(')+1,dateAPI.indexOf('+')));
     }
 
+
+    public static void getAgendaEventList(List<CalendarEvent> eventList, Context mContext) {
+        /////
+
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<EventDay> days = realm.where(EventDay.class).findAll();
+        //TODO: only days in scope
+        //Log.d(LogConst.LOG, Integer.toString(days.size()));
+        for(EventDay day: days) {
+            //Log.d(LogConst.LOG,day.getDate().toString());
+            RealmList<AgendaEvent> events = day.getAgendaEvents();
+            for(AgendaEvent event: events) {
+
+                Calendar startTime = Calendar.getInstance();
+                Calendar endTime = Calendar.getInstance();
+                String dateString = event.getDuration();
+                startTime.setTimeInMillis(event.getDate_start_long());
+                endTime.setTimeInMillis(event.getDate_end_long());
+
+                BocconiCalendarEvent eventBocconi = new BocconiCalendarEvent(event.getTitle(), event.getDescription(), event.getSupertitle(),
+                        getColorWrapper(mContext, R.color.orange_dark), startTime, endTime, false, dateString);
+                eventList.add(eventBocconi);
+            }
+        }
+
+        realm.close();
+
+    }
+
     public static void writeAgendaCalendarViewPersistence(List<CalendarEvent> doneEvents, List<IDayItem> doneDays,List<IWeekItem> doneWeeks) {
 
         Realm realm = Realm.getDefaultInstance();
@@ -196,10 +229,10 @@ public class DataWriter {
         realm.beginTransaction();
 
         ////// clear the realm
-        realm.clear(RDay.class);
-        realm.clear(RCal.class);
-        realm.clear(REvent.class);
-        realm.clear(RWeek.class);
+        realm.delete(RDay.class);
+        realm.delete(RCal.class);
+        realm.delete(REvent.class);
+        realm.delete(RWeek.class);
         ///////
         RCal rCal = realm.createObject(RCal.class);
 
@@ -284,5 +317,15 @@ public class DataWriter {
 
         realm.commitTransaction();
         realm.close();
+    }
+
+
+    // support v4 workaround
+    private static int getColorWrapper(Context context, int id) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return context.getColor(id);
+        } else {
+            return context.getResources().getColor(id);
+        }
     }
 }

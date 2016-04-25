@@ -2,9 +2,7 @@ package com.thermatk.android.meatb.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,8 +23,7 @@ import com.thermatk.android.meatb.agenda.BocconiCalendarEvent;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.agenda.BocconiEventRenderer;
-import com.thermatk.android.meatb.data.AgendaEvent;
-import com.thermatk.android.meatb.data.DataWriter;
+import com.thermatk.android.meatb.data.DataUtilities;
 import com.thermatk.android.meatb.data.EventDay;
 import com.thermatk.android.meatb.data.agenda.RDay;
 import com.thermatk.android.meatb.data.agenda.REvent;
@@ -44,7 +41,6 @@ import java.util.Locale;
 import cz.msebera.android.httpclient.Header;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
-import io.realm.RealmList;
 import io.realm.RealmResults;
 
 
@@ -53,6 +49,12 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
     List<CalendarEvent> mLoadEvents = new ArrayList<>();
     List<IDayItem> mLoadDays = new ArrayList<>();
     List<IWeekItem> mLoadWeeks = new ArrayList<>();
+
+
+    RealmResults<RDay> rDays;
+    RealmResults<RWeek> rWeeks;
+    RealmResults<REvent> rEvents;
+
 
     Realm realm;
     AgendaCalendarView mAgendaCalendarView;
@@ -108,39 +110,6 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         return rootView;
     }
 
-    private void trueList(List<CalendarEvent> eventList) {
-        /////
-
-        RealmResults<EventDay> days = realm.where(EventDay.class).findAll();
-        //TODO: only days in scope
-        //Log.d(LogConst.LOG, Integer.toString(days.size()));
-        for(EventDay day: days) {
-            //Log.d(LogConst.LOG,day.getDate().toString());
-            RealmList<AgendaEvent> events = day.getAgendaEvents();
-            for(AgendaEvent event: events) {
-
-                Calendar startTime = Calendar.getInstance();
-                Calendar endTime = Calendar.getInstance();
-                String dateString = event.getDuration();
-                startTime.setTimeInMillis(event.getDate_start_long());
-                endTime.setTimeInMillis(event.getDate_end_long());
-
-                BocconiCalendarEvent eventBocconi = new BocconiCalendarEvent(event.getTitle(), event.getDescription(), event.getSupertitle(),
-                    getColorWrapper(getActivity(), R.color.orange_dark), startTime, endTime, false, dateString);
-                eventList.add(eventBocconi);
-            }
-        }
-
-    }
-    // support v4 workaround
-    private static int getColorWrapper(Context context, int id) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return context.getColor(id);
-        } else {
-            return context.getResources().getColor(id);
-        }
-    }
-
     public void sendRequest() {
 
         Calendar minDate = Calendar.getInstance();
@@ -153,7 +122,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                DataWriter.writeAgendaData(response);
+                DataUtilities.writeAgendaData(response);
 
 
 
@@ -173,7 +142,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
                 maxDate.add(Calendar.DAY_OF_WEEK, 1);
 
                 List<CalendarEvent> eventList = new ArrayList<>();
-                trueList(eventList);
+                DataUtilities.getAgendaEventList(eventList, getActivity());
 
                 CalendarManager calendarManager = CalendarManager.getInstance(getActivity());
                 calendarManager.buildCal(minDate, maxDate, Locale.ENGLISH, new ACVDay(), new ACVWeek());
@@ -183,7 +152,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
                 List<CalendarEvent> readyEvents = calendarManager.getEvents();
                 List<IDayItem> readyDays = calendarManager.getDays();
                 List<IWeekItem> readyWeeks = calendarManager.getWeeks();
-                DataWriter.writeAgendaCalendarViewPersistence(readyEvents, readyDays, readyWeeks);
+                DataUtilities.writeAgendaCalendarViewPersistence(readyEvents, readyDays, readyWeeks);
                 mAgendaCalendarView.setVisibility(View.VISIBLE);
                 getData();
             }
@@ -224,23 +193,29 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
 
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        rDays.removeChangeListeners();
+        rWeeks.removeChangeListeners();
+        rEvents.removeChangeListeners();
+    }
+
     public void getData() {
-        final Activity mActivity = getActivity();
-        mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         // TODO: kill orientation workaround and switch to AsyncTask when realm releases freeze
-        final RealmResults<RDay> rDays = realm.where(RDay.class).findAllAsync();
+        rDays = realm.where(RDay.class).findAllAsync();
         rDays.addChangeListener(new RealmChangeListener() {
             @Override
             public void onChange() {
                 mLoadDays.addAll(rDays);
                 rDays.removeChangeListeners();
-                final RealmResults<RWeek> rWeeks = realm.where(RWeek.class).findAllAsync();
+                rWeeks = realm.where(RWeek.class).findAllAsync();
                 rWeeks.addChangeListener(new RealmChangeListener() {
                     @Override
                     public void onChange() {
                         mLoadWeeks.addAll(rWeeks);
                         rWeeks.removeChangeListeners();
-                        final RealmResults<REvent> rEvents = realm.where(REvent.class).findAllAsync();
+                        rEvents = realm.where(REvent.class).findAllAsync();
                         rEvents.addChangeListener(new RealmChangeListener() {
                             @Override
                             public void onChange() {
@@ -248,7 +223,6 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
                                 rEvents.removeChangeListeners();
                                 //////
                                 populateView();
-                                mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
                             }
                         });
                     }

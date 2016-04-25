@@ -1,6 +1,7 @@
 package com.thermatk.android.meatb.adapters;
 
 import android.content.Context;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -28,10 +29,12 @@ public class InboxAdapter extends RealmBasedRecyclerViewAdapter<InboxMessage,
 
     public class ViewHolder extends RealmViewHolder {
         public TextView title;
+        public TextView time;
 
         public ViewHolder(LinearLayout container) {
             super(container);
             this.title = (TextView) container.findViewById(R.id.title);
+            this.time = (TextView) container.findViewById(R.id.event_time);
         }
     }
 
@@ -47,5 +50,6 @@ public class InboxAdapter extends RealmBasedRecyclerViewAdapter<InboxMessage,
 
         final InboxMessage message = realmResults.get(position);
         viewHolder.title.setText(message.getTitle());
+        viewHolder.time.setText(DateFormat.format("yyyy-MM-dd kk:mm", message.getDate()));
     }
 }

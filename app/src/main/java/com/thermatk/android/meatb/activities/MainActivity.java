@@ -29,6 +29,7 @@ import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.data.InitData;
 import com.thermatk.android.meatb.fragments.AgendaFragment;
+import com.thermatk.android.meatb.fragments.InboxFragment;
 import com.thermatk.android.meatb.fragments.RegisterAttendanceFragment;
 import com.thermatk.android.meatb.fragments.ProfileFragment;
 
@@ -143,7 +144,6 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         changeFragment(new ProfileFragment());
-                        setTitle("Profile");
                         return false;
                     }
                 });
@@ -152,7 +152,6 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         changeFragment(new RegisterAttendanceFragment());
-                        setTitle("Attendance");
                         return false;
                     }
                 });
@@ -161,7 +160,14 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         changeFragment(new AgendaFragment());
-                        setTitle("Agenda");
+                        return false;
+                    }
+                });
+        PrimaryDrawerItem inboxDrawerItem = new PrimaryDrawerItem().withName("Inbox").withIcon(GoogleMaterial.Icon.gmd_email)
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        changeFragment(new InboxFragment());
                         return false;
                     }
                 });
@@ -170,7 +176,8 @@ public class MainActivity extends AppCompatActivity {
                 profileDrawerItem,
                 new DividerDrawerItem(),
                 attendanceDrawerItem,
-                agendaDrawerItem
+                agendaDrawerItem,
+                inboxDrawerItem
         );
     }
 

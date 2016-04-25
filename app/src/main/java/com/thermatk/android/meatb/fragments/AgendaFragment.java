@@ -68,6 +68,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getActivity().setTitle("Agenda");
     }
 
     @Override

@@ -1,16 +1,17 @@
 package com.thermatk.android.meatb.fragments;
 
-import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.thermatk.android.meatb.R;
 
 
-public class ProfileFragment extends Fragment{
+public class InboxFragment extends Fragment{
 
-    public ProfileFragment() {
+    public InboxFragment() {
         // Required empty public constructor
     }
 
@@ -19,7 +20,7 @@ public class ProfileFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActivity().setTitle("Profile");
+        getActivity().setTitle("Inbox");
     }
 
     @Override
@@ -28,7 +29,7 @@ public class ProfileFragment extends Fragment{
 
 
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_inbox, container, false);
         /*Button mSignInButton = (Button) rootView.findViewById(R.id.button);
         mSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override

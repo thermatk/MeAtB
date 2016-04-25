@@ -277,10 +277,10 @@ public class DataUtilities {
         realm.beginTransaction();
 
         ////// clear the realm
-        realm.delete(RDay.class);
-        realm.delete(RCal.class);
-        realm.delete(REvent.class);
-        realm.delete(RWeek.class);
+        realm.clear(RDay.class);
+        realm.clear(RCal.class);
+        realm.clear(REvent.class);
+        realm.clear(RWeek.class);
         ///////
         RCal rCal = realm.createObject(RCal.class);
 

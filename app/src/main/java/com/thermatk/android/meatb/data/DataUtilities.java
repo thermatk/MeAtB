@@ -73,6 +73,54 @@ public class DataUtilities {
         realm.close();
     }
 
+    public static void writeInboxData(JSONArray response) {
+        Realm realm = Realm.getDefaultInstance();
+        long currentTime = System.currentTimeMillis();
+
+
+
+        for (int i = 0; i < response.length(); i++) {
+            JSONObject oneMessage;
+            long dateLong;
+            Date date;
+            try {
+                oneMessage = response.getJSONObject(i);
+                String strTemp = oneMessage.getString("date_sent");
+
+                dateLong = getDateAPI(strTemp);
+                //TODO: do some better timezone hacks
+                // add 4 hours to be sure we're in the right day
+                //dateLong +=  (DateUtils.HOUR_IN_MILLIS * 4);
+                date = new Date(dateLong);
+
+                realm.beginTransaction();
+
+                InboxMessage message = realm.createObject(InboxMessage.class);
+                message.setDate(date);
+                message.setId(i + 1); ///// TODO: do not forget about the id problem
+                message.setDateLong(dateLong);
+                message.setLastUpdated(currentTime);
+                message.setInternalId(oneMessage.getLong("id"));
+                message.setDescription(oneMessage.getString("description"));
+                message.setTitle(oneMessage.getString("title"));
+                message.setFavorite(oneMessage.getBoolean("is_favorite"));
+                message.setFeatured(oneMessage.getBoolean("is_featured"));
+                message.setUnread(oneMessage.getBoolean("is_unread"));
+
+                realm.commitTransaction();
+                ///////
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+
+
+
+        realm.close();
+    }
+
     public static void writeAgendaData(JSONArray response) {
 
 

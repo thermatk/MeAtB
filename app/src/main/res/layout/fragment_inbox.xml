@@ -2,11 +2,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.thermatk.android.meatb.fragments.ProfileFragment">
-    <Button
-        android:layout_gravity="center"
-        android:layout_width="wrap_content"
+    <co.moonmonkeylabs.realmrecyclerview.RealmRecyclerView
+        android:id="@+id/realm_recycler_view"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Attendace(100%) and Agenda(80%) kinda work :)"
-        android:id="@+id/button" />
+        app:rrvIsRefreshable="false"
+        app:rrvLayoutType="LinearLayout"
+        app:rrvEmptyLayoutId="@layout/empty_view"
+        />
 </FrameLayout>

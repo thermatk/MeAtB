@@ -83,3 +83,5 @@
 -keep class com.thermatk.android.meatb.agenda.BocconiCalendarEvent { *; }
 
 -keepattributes Signature
+
+-keep class android.support.v7.widget.RoundRectDrawable { *; }

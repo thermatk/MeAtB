@@ -68,4 +68,11 @@ public class yabAPIClient {
 
         getAgenda(dateStart, dateEnd, responseHandler);
     }
+
+    public void getInbox(JsonHttpResponseHandler responseHandler) {
+        String agendaURL= "http://ks3-mobile.unibocconi.it/universityapp_prod/api/v6/inbox?rl=en";
+        client.addHeader("auth_secret", "b0cc0n1s3cr3t");
+        client.setBasicAuth(username, password);
+        client.get(agendaURL, responseHandler);
+    }
 }

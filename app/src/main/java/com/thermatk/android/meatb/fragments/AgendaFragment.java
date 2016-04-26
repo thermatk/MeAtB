@@ -180,7 +180,8 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
 
     @Override
     public void onEventSelected(CalendarEvent event) {
-
+        Log.d(LogConst.LOG,event.getTitle());
+        // TODO: show extended event info
     }
 
     @Override

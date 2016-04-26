@@ -12,7 +12,8 @@
         android:layout_height="wrap_content"
         android:focusable="true"
         android:clickable="true"
-        android:foreground="?android:selectableItemBackground">
+        android:foreground="?android:selectableItemBackground"
+        android:id="@+id/inbox_cardview">
 
         <RelativeLayout
             android:layout_width="match_parent"

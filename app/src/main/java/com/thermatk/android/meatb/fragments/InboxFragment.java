@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.thermatk.android.meatb.LogConst;
@@ -18,10 +19,13 @@ import com.thermatk.android.meatb.yabAPIClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Date;
+
 import co.moonmonkeylabs.realmrecyclerview.RealmRecyclerView;
 import cz.msebera.android.httpclient.Header;
 import io.realm.Realm;
 import io.realm.RealmResults;
+import io.realm.Sort;
 
 
 public class InboxFragment extends Fragment{
@@ -39,23 +43,21 @@ public class InboxFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActivity().setTitle("Inbox");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        getActivity().setTitle("Inbox");
 
 
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_inbox, container, false);
 
-
-
         realm = Realm.getDefaultInstance();
         realmRecyclerView = (RealmRecyclerView) rootView.findViewById(R.id.realm_recycler_view);
 
-        RealmResults<InboxMessage> inboxMessages = realm.where(InboxMessage.class).findAll();
+        RealmResults<InboxMessage> inboxMessages = realm.where(InboxMessage.class).findAllSorted("date", Sort.DESCENDING);
         boolean wasUpdated = inboxMessages.size()>0;
         if(!wasUpdated) {
             sendRequest();
@@ -67,7 +69,8 @@ public class InboxFragment extends Fragment{
     }
 
     public void attachAdapter(RealmResults<InboxMessage> inboxMessages){
-        inboxAdapter = new InboxAdapter(getActivity(), inboxMessages, true, true);
+        inboxAdapter = new InboxAdapter(getActivity(), inboxMessages, true, false);
+        // TODO: no animate to show on top, find a better way
         realmRecyclerView.setAdapter(inboxAdapter);
     }
 

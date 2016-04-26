@@ -106,6 +106,8 @@ public class DataUtilities {
                 message.setFavorite(oneMessage.getBoolean("is_favorite"));
                 message.setFeatured(oneMessage.getBoolean("is_featured"));
                 message.setUnread(oneMessage.getBoolean("is_unread"));
+                message.setSupertitle(oneMessage.getString("supertitle"));
+                message.setDownloadedFull(false);
 
                 realm.commitTransaction();
                 ///////

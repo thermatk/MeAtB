@@ -105,6 +105,14 @@ public class InboxMessage extends RealmObject {
         this.downloadedFull = downloadedFull;
     }
 
+    public String getFullDescription() {
+        return fullDescription;
+    }
+
+    public void setFullDescription(String fullDescription) {
+        this.fullDescription = fullDescription;
+    }
+
     @PrimaryKey
     private long id;
     private long dateLong;
@@ -119,4 +127,6 @@ public class InboxMessage extends RealmObject {
 
     private long lastUpdated;
     private boolean downloadedFull;
+
+    private String fullDescription;
 }

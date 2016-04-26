@@ -20,6 +20,7 @@ import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -89,13 +90,13 @@ public class AgendaCalendarView extends FrameLayout implements StickyListHeaders
         super(context, attrs);
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ColorOptionsView, 0, 0);
-        mAgendaCurrentDayTextColor = a.getColor(R.styleable.ColorOptionsView_agendaCurrentDayTextColor, getResources().getColor(R.color.theme_primary));
-        mCalendarHeaderColor = a.getColor(R.styleable.ColorOptionsView_calendarHeaderColor, getResources().getColor(R.color.theme_primary_dark));
-        mCalendarBackgroundColor = a.getColor(R.styleable.ColorOptionsView_calendarColor, getResources().getColor(R.color.theme_primary));
-        mCalendarDayTextColor = a.getColor(R.styleable.ColorOptionsView_calendarDayTextColor, getResources().getColor(R.color.theme_text_icons));
-        mCalendarCurrentDayColor = a.getColor(R.styleable.ColorOptionsView_calendarCurrentDayTextColor, getResources().getColor(R.color.calendar_text_current_day));
-        mCalendarPastDayTextColor = a.getColor(R.styleable.ColorOptionsView_calendarPastDayTextColor, getResources().getColor(R.color.theme_light_primary));
-        mFabColor = a.getColor(R.styleable.ColorOptionsView_fabColor, getResources().getColor(R.color.theme_accent));
+        mAgendaCurrentDayTextColor = a.getColor(R.styleable.ColorOptionsView_agendaCurrentDayTextColor, ContextCompat.getColor(context,R.color.theme_primary));
+        mCalendarHeaderColor = a.getColor(R.styleable.ColorOptionsView_calendarHeaderColor, ContextCompat.getColor(context,R.color.theme_primary_dark));
+        mCalendarBackgroundColor = a.getColor(R.styleable.ColorOptionsView_calendarColor, ContextCompat.getColor(context,R.color.theme_primary));
+        mCalendarDayTextColor = a.getColor(R.styleable.ColorOptionsView_calendarDayTextColor, ContextCompat.getColor(context,R.color.theme_text_icons));
+        mCalendarCurrentDayColor = a.getColor(R.styleable.ColorOptionsView_calendarCurrentDayTextColor, ContextCompat.getColor(context,R.color.calendar_text_current_day));
+        mCalendarPastDayTextColor = a.getColor(R.styleable.ColorOptionsView_calendarPastDayTextColor, ContextCompat.getColor(context,R.color.theme_light_primary));
+        mFabColor = a.getColor(R.styleable.ColorOptionsView_fabColor, ContextCompat.getColor(context,R.color.theme_accent));
 
         a.recycle();
 

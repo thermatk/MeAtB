@@ -2,11 +2,13 @@ package com.thermatk.android.meatb.data;
 
 import android.content.Context;
 import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.text.format.DateFormat;
 
 import com.github.tibolte.agendacalendarview.models.CalendarEvent;
 import com.github.tibolte.agendacalendarview.models.IDayItem;
 import com.github.tibolte.agendacalendarview.models.IWeekItem;
+import com.thermatk.android.meatb.CalendarHelper;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.agenda.BocconiCalendarEvent;
 import com.thermatk.android.meatb.data.agenda.RCal;
@@ -26,6 +28,10 @@ import java.util.List;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
+
+import static com.thermatk.android.meatb.CalendarHelper.addEvent;
+import static com.thermatk.android.meatb.CalendarHelper.getReminderState;
+import static com.thermatk.android.meatb.CalendarHelper.setReminder;
 
 public class DataUtilities {
     public static void writeInitData(JSONObject rawJSON) {
@@ -123,7 +129,7 @@ public class DataUtilities {
         realm.close();
     }
 
-    public static void writeAgendaData(JSONArray response) {
+    public static void writeAgendaData(JSONArray response, Context context) {
 
 
 
@@ -224,6 +230,22 @@ public class DataUtilities {
                     agendaEvent.setSupertitle(supertitle);
                     agendaEvent.setType(type);
                     agendaEvent.setTitle(title);
+                    // TODO: add calendar
+                    if(getReminderState(context)) {
+                        long startTime = date_start.getTime();
+
+                        long endTime = 0;
+                        if(date_end == null) {
+                            // add 90 minutes
+                            endTime = startTime + 90*60*1000;
+                        } else {
+                            endTime = date_end.getTime();
+                        }
+                        long eventId = addEvent(context,startTime,endTime,title,"me@B class reminder",supertitle);
+                        agendaEvent.setCalendarId(eventId);
+                        setReminder(context,eventId,10);
+                    }
+
 
                     agendaList.add(agendaEvent);
                 }
@@ -375,7 +397,7 @@ public class DataUtilities {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             return context.getColor(id);
         } else {
-            return context.getResources().getColor(id);
+            return ContextCompat.getColor(context,id);
         }
     }
 }

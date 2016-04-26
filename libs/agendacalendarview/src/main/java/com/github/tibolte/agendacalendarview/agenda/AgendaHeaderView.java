@@ -7,6 +7,7 @@ import com.github.tibolte.agendacalendarview.utils.DateHelper;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.GradientDrawable;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.net.ConnectException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -52,9 +54,9 @@ public class AgendaHeaderView extends LinearLayout {
         Calendar today = CalendarManager.getInstance().getToday();
 
         SimpleDateFormat dayWeekFormatter = new SimpleDateFormat("E");
-
-        txtDayOfMonth.setTextColor(getResources().getColor(R.color.calendar_text_default));
-        txtDayOfWeek.setTextColor(getResources().getColor(R.color.calendar_text_default));
+        Context mContext = getContext();
+        txtDayOfMonth.setTextColor(ContextCompat.getColor(mContext,R.color.calendar_text_default));
+        txtDayOfWeek.setTextColor(ContextCompat.getColor(mContext,R.color.calendar_text_default));
 
         if (DateHelper.sameDate(day, today)) {
             txtDayOfMonth.setTextColor(currentDayTextColor);

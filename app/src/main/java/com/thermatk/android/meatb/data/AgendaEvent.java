@@ -19,7 +19,15 @@ public class AgendaEvent extends RealmObject {
     private String title;
     private long type;
     private long courseId;
+    private long calendarId;
 
+    public long getCalendarId() {
+        return calendarId;
+    }
+
+    public void setCalendarId(long calendarId) {
+        this.calendarId = calendarId;
+    }
 
     public String getDuration() {
         return duration;

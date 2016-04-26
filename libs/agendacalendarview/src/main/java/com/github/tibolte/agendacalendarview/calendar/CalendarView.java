@@ -12,6 +12,7 @@ import com.github.tibolte.agendacalendarview.utils.DateHelper;
 import com.github.tibolte.agendacalendarview.utils.Events;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -104,7 +105,11 @@ public class CalendarView extends LinearLayout {
                     public void onGlobalLayout() {
                         if (getWidth() != 0 && getHeight() != 0) {
                             collapseCalendarView();
-                            getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                            if (Build.VERSION.SDK_INT < 16) {
+                                getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                            } else {
+                                getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                            }
                         }
                     }
                 }

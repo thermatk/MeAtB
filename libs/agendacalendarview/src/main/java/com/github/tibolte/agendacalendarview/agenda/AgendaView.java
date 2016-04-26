@@ -3,6 +3,7 @@ package com.github.tibolte.agendacalendarview.agenda;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -71,8 +72,11 @@ public class AgendaView extends FrameLayout {
                                             setLayoutParams(layoutParams);
 
                                             getAgendaListView().scrollToCurrentDate(CalendarManager.getInstance().getToday());
-
-                                            getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                                            if (Build.VERSION.SDK_INT < 16) {
+                                                getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                                            } else {
+                                                getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                                            }
                                         }
                                     }
                                 }

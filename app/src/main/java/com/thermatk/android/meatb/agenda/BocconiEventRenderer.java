@@ -1,5 +1,7 @@
 package com.thermatk.android.meatb.agenda;
 
+import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -23,8 +25,8 @@ public class BocconiEventRenderer extends EventRenderer<REventRealmProxy> {
         descriptionContainer.setVisibility(View.VISIBLE);
 
         txtDate.setText(event.getDate());
-
-        txtTitle.setTextColor(view.getResources().getColor(android.R.color.black));
+        Context mContext = view.getContext();
+        txtTitle.setTextColor(ContextCompat.getColor(mContext,android.R.color.black));
 
         txtTitle.setText(event.getTitle());
         txtLocation.setText(event.getLocation());
@@ -36,12 +38,12 @@ public class BocconiEventRenderer extends EventRenderer<REventRealmProxy> {
         }
 
         if (event.getTitle().equals(view.getResources().getString(com.github.tibolte.agendacalendarview.R.string.agenda_event_no_events))) {
-            txtTitle.setTextColor(view.getResources().getColor(android.R.color.black));
+            txtTitle.setTextColor(ContextCompat.getColor(mContext,android.R.color.black));
         } else {
-            txtTitle.setTextColor(view.getResources().getColor(com.github.tibolte.agendacalendarview.R.color.theme_text_icons));
+            txtTitle.setTextColor(ContextCompat.getColor(mContext,com.github.tibolte.agendacalendarview.R.color.theme_text_icons));
         }
         descriptionContainer.setBackgroundColor(event.getColor());
-        txtLocation.setTextColor(view.getResources().getColor(com.github.tibolte.agendacalendarview.R.color.theme_text_icons));
+        txtLocation.setTextColor(ContextCompat.getColor(mContext,com.github.tibolte.agendacalendarview.R.color.theme_text_icons));
     }
 
     @Override

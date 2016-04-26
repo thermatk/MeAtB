@@ -121,7 +121,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                DataUtilities.writeAgendaData(response);
+                DataUtilities.writeAgendaData(response, getActivity());
 
 
 

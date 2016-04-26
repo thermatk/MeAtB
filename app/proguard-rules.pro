@@ -85,3 +85,4 @@
 -keepattributes Signature
 
 -keep class android.support.v7.widget.RoundRectDrawable { *; }
+-dontwarn android.support.v4.**

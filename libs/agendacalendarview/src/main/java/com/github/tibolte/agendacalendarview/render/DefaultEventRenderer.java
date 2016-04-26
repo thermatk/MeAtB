@@ -1,6 +1,8 @@
 package com.github.tibolte.agendacalendarview.render;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -23,7 +25,8 @@ public class DefaultEventRenderer extends EventRenderer<CalendarEvent> {
         LinearLayout locationContainer = (LinearLayout) view.findViewById(R.id.view_agenda_event_location_container);
 
         descriptionContainer.setVisibility(View.VISIBLE);
-        txtTitle.setTextColor(view.getResources().getColor(android.R.color.black));
+        Context mContext = view.getContext();
+        txtTitle.setTextColor(ContextCompat.getColor(mContext,android.R.color.black));
 
         txtTitle.setText(event.getTitle());
         txtLocation.setText(event.getLocation());
@@ -35,12 +38,12 @@ public class DefaultEventRenderer extends EventRenderer<CalendarEvent> {
         }
 
         if (event.getTitle().equals(view.getResources().getString(R.string.agenda_event_no_events))) {
-            txtTitle.setTextColor(view.getResources().getColor(android.R.color.black));
+            txtTitle.setTextColor(ContextCompat.getColor(mContext,android.R.color.black));
         } else {
-            txtTitle.setTextColor(view.getResources().getColor(R.color.theme_text_icons));
+            txtTitle.setTextColor(ContextCompat.getColor(mContext,R.color.theme_text_icons));
         }
         descriptionContainer.setBackgroundColor(event.getColor());
-        txtLocation.setTextColor(view.getResources().getColor(R.color.theme_text_icons));
+        txtLocation.setTextColor(ContextCompat.getColor(mContext,R.color.theme_text_icons));
     }
 
     @Override

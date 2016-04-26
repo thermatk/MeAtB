@@ -1,29 +1,38 @@
 package com.thermatk.android.meatb.activities;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.transition.Fade;
 import android.transition.Slide;
 import android.util.Log;
 import android.view.View;
+import android.widget.CompoundButton;
 
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.interfaces.OnCheckedChangeListener;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.SwitchDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.Nameable;
 import com.mikepenz.materialdrawer.util.KeyboardUtil;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
@@ -35,13 +44,22 @@ import com.thermatk.android.meatb.fragments.ProfileFragment;
 
 import io.realm.Realm;
 
+import static com.thermatk.android.meatb.CalendarHelper.addCalendar;
+import static com.thermatk.android.meatb.CalendarHelper.setReminderState;
+
 public class MainActivity extends AppCompatActivity {
     private String username = null;
     private SharedPreferences mSharedPreferences;
+    Drawer result;
+    SwitchDrawerItem calendarSwitchDrawerItem;
+    private Activity mActivity;
+
+    private final int MY_PERMISSIONS_REQUEST_WRITE_CALENDAR = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mActivity = this;
         mSharedPreferences  =  PreferenceManager.getDefaultSharedPreferences(this);
         username = mSharedPreferences.getString("bocconiusername", null);
         if(username == null || mSharedPreferences.getString("bocconipassword", null) == null) {
@@ -125,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
         // TODO: non-hacky fragments
         addDrawerItems(resultBuilder);
 
-        Drawer result = resultBuilder.build();
+        result = resultBuilder.build();
         /////
         realm.close();
         ////
@@ -171,13 +189,17 @@ public class MainActivity extends AppCompatActivity {
                         return false;
                     }
                 });
+        calendarSwitchDrawerItem = new SwitchDrawerItem().withName("Calendar Reminders").withIcon(GoogleMaterial.Icon.gmd_alarm_on).
+                withChecked(false).withSelectable(false).withOnCheckedChangeListener(onCalendarSwitchListener);
 
         resultBuilder.addDrawerItems(
                 profileDrawerItem,
                 new DividerDrawerItem(),
                 attendanceDrawerItem,
                 agendaDrawerItem,
-                inboxDrawerItem
+                inboxDrawerItem,
+                new DividerDrawerItem(),
+                calendarSwitchDrawerItem
         );
     }
 
@@ -185,8 +207,66 @@ public class MainActivity extends AppCompatActivity {
         return mSharedPreferences.getBoolean("isFirstLaunch", true);
     }
 
+    private OnCheckedChangeListener onCalendarSwitchListener = new OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
+            Log.i(LogConst.LOG, "DrawerItem: " + ((Nameable) drawerItem).getName() + " - toggleChecked: " + isChecked);
+            if(isChecked) {
+                // Here, thisActivity is the current activity
+                if (ContextCompat.checkSelfPermission(getApplicationContext(),
+                        Manifest.permission.WRITE_CALENDAR)
+                        != PackageManager.PERMISSION_GRANTED) {
 
+                        // No explanation needed, we can request the permission.
 
+                        ActivityCompat.requestPermissions(mActivity,
+                                new String[]{Manifest.permission.WRITE_CALENDAR},
+                                MY_PERMISSIONS_REQUEST_WRITE_CALENDAR);
+
+                        // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                        // app-defined int constant. The callback method gets the
+                        // result of the request.
+                }else {
+                    long calendarId = addCalendar(getApplicationContext());
+                    setReminderState(mSharedPreferences,true,calendarId); //TODO: check if have calendar and need one
+                }
+            } else {
+                setReminderState(mSharedPreferences,false,-1);
+            }
+        }
+    };
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+    String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_WRITE_CALENDAR: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    Log.d(LogConst.LOG, "Granted Calendar!");
+                    long calendarId = addCalendar(getApplicationContext());
+                    setReminderState(mSharedPreferences,true,calendarId);
+
+                } else {
+                    Log.d(LogConst.LOG, "Denied Calendar!");
+                    calendarSwitchDrawerItem.withChecked(false);
+                    result.updateItem(calendarSwitchDrawerItem);
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    setReminderState(mSharedPreferences,false,-1);
+
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
     private void setupWindowAnimations(Fragment fragment) {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Fade fade;

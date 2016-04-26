@@ -182,15 +182,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean isFirstLaunch() {
-        boolean isFirstLaunch = mSharedPreferences.getBoolean("isFirstLaunch", true);
-        return isFirstLaunch;
+        return mSharedPreferences.getBoolean("isFirstLaunch", true);
     }
 
 
 
     private void setupWindowAnimations(Fragment fragment) {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Fade fade = null;
+            Fade fade;
             fade = new Fade();
             fade.setDuration(1000);
             fragment.setEnterTransition(fade);

@@ -5,9 +5,6 @@ import java.util.Date;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
-/**
- * Created by thermatk on 25.04.16.
- */
 public class InboxMessage extends RealmObject {
     public long getId() {
         return id;

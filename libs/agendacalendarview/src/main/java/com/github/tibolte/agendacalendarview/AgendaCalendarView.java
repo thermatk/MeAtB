@@ -122,9 +122,7 @@ public class AgendaCalendarView extends FrameLayout implements StickyListHeaders
         mCalendarView.findViewById(R.id.cal_day_names).setBackgroundColor(mCalendarHeaderColor);
         mCalendarView.findViewById(R.id.list_week).setBackgroundColor(mCalendarBackgroundColor);
 
-        mAgendaView.getAgendaListView().setOnItemClickListener((AdapterView<?> parent, View view, int position, long id)->{
-            mCalendarPickerController.onEventSelected(CalendarManager.getInstance().getEvents().get(position));
-        });
+        mAgendaView.getAgendaListView().setOnItemClickListener((AdapterView<?> parent, View view, int position, long id)-> mCalendarPickerController.onEventSelected(CalendarManager.getInstance().getEvents().get(position)));
 
         BusProvider.getInstance().toObserverable()
                 .subscribe(event -> {

@@ -1,8 +1,6 @@
 package com.thermatk.android.meatb.fragments;
 
-import android.app.Activity;
 import android.app.Fragment;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;

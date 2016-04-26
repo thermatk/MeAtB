@@ -2,7 +2,6 @@ package com.thermatk.android.meatb.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
@@ -18,9 +17,6 @@ import io.realm.RealmBasedRecyclerViewAdapter;
 import io.realm.RealmResults;
 import io.realm.RealmViewHolder;
 
-/**
- * Created by thermatk on 25.04.16.
- */
 public class InboxAdapter extends RealmBasedRecyclerViewAdapter<InboxMessage,
         InboxAdapter.ViewHolder> {
     RealmResults<InboxMessage> realmResults;
@@ -54,8 +50,7 @@ public class InboxAdapter extends RealmBasedRecyclerViewAdapter<InboxMessage,
     @Override
     public ViewHolder onCreateRealmViewHolder(ViewGroup viewGroup, int viewType) {
         View v = inflater.inflate(R.layout.view_inbox_row, viewGroup, false);
-        ViewHolder vh = new ViewHolder((LinearLayout) v);
-        return vh;
+        return new ViewHolder((LinearLayout) v);
     }
 
     @Override
@@ -70,7 +65,7 @@ public class InboxAdapter extends RealmBasedRecyclerViewAdapter<InboxMessage,
         viewHolder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(LogConst.LOG, realmResults.get(position).getDescription().toString());
+                Log.d(LogConst.LOG, realmResults.get(position).getDescription());
                 // TODO: show extended message
                 /*courseIntent.putExtra("courseId", item.getId());
                 mContext.startActivity(courseIntent);*/

@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.thermatk.android.meatb.LogConst;
@@ -18,8 +17,6 @@ import com.thermatk.android.meatb.yabAPIClient;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.util.Date;
 
 import co.moonmonkeylabs.realmrecyclerview.RealmRecyclerView;
 import cz.msebera.android.httpclient.Header;

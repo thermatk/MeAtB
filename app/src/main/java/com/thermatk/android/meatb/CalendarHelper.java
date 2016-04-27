@@ -70,7 +70,7 @@ public class CalendarHelper {
         SharedPreferences.Editor editSP = mSharedPreferences.edit();
 
         editSP.putBoolean("ReminderSet", state);
-        editSP.putLong("CalendarId", calendarId);
+        editSP.putLong("calendarId", calendarId);
         editSP.apply();
     }
     public static boolean getReminderState(Context context) {
@@ -90,9 +90,10 @@ public class CalendarHelper {
             values.put(CalendarContract.Events.DESCRIPTION, description);
             values.put(CalendarContract.Events.EVENT_LOCATION, location);
             values.put(CalendarContract.Events.TITLE, title);
+            values.put(CalendarContract.Events.ALL_DAY, 0);
             values.put(CalendarContract.Events.CALENDAR_ID, getCalendarId(context));
-            values.put(CalendarContract.Events.EVENT_TIMEZONE, Calendar.getInstance()
-                    .getTimeZone().getID());
+            values.put(CalendarContract.Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
+            values.put(CalendarContract.Events.ACCESS_LEVEL, CalendarContract.Events.ACCESS_PUBLIC);
 
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
@@ -141,10 +142,12 @@ public class CalendarHelper {
                 CalendarContract.Calendars.OWNER_ACCOUNT,
                 "me@B");
         values.put(
-                CalendarContract.Calendars.CALENDAR_TIME_ZONE,Calendar.getInstance()
-                        .getTimeZone().getID());
+                CalendarContract.Calendars.CALENDAR_TIME_ZONE,TimeZone.getDefault().getID());
         values.put(
                 CalendarContract.Calendars.SYNC_EVENTS,
+                1);
+        values.put(
+                CalendarContract.Calendars.VISIBLE,
                 1);
         Uri.Builder builder =
                 CalendarContract.Calendars.CONTENT_URI.buildUpon();

@@ -29,6 +29,9 @@
         <service
             android:name=".services.InboxUpdateService"
             android:enabled="true"/>
+        <service
+            android:name=".services.AgendaUpdateService"
+            android:enabled="true"/>
     </application>
 
 </manifest>

@@ -1,6 +1,7 @@
 package com.thermatk.android.meatb.fragments;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +27,7 @@ import com.thermatk.android.meatb.data.EventDay;
 import com.thermatk.android.meatb.data.agenda.RDay;
 import com.thermatk.android.meatb.data.agenda.REvent;
 import com.thermatk.android.meatb.data.agenda.RWeek;
+import com.thermatk.android.meatb.services.AgendaUpdateService;
 import com.thermatk.android.meatb.yabAPIClient;
 
 import org.json.JSONArray;
@@ -84,27 +86,44 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
 
 
         setRetainInstance(true);
-
+        // Split 1: if just a simple configuration change happened
         if(mLoadEvents.size()>0) {
             populateView();
         } else {
             // TODO: RealmChangeListener
             // TODO: call populate database
-            //// check if first time in agenda
+
+
+            // Split 2: if for the first time in agenda
 
             RealmResults<EventDay> days = realm.allObjects(EventDay.class);
             if (days.size() == 0) {
                 mAgendaCalendarView.setVisibility(View.INVISIBLE);
                 // show progress
-                sendRequest();
+
+                // start service
+                Intent intent = new Intent(getActivity().getApplicationContext(),
+                        AgendaUpdateService.class);
+                Log.d(LogConst.LOG,"Starting AGENDAUPDATESERVICE!");
+                getActivity().startService(intent);
+                // show some no events event? or progress fragment?
+                //mAgendaCalendarView.init(new ArrayList<CalendarEvent>(), minDate, maxDate, Locale.ENGLISH, this, new ACVWeek(), new ACVDay(),new BocconiCalendarEvent());
+                //sendRequest();
                 /// TODO: callback, with RealmChangeListener?
+                // and
+                //mAgendaCalendarView.setVisibility(View.VISIBLE);
+                //getData();
+                days.addChangeListener(new RealmChangeListener() {
+                    @Override
+                    public void onChange() {
+                        Log.d(LogConst.LOG,"Service is done");
+                    }
+                });
             } else {
-                /////
+                // Usual way
                 getData();
             }
         }
-
-        ////
 
         return rootView;
     }
@@ -166,7 +185,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
                 Log.i(LogConst.LOG, "AgendaRequest failed " + response);
             }
         };
-        yabAPIClient agendaClient = new yabAPIClient(getActivity());
+        yabAPIClient agendaClient = new yabAPIClient(getActivity(),true);
         agendaClient.getAgendaForAYear(responseHandler);
 
     }
@@ -196,9 +215,11 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
     @Override
     public void onDetach() {
         super.onDetach();
-        rDays.removeChangeListeners();
-        rWeeks.removeChangeListeners();
-        rEvents.removeChangeListeners();
+        if(rEvents!=null) {
+            rDays.removeChangeListeners();
+            rWeeks.removeChangeListeners();
+            rEvents.removeChangeListeners();
+        }
     }
 
     public void getData() {

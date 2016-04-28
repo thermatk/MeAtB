@@ -91,7 +91,7 @@ public class InboxFragment extends Fragment{
                 Log.i(LogConst.LOG, "AgendaRequest failed " + response);
             }
         };
-        yabAPIClient inboxClient = new yabAPIClient(getActivity());
+        yabAPIClient inboxClient = new yabAPIClient(getActivity(),true);
         inboxClient.getInbox(responseHandler);
     }
 

@@ -164,7 +164,7 @@ public class RegisterAttendanceFragment extends Fragment {
                     showProgress(false);
                 }
             };
-            yabAPIClient registerClient = new yabAPIClient(getActivity());
+            yabAPIClient registerClient = new yabAPIClient(getActivity(),true);
             registerClient.registerAttendance(codice, responseHandler);
         }
     }

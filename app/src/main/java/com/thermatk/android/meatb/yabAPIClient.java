@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.SyncHttpClient;
 import com.thermatk.android.meatb.data.InitData;
 
 import java.util.Date;
@@ -21,9 +22,14 @@ public class yabAPIClient {
     private String password;
 
 
-    private AsyncHttpClient client = new AsyncHttpClient();
+    private AsyncHttpClient client;
 
-    public yabAPIClient(Context appContext) {
+    public yabAPIClient(Context appContext, boolean async) {
+        if(async) {
+            client = new AsyncHttpClient();
+        } else {
+            client = new SyncHttpClient();
+        }
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(appContext);
 
         username = sharedPrefs.getString("bocconiusername", null);

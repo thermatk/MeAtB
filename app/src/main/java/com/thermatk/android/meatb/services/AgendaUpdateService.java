@@ -1,11 +1,8 @@
 package com.thermatk.android.meatb.services;
 
-import android.app.Service;
+import android.app.IntentService;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.IBinder;
 import android.util.Log;
-import android.view.View;
 
 import com.github.tibolte.agendacalendarview.CalendarManager;
 import com.github.tibolte.agendacalendarview.models.CalendarEvent;
@@ -33,31 +30,17 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 
 
-public class AgendaUpdateService extends Service {
-    public AgendaUpdateService() {
+public class AgendaUpdateService extends IntentService {
+
+    public AgendaUpdateService(String name) {
+        super(name);
     }
 
     @Override
-    public void onDestroy () {
-        Log.d(LogConst.LOG,"Service AGENDAUPDATESERVICE finished");
-    }
+    protected void onHandleIntent(Intent intent) {
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-
-        new UpdateTask().execute();
-        return Service.START_STICKY;
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    private class UpdateTask extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... params) {JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
+        Log.d(LogConst.LOG, "AgendaUpdateService started");
+        JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 DataUtilities.writeAgendaData(response,getApplicationContext());
@@ -105,14 +88,9 @@ public class AgendaUpdateService extends Service {
                 Log.i(LogConst.LOG, "AgendaRequest failed " + response);
             }
         };
-            yabAPIClient agendaClient = new yabAPIClient(getApplicationContext(),false);
-            agendaClient.getAgendaForAYear(responseHandler);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void v) {
-            stopSelf();
-        }
+        yabAPIClient agendaClient = new yabAPIClient(getApplicationContext(),false);
+        agendaClient.getAgendaForAYear(responseHandler);
+        Log.d(LogConst.LOG, "AgendaUpdateService ended");
     }
+
 }

@@ -60,26 +60,26 @@ public class DataHelper {
             carreerNotes = careers.get("notes").toString();
             carreerId = Long.parseLong(careers.get("id").toString());
             careerDateStart = careers.get("date_start").toString();
+
+            Realm realm = Realm.getDefaultInstance();
+            realm.beginTransaction();
+            //TODO: check existence
+            InitData data = realm.createObject(InitData.class);
+            data.setFirstname(firstname);
+            data.setLastname(lastname);
+            data.setPhoto_url(photo_url);
+            data.setCarreerTitle(carreerTitle);
+            data.setCareerDateStart(careerDateStart);
+            data.setCarreerDescription(carreerDescription);
+            data.setCarreerId(carreerId);
+            data.setCarreerNotes(carreerNotes);
+            data.setRawData(rawJSON.toString());
+            data.setLastUpdated(System.currentTimeMillis());
+            realm.commitTransaction();
+            realm.close();
         } catch (JSONException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-
-        Realm realm = Realm.getDefaultInstance();
-        realm.beginTransaction();
-        //TODO: check existence
-        InitData data = realm.createObject(InitData.class);
-        data.setFirstname(firstname);
-        data.setLastname(lastname);
-        data.setPhoto_url(photo_url);
-        data.setCarreerTitle(carreerTitle);
-        data.setCareerDateStart(careerDateStart);
-        data.setCarreerDescription(carreerDescription);
-        data.setCarreerId(carreerId);
-        data.setCarreerNotes(carreerNotes);
-        data.setRawData(rawJSON.toString());
-        data.setLastUpdated(System.currentTimeMillis());
-        realm.commitTransaction();
-        realm.close();
     }
 
     public static void writeInboxData(JSONArray response) {

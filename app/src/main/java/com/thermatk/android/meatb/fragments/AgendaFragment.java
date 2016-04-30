@@ -22,7 +22,7 @@ import com.thermatk.android.meatb.agenda.BocconiCalendarEvent;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.agenda.BocconiEventRenderer;
-import com.thermatk.android.meatb.data.DataUtilities;
+import com.thermatk.android.meatb.helpers.DataHelper;
 import com.thermatk.android.meatb.data.EventDay;
 import com.thermatk.android.meatb.data.agenda.RDay;
 import com.thermatk.android.meatb.data.agenda.REvent;
@@ -140,7 +140,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                DataUtilities.writeAgendaData(response, getActivity());
+                DataHelper.writeAgendaData(response, getActivity());
 
 
 
@@ -160,7 +160,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
                 maxDate.add(Calendar.DAY_OF_WEEK, 1);
 
                 List<CalendarEvent> eventList = new ArrayList<>();
-                DataUtilities.getAgendaEventList(eventList, getActivity());
+                DataHelper.getAgendaEventList(eventList, getActivity());
 
                 CalendarManager calendarManager = CalendarManager.getInstance(getActivity());
                 calendarManager.buildCal(minDate, maxDate, Locale.ENGLISH, new ACVDay(), new ACVWeek());
@@ -170,7 +170,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
                 List<CalendarEvent> readyEvents = calendarManager.getEvents();
                 List<IDayItem> readyDays = calendarManager.getDays();
                 List<IWeekItem> readyWeeks = calendarManager.getWeeks();
-                DataUtilities.writeAgendaCalendarViewPersistence(readyEvents, readyDays, readyWeeks);
+                DataHelper.writeAgendaCalendarViewPersistence(readyEvents, readyDays, readyWeeks);
                 mAgendaCalendarView.setVisibility(View.VISIBLE);
                 getData();
             }

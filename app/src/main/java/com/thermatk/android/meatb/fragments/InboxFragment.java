@@ -11,7 +11,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.adapters.InboxAdapter;
-import com.thermatk.android.meatb.data.DataUtilities;
+import com.thermatk.android.meatb.helpers.DataHelper;
 import com.thermatk.android.meatb.data.InboxMessage;
 import com.thermatk.android.meatb.yabAPIClient;
 
@@ -76,7 +76,7 @@ public class InboxFragment extends Fragment{
         JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                DataUtilities.writeInboxData(response);
+                DataHelper.writeInboxData(response);
                 RealmResults<InboxMessage> inboxMessages = realm.where(InboxMessage.class).findAll();
                 attachAdapter(inboxMessages);
             }

@@ -13,7 +13,7 @@ import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.agenda.ACVDay;
 import com.thermatk.android.meatb.agenda.ACVWeek;
 import com.thermatk.android.meatb.agenda.BocconiCalendarEvent;
-import com.thermatk.android.meatb.data.DataUtilities;
+import com.thermatk.android.meatb.helpers.DataHelper;
 import com.thermatk.android.meatb.data.EventDay;
 import com.thermatk.android.meatb.yabAPIClient;
 
@@ -43,7 +43,7 @@ public class AgendaUpdateService extends IntentService {
         JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                DataUtilities.writeAgendaData(response,getApplicationContext());
+                DataHelper.writeAgendaData(response,getApplicationContext());
 
 
                 Realm realm = Realm.getDefaultInstance();
@@ -64,7 +64,7 @@ public class AgendaUpdateService extends IntentService {
                 maxDate.add(Calendar.DAY_OF_WEEK, 1);
 
                 List<CalendarEvent> eventList = new ArrayList<>();
-                DataUtilities.getAgendaEventList(eventList, getApplicationContext());
+                DataHelper.getAgendaEventList(eventList, getApplicationContext());
 
                 CalendarManager calendarManager = CalendarManager.getInstance(getApplicationContext());
                 calendarManager.buildCal(minDate, maxDate, Locale.ENGLISH, new ACVDay(), new ACVWeek());
@@ -74,7 +74,7 @@ public class AgendaUpdateService extends IntentService {
                 List<CalendarEvent> readyEvents = calendarManager.getEvents();
                 List<IDayItem> readyDays = calendarManager.getDays();
                 List<IWeekItem> readyWeeks = calendarManager.getWeeks();
-                DataUtilities.writeAgendaCalendarViewPersistence(readyEvents, readyDays, readyWeeks);
+                DataHelper.writeAgendaCalendarViewPersistence(readyEvents, readyDays, readyWeeks);
                 realm.close();
             }
 

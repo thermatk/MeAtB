@@ -1,4 +1,4 @@
-package com.thermatk.android.meatb.data;
+package com.thermatk.android.meatb.helpers;
 
 import android.content.Context;
 import android.os.Build;
@@ -8,9 +8,12 @@ import android.text.format.DateFormat;
 import com.github.tibolte.agendacalendarview.models.CalendarEvent;
 import com.github.tibolte.agendacalendarview.models.IDayItem;
 import com.github.tibolte.agendacalendarview.models.IWeekItem;
-import com.thermatk.android.meatb.CalendarHelper;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.agenda.BocconiCalendarEvent;
+import com.thermatk.android.meatb.data.AgendaEvent;
+import com.thermatk.android.meatb.data.EventDay;
+import com.thermatk.android.meatb.data.InboxMessage;
+import com.thermatk.android.meatb.data.InitData;
 import com.thermatk.android.meatb.data.agenda.RCal;
 import com.thermatk.android.meatb.data.agenda.RDay;
 import com.thermatk.android.meatb.data.agenda.REvent;
@@ -29,11 +32,11 @@ import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 
-import static com.thermatk.android.meatb.CalendarHelper.addEvent;
-import static com.thermatk.android.meatb.CalendarHelper.getReminderState;
-import static com.thermatk.android.meatb.CalendarHelper.setReminder;
+import static com.thermatk.android.meatb.helpers.CalendarHelper.addEvent;
+import static com.thermatk.android.meatb.helpers.CalendarHelper.getReminderState;
+import static com.thermatk.android.meatb.helpers.CalendarHelper.setReminder;
 
-public class DataUtilities {
+public class DataHelper {
     public static void writeInitData(JSONObject rawJSON) {
         // TODO: make async https://realm.io/docs/java/latest/#asynchronous-transactions
         String firstname = null;

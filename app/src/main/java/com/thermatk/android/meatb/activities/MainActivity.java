@@ -44,8 +44,8 @@ import com.thermatk.android.meatb.fragments.ProfileFragment;
 
 import io.realm.Realm;
 
-import static com.thermatk.android.meatb.CalendarHelper.addCalendar;
-import static com.thermatk.android.meatb.CalendarHelper.setReminderState;
+import static com.thermatk.android.meatb.helpers.CalendarHelper.addCalendar;
+import static com.thermatk.android.meatb.helpers.CalendarHelper.setReminderState;
 
 public class MainActivity extends AppCompatActivity {
     private String username = null;

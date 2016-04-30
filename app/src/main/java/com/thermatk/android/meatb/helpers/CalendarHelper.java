@@ -1,4 +1,4 @@
-package com.thermatk.android.meatb;
+package com.thermatk.android.meatb.helpers;
 
 import android.Manifest;
 import android.content.ContentResolver;

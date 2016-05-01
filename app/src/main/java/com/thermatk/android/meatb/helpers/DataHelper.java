@@ -260,7 +260,7 @@ public class DataHelper {
             }
         }
 
-
+        realm.refresh();
         realm.close();        
     }
 
@@ -292,7 +292,7 @@ public class DataHelper {
                 eventList.add(eventBocconi);
             }
         }
-
+        realm.refresh();
         realm.close();
 
     }

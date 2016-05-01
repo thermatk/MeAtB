@@ -108,6 +108,8 @@ public class AgendaUpdateService extends IntentService {
         Intent intentResponse = new Intent();
         intentResponse.setAction(ACTION_AgendaUpdateService_DONE);
         intentResponse.addCategory(Intent.CATEGORY_DEFAULT);
+        Realm realm = Realm.getDefaultInstance();
+        realm.refresh();
         sendBroadcast(intentResponse);
     }
 

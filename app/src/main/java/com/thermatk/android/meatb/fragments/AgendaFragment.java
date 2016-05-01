@@ -245,12 +245,12 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
 
     public void serviceIsDone() {
         doingAsync = false;
-        final FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.detach(this);
-        ft.attach(this);
-        ft.commit();
+        realm.refresh();
+        getData();
+        showProgress(false);
     }
     public class AsyncBroadcastReceiver extends BroadcastReceiver {
+
         @Override
         public void onReceive(Context context, Intent intent) {
             serviceIsDone();

@@ -3,9 +3,11 @@ package com.thermatk.android.meatb.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.Context;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
@@ -38,6 +40,9 @@ import cz.msebera.android.httpclient.Header;
  * A login screen that offers login via username/password.
  */
 public class LoginActivity extends AppCompatActivity{
+    private final static int AS_RESULT_SUCCESS =1;
+    private final static int AS_RESULT_ERROR_CREDENTIAL =2;
+    private final static int AS_RESULT_ERROR_NETWORK =3;
 
     // UI references.
     private TextInputEditText mUsernameView;
@@ -45,7 +50,14 @@ public class LoginActivity extends AppCompatActivity{
     private View mProgressView;
     private View mLoginFormView;
     private TextView mErrorTextView;
+    private boolean doingAsync = false;
 
+    @Override
+    protected void onSaveInstanceState (Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("doingAsync", doingAsync);
+
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +95,13 @@ public class LoginActivity extends AppCompatActivity{
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
         mErrorTextView = (TextView) findViewById(R.id.errorTextView);
+        if(savedInstanceState != null) {
+            if(savedInstanceState.getBoolean("doingAsync", false)) {
+                showProgress(true);
+                RetainFragment.setActivity(this);
+                doingAsync = true;
+            }
+        }
     }
 
 
@@ -98,8 +117,8 @@ public class LoginActivity extends AppCompatActivity{
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        final String username = mUsernameView.getText().toString();
-        final String password = mPasswordView.getText().toString();
+        String username = mUsernameView.getText().toString();
+        String password = mPasswordView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -131,54 +150,11 @@ public class LoginActivity extends AppCompatActivity{
             // form field with an error.
             focusView.requestFocus();
         } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
-            showProgress(true);
-
-            final Context mContext = this;
-            final Intent returnIntent =new Intent(this, MainActivity.class);
-            JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                    // fail by default
-                    int authState = 2;
-                    try {
-                        authState = Integer.parseInt(response.get("auth_state").toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    if(authState == 1) {
-                        // Store credentials
-                        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
-                        editor.putString("bocconiusername", username);
-                        editor.putString("bocconipassword", password);
-                        editor.apply();
-                        // TODO: Save profile info
-                        DataHelper.writeInitData(response);
-                        ////
-                        Log.i(LogConst.LOG, "AuthRequest success, login state 1");
-                        finish();
-                        startActivity(returnIntent);
-                    } else {
-
-                        Log.i(LogConst.LOG, "AuthRequest success, login state FAIL, response:" + response.toString());
-                        showProgress(false);
-                        // TODO: show different error codes
-                        showError("Credentials not recognized");
-                    }
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable error, JSONObject response) {
-                    Log.i(LogConst.LOG, "AuthRequest failed " + response);
-
-
-                    showError("Network error");
-                    showProgress(false);
-                }
-            };
-
-            yabAPIClient.getLogin(username,password,responseHandler);
+            doingAsync = true;
+            RetainFragment retainFragment =
+                    RetainFragment.findOrCreateRetainFragment(getFragmentManager(), username, password);
+            RetainFragment.setActivity(this);
+            retainFragment.loadAsync();
         }
     }
 
@@ -250,6 +226,119 @@ public class LoginActivity extends AppCompatActivity{
     @Override
     public void onBackPressed() {
         //preventing going back to MainActivity
+    }
+
+    private void responseFromAsync(int result) {
+        Log.d(LogConst.LOG, "Got response from async");
+
+        if(result == AS_RESULT_SUCCESS) {
+            Intent returnIntent =new Intent(this, MainActivity.class);
+            finish();
+            startActivity(returnIntent);
+        } else if(result  == AS_RESULT_ERROR_CREDENTIAL) {
+            showProgress(false);
+            // TODO: show different error codes
+            showError("Credentials not recognized");
+        } else if(result ==AS_RESULT_ERROR_NETWORK) {
+            showError("Network error");
+            showProgress(false);
+
+        } else {
+            showError("Unknown error");
+            showProgress(false);
+        }
+        doingAsync = false;
+    }
+
+    public static class RetainFragment extends Fragment {
+        private static final String TAG = "RetainFragment";
+        private static String username;
+        private static String password;
+        private static LoginActivity mActivity;
+
+
+        public RetainFragment() {
+        }
+        public static void setActivity(LoginActivity current) {
+            mActivity = current;
+        }
+        public static RetainFragment findOrCreateRetainFragment(FragmentManager fm, String usernameAct, String passwordAct) {
+            RetainFragment fragment = (RetainFragment) fm.findFragmentByTag(TAG);
+            if (fragment == null) {
+                fragment = new RetainFragment();
+                fm.beginTransaction().add(fragment, TAG).commit();
+                username = usernameAct;
+                password = passwordAct;
+            }
+            return fragment;
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setRetainInstance(true);
+        }
+
+        private void loadAsync() {
+            new AsyncTask<JSONObject, Void, Void>() {
+                private int asyncResult;
+                @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+
+                    mActivity.showProgress(true);
+                }
+
+                @Override
+                protected Void doInBackground(JSONObject... params) {
+
+                    JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                            // fail by default
+                            int authState = 2;
+                            try {
+                                authState = Integer.parseInt(response.get("auth_state").toString());
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            if(authState == 1) {
+                                // Store credentials
+                                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+                                editor.putString("bocconiusername", username);
+                                editor.putString("bocconipassword", password);
+
+                                editor.apply();
+                                // TODO: Save profile info
+                                DataHelper.writeInitData(response);
+                                ////
+                                Log.i(LogConst.LOG, "AuthRequest success, login state 1");
+                                asyncResult = AS_RESULT_SUCCESS;
+                            } else {
+
+                                Log.i(LogConst.LOG, "AuthRequest success, login state FAIL, response:" + response.toString());
+
+                                asyncResult = AS_RESULT_ERROR_CREDENTIAL;
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, Throwable error, JSONObject response) {
+                            Log.i(LogConst.LOG, "AuthRequest failed " + response);
+                            asyncResult = AS_RESULT_ERROR_NETWORK;
+                        }
+                    };
+
+                    yabAPIClient.getLogin(username,password,responseHandler, false);
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Void response) {
+                    mActivity.responseFromAsync(asyncResult);
+                }
+            }.execute();
+        }
     }
 }
 

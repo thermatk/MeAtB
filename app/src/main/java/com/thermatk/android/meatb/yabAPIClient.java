@@ -39,8 +39,13 @@ public class yabAPIClient {
             Log.d(LogConst.LOG,"Couldn't load credentials");
         }
     }
-    public static void getLogin(String username, String password, JsonHttpResponseHandler responseHandler) {
-        AsyncHttpClient client = new AsyncHttpClient();
+    public static void getLogin(String username, String password, JsonHttpResponseHandler responseHandler, boolean async) {
+        AsyncHttpClient client;
+        if(async) {
+            client = new AsyncHttpClient();
+        } else {
+            client = new SyncHttpClient();
+        }
         String testLoginURL = "http://ks3-mobile.unibocconi.it/universityapp_prod/api/v6/app/init?os=android";
         client.addHeader("auth_secret", "b0cc0n1s3cr3t");
         client.setBasicAuth(username, password);

@@ -251,7 +251,7 @@ public class LoginActivity extends AppCompatActivity{
     }
 
     public static class RetainFragment extends Fragment {
-        private static final String TAG = "RetainFragment";
+        private static final String TAG = "RetainFragmentLogin";
         private static String username;
         private static String password;
         private static LoginActivity mActivity;

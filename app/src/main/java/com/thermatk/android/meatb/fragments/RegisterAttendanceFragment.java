@@ -237,7 +237,7 @@ public class RegisterAttendanceFragment extends Fragment {
     }
 
     public static class RetainFragment extends Fragment {
-        private static final String TAG = "RetainFragment";
+        private static final String TAG = "RetainFragmentAttendance";
         private static String codice;
         private static RegisterAttendanceFragment mFragment;
 

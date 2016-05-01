@@ -391,6 +391,7 @@ public class DataHelper {
         rCal.setLastUpdated(currentTime);
 
         realm.commitTransaction();
+        realm.refresh();
         realm.close();
     }
 

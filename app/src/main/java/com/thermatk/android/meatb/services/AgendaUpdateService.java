@@ -2,6 +2,8 @@ package com.thermatk.android.meatb.services;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.github.tibolte.agendacalendarview.CalendarManager;
@@ -15,6 +17,7 @@ import com.thermatk.android.meatb.agenda.ACVWeek;
 import com.thermatk.android.meatb.agenda.BocconiCalendarEvent;
 import com.thermatk.android.meatb.helpers.DataHelper;
 import com.thermatk.android.meatb.data.EventDay;
+import com.thermatk.android.meatb.helpers.ServiceHelper;
 import com.thermatk.android.meatb.yabAPIClient;
 
 import org.json.JSONArray;
@@ -31,14 +34,23 @@ import io.realm.RealmResults;
 
 
 public class AgendaUpdateService extends IntentService {
+    public static final String ACTION_AgendaUpdateService_DONE = "com.thermatk.android.meatb.services.AgendaUpdateService.DONE";
 
     public AgendaUpdateService(String name) {
         super(name);
     }
 
+    public AgendaUpdateService() {
+        super("AgendaUpdateService");
+    }
+
     @Override
     protected void onHandleIntent(Intent intent) {
-
+        if(ServiceHelper.isAgendaServiceRunning(getApplicationContext())) {
+            Log.d(LogConst.LOG, "AgendaUpdateService already running");
+            return;
+        }
+        ServiceHelper.setAgendaServiceRunning(getApplicationContext(),true);
         Log.d(LogConst.LOG, "AgendaUpdateService started");
         JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
             @Override
@@ -91,6 +103,12 @@ public class AgendaUpdateService extends IntentService {
         yabAPIClient agendaClient = new yabAPIClient(getApplicationContext(),false);
         agendaClient.getAgendaForAYear(responseHandler);
         Log.d(LogConst.LOG, "AgendaUpdateService ended");
+        ServiceHelper.setAgendaServiceRunning(getApplicationContext(),false);
+
+        Intent intentResponse = new Intent();
+        intentResponse.setAction(ACTION_AgendaUpdateService_DONE);
+        intentResponse.addCategory(Intent.CATEGORY_DEFAULT);
+        sendBroadcast(intentResponse);
     }
 
 }

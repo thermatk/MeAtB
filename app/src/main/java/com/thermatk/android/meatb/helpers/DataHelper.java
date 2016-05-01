@@ -326,10 +326,6 @@ public class DataHelper {
         }
         rCal.setrDays(rDays);
 
-        realm.commitTransaction();
-        // weeks
-        realm.beginTransaction();
-
         RealmList<RWeek> rWeeks = new RealmList<>();
         for (IWeekItem week : doneWeeks) {
             RWeek rWeek = realm.createObject(RWeek.class);
@@ -349,12 +345,6 @@ public class DataHelper {
             rWeeks.add(rWeek);
         }
         rCal.setrWeeks(rWeeks);
-
-        realm.commitTransaction();
-
-        // events
-
-        realm.beginTransaction();
 
         RealmList<REvent> rEvents = new RealmList<>();
         for (CalendarEvent basicevent : doneEvents) {

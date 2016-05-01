@@ -1,7 +1,16 @@
 package com.thermatk.android.meatb.fragments;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,11 +31,13 @@ import com.thermatk.android.meatb.agenda.BocconiCalendarEvent;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.agenda.BocconiEventRenderer;
+import com.thermatk.android.meatb.data.agenda.RCal;
 import com.thermatk.android.meatb.helpers.DataHelper;
 import com.thermatk.android.meatb.data.EventDay;
 import com.thermatk.android.meatb.data.agenda.RDay;
 import com.thermatk.android.meatb.data.agenda.REvent;
 import com.thermatk.android.meatb.data.agenda.RWeek;
+import com.thermatk.android.meatb.helpers.ServiceHelper;
 import com.thermatk.android.meatb.services.AgendaUpdateService;
 import com.thermatk.android.meatb.yabAPIClient;
 
@@ -39,6 +50,7 @@ import java.util.List;
 import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
+import io.realm.BaseRealm;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
@@ -55,20 +67,32 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
     RealmResults<RWeek> rWeeks;
     RealmResults<REvent> rEvents;
 
-
+    private boolean doingAsync = false;
+    private AsyncBroadcastReceiver asyncBroadcastReceiver;
     Realm realm;
-    AgendaCalendarView mAgendaCalendarView;
+    private AgendaCalendarView mAgendaCalendarView;
+    private View mProgressView;
 
     public AgendaFragment() {
         // Required empty public constructor
     }
 
 
+    @Override
+    public void onSaveInstanceState (Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("doingAsync", doingAsync);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActivity().setTitle("Agenda");
+        if(savedInstanceState != null) {
+            if(savedInstanceState.getBoolean("doingAsync", false)) {
+                doingAsync = true;
+            }
+        }
     }
 
     @Override
@@ -79,115 +103,41 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_agenda, container, false);
         mAgendaCalendarView = (AgendaCalendarView) rootView.findViewById(R.id.agenda_calendar_view);
+        mProgressView = rootView.findViewById(R.id.agenda_progress);
 
 
 
         realm = Realm.getDefaultInstance();
 
-
-        setRetainInstance(true);
-        // Split 1: if just a simple configuration change happened
-        if(mLoadEvents.size()>0) {
-            populateView();
+        if(doingAsync) {
+            showProgress(true);
+            attachReceiver();
         } else {
-            // TODO: RealmChangeListener
-            // TODO: call populate database
-
-
-            // Split 2: if for the first time in agenda
-
             RealmResults<EventDay> days = realm.allObjects(EventDay.class);
             if (days.size() == 0) {
-                mAgendaCalendarView.setVisibility(View.INVISIBLE);
                 // show progress
-
                 // start service
                 Intent intent = new Intent(getActivity().getApplicationContext(),
                         AgendaUpdateService.class);
-                Log.d(LogConst.LOG,"Starting AGENDAUPDATESERVICE!");
                 getActivity().startService(intent);
                 // show some no events event? or progress fragment?
-                //mAgendaCalendarView.init(new ArrayList<CalendarEvent>(), minDate, maxDate, Locale.ENGLISH, this, new ACVWeek(), new ACVDay(),new BocconiCalendarEvent());
-                //sendRequest();
-                /// TODO: callback, with RealmChangeListener?
-                // and
-                //mAgendaCalendarView.setVisibility(View.VISIBLE);
-                //getData();
-                days.addChangeListener(new RealmChangeListener() {
-                    @Override
-                    public void onChange() {
-                        Log.d(LogConst.LOG,"Service is done");
-                    }
-                });
+
+                doingAsync = true;
+                attachReceiver();
+                showProgress(true);
             } else {
                 // Usual way
                 getData();
             }
         }
-
         return rootView;
     }
 
-    public void sendRequest() {
-
-        Calendar minDate = Calendar.getInstance();
-        Calendar maxDate = Calendar.getInstance();
-
-        minDate.add(Calendar.DAY_OF_MONTH, -2);
-        maxDate.add(Calendar.MONTH, 1);
-
-        mAgendaCalendarView.init(new ArrayList<CalendarEvent>(), minDate, maxDate, Locale.ENGLISH, this, new ACVWeek(), new ACVDay(),new BocconiCalendarEvent());
-        JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                DataHelper.writeAgendaData(response, getActivity());
-
-
-
-                // minimum and maximum date of our calendar
-                Calendar minDate = Calendar.getInstance();
-                Calendar maxDate = Calendar.getInstance();
-
-                minDate.add(Calendar.DAY_OF_MONTH, -1);
-                //// TODO: optimize
-
-                RealmResults<EventDay> days = realm.where(EventDay.class).findAllSorted("date");
-                EventDay lastDay = days.last();
-
-
-                ///
-                maxDate.setTimeInMillis(lastDay.getDateLong());
-                maxDate.add(Calendar.DAY_OF_WEEK, 1);
-
-                List<CalendarEvent> eventList = new ArrayList<>();
-                DataHelper.getAgendaEventList(eventList, getActivity());
-
-                CalendarManager calendarManager = CalendarManager.getInstance(getActivity());
-                calendarManager.buildCal(minDate, maxDate, Locale.ENGLISH, new ACVDay(), new ACVWeek());
-                calendarManager.loadEvents(eventList, new BocconiCalendarEvent());
-
-
-                List<CalendarEvent> readyEvents = calendarManager.getEvents();
-                List<IDayItem> readyDays = calendarManager.getDays();
-                List<IWeekItem> readyWeeks = calendarManager.getWeeks();
-                DataHelper.writeAgendaCalendarViewPersistence(readyEvents, readyDays, readyWeeks);
-                mAgendaCalendarView.setVisibility(View.VISIBLE);
-                getData();
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable error, JSONObject response) {
-                Log.i(LogConst.LOG, "AgendaRequest failed " + response);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable error, JSONArray response) {
-                Log.i(LogConst.LOG, "AgendaRequest failed " + response);
-            }
-        };
-        yabAPIClient agendaClient = new yabAPIClient(getActivity(),true);
-        agendaClient.getAgendaForAYear(responseHandler);
-
+    public void attachReceiver() {
+        asyncBroadcastReceiver = new AsyncBroadcastReceiver();
+        IntentFilter intentFilter = new IntentFilter(AgendaUpdateService.ACTION_AgendaUpdateService_DONE);
+        intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+        getActivity().registerReceiver(asyncBroadcastReceiver, intentFilter);
     }
 
     @Override
@@ -220,6 +170,8 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
             rWeeks.removeChangeListeners();
             rEvents.removeChangeListeners();
         }
+        realm.close();
+        getActivity().unregisterReceiver(asyncBroadcastReceiver);
     }
 
     public void getData() {
@@ -252,11 +204,58 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         });
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            mAgendaCalendarView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mAgendaCalendarView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mAgendaCalendarView.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mAgendaCalendarView.setVisibility(show ? View.GONE : View.VISIBLE);
+        }
+    }
     public void getDataSync() {
         mLoadDays.addAll(realm.allObjects(RDay.class));
         mLoadWeeks.addAll(realm.allObjects(RWeek.class));
         mLoadEvents.addAll(realm.allObjects(REvent.class));
         populateView();
     }
+
+    public void serviceIsDone() {
+        doingAsync = false;
+        final FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.detach(this);
+        ft.attach(this);
+        ft.commit();
+    }
+    public class AsyncBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            serviceIsDone();
+        }
+    }
+
 
 }

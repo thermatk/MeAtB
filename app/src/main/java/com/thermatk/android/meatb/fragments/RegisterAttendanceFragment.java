@@ -3,7 +3,10 @@ package com.thermatk.android.meatb.fragments;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.FragmentManager;
+import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -21,6 +24,7 @@ import android.widget.TextView;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
+import com.thermatk.android.meatb.activities.MainActivity;
 import com.thermatk.android.meatb.yabAPIClient;
 
 import org.json.JSONException;
@@ -30,12 +34,24 @@ import cz.msebera.android.httpclient.Header;
 
 
 public class RegisterAttendanceFragment extends Fragment {
+    private final static int AS_RESULT_SUCCESS =1;
+    private final static int AS_RESULT_WARNING =2;
+    private final static int AS_RESULT_NETWORK =3;
+    private final static int AS_RESULT_OTHER =4;
 
     // UI references.
     private TextInputEditText mCodiceView;
     private View mProgressView;
     private View mAttendanceFormView;
     private TextView mErrorTextView;
+    private boolean doingAsync = false;
+
+    @Override
+    public void onSaveInstanceState (Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("doingAsync", doingAsync);
+
+    }
 
     public RegisterAttendanceFragment() {
         // Required empty public constructor
@@ -45,6 +61,12 @@ public class RegisterAttendanceFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActivity().setTitle("Attendance");
+        if(savedInstanceState != null) {
+            if(savedInstanceState.getBoolean("doingAsync", false)) {
+                RetainFragment.setFragment(this);
+                doingAsync = true;
+            }
+        }
     }
 
     @Override
@@ -79,7 +101,9 @@ public class RegisterAttendanceFragment extends Fragment {
         mAttendanceFormView = rootView.findViewById(R.id.attendance_form);
         mProgressView = rootView.findViewById(R.id.attendance_progress);
         mErrorTextView = (TextView) rootView.findViewById(R.id.errorTextView);
-
+        if(doingAsync) {
+            showProgress(true);
+        }
         return rootView;
     }
 
@@ -117,55 +141,13 @@ public class RegisterAttendanceFragment extends Fragment {
             // form field with an error.
             focusView.requestFocus();
         } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
-            showProgress(true);
-
-            JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                    // fail by default
-                    int esito = 0;
-                    String message = null;
-                    String wrkMessage = null;
-
-                    try {
-                        esito = Integer.parseInt(response.get("esito").toString());
-                        message = response.get("message").toString();
-                        wrkMessage = response.get("wrkmessage").toString();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    showProgress(false);
-                    if(esito == 1) {
-                        ////
-                        Log.i(LogConst.LOG, "AttendRegRequest success");
-                        // TODO: Show success
-                        showInfo("Success: " + message + " " + wrkMessage, false);
-                    } else if (esito == 2) {
-                        ////
-                        Log.i(LogConst.LOG, "AttendRegRequest warning");
-                        // TODO: Implement warnings in orange
-                        showInfo("Warning: " + message + " " + wrkMessage, false);
-                    } else {
-
-                        Log.i(LogConst.LOG, "AttendRegRequest success, state FAIL, response:" + response.toString());
-                        // TODO: show different error codes
-                        showInfo("Something went wrong: "+ message + wrkMessage, true);
-                    }
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable error, JSONObject response) {
-                    Log.i(LogConst.LOG, "AuthRequest failed " + response);
 
 
-                    showInfo("Network error", true);
-                    showProgress(false);
-                }
-            };
-            yabAPIClient registerClient = new yabAPIClient(getActivity(),true);
-            registerClient.registerAttendance(codice, responseHandler);
+            doingAsync = true;
+            RetainFragment retainFragment =
+                    RetainFragment.findOrCreateRetainFragment(getFragmentManager(), codice);
+            RetainFragment.setFragment(this);
+            retainFragment.loadAsync();
         }
     }
 
@@ -234,4 +216,119 @@ public class RegisterAttendanceFragment extends Fragment {
         }
     }
 
+    private void responseFromAsync(int result, String message) {
+        Log.d(LogConst.LOG, "Got response from async");
+
+        if(result == AS_RESULT_SUCCESS) {
+            showInfo(message, false);
+        } else if (result == AS_RESULT_WARNING) {
+            // TODO: Implement warnings in orange
+            showInfo(message, false);
+        } else if(result == AS_RESULT_OTHER) {
+            // TODO: show different error codes
+            showInfo(message, true);
+        } else if(result == AS_RESULT_NETWORK) {
+            showInfo(message, true);
+        } else {
+            showInfo("Unknown error", true);
+        }
+        showProgress(false);
+        doingAsync = false;
+    }
+
+    public static class RetainFragment extends Fragment {
+        private static final String TAG = "RetainFragment";
+        private static String codice;
+        private static RegisterAttendanceFragment mFragment;
+
+
+        public RetainFragment() {
+        }
+        public static void setFragment(RegisterAttendanceFragment current) {
+            mFragment = current;
+        }
+        public static RetainFragment findOrCreateRetainFragment(FragmentManager fm, String codiceFragment) {
+            RetainFragment fragment = (RetainFragment) fm.findFragmentByTag(TAG);
+            if (fragment == null) {
+                fragment = new RetainFragment();
+                fm.beginTransaction().add(fragment, TAG).commit();
+                codice = codiceFragment;
+            }
+            return fragment;
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setRetainInstance(true);
+        }
+
+        private void loadAsync() {
+            new AsyncTask<JSONObject, Void, Void>() {
+                private String asyncResultMessage;
+                private int asyncResult;
+                @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    mFragment.showProgress(true);
+                }
+
+                @Override
+                protected Void doInBackground(JSONObject... params) {
+                    JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                            // fail by default
+                            int esito = 0;
+                            String message = null;
+                            String wrkMessage = null;
+
+                            try {
+                                esito = Integer.parseInt(response.get("esito").toString());
+                                message = response.get("message").toString();
+                                wrkMessage = response.get("wrkmessage").toString();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            if(esito == 1) {
+                                asyncResult = AS_RESULT_SUCCESS;
+                                ////
+                                Log.i(LogConst.LOG, "AttendRegRequest success");
+                                asyncResultMessage =(new StringBuilder()).append("Success: ").append(message).append(" ").append(wrkMessage).toString();
+
+                            } else if (esito == 2) {
+                                asyncResult = AS_RESULT_WARNING;
+                                ////
+                                Log.i(LogConst.LOG, "AttendRegRequest warning");
+                                asyncResultMessage =(new StringBuilder()).append("Warning: ").append(message).append(" ").append(wrkMessage).toString();
+                            } else {
+
+                                asyncResult = AS_RESULT_OTHER;
+                                Log.i(LogConst.LOG, "AttendRegRequest success, state FAIL, response:" + response.toString());
+                                asyncResultMessage =(new StringBuilder()).append("Something went wrong: ").append(message).append(" ").append(wrkMessage).toString();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, Throwable error, JSONObject response) {
+                            Log.i(LogConst.LOG, "AuthRequest failed " + response);
+
+
+                            asyncResult = AS_RESULT_NETWORK;
+                            asyncResultMessage = "Network error";
+                        }
+                    };
+                    yabAPIClient registerClient = new yabAPIClient(getActivity(),false);
+                    registerClient.registerAttendance(codice, responseHandler);
+
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Void response) {
+                    mFragment.responseFromAsync(asyncResult, asyncResultMessage);
+                }
+            }.execute();
+        }
+    }
 }

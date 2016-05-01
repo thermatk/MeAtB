@@ -245,6 +245,8 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
 
     public void serviceIsDone() {
         doingAsync = false;
+        realm.close();
+        realm = Realm.getDefaultInstance();
         realm.refresh();
         getData();
         showProgress(false);

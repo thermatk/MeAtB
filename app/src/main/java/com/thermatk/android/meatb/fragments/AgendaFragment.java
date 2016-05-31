@@ -210,10 +210,11 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
     }
     public void getDataSync() {
         //RCal cal = realm.where(RCal.class).findAll();
+        /*
         mLoadDays.addAll(realm.allObjects(RDay.class));
         mLoadWeeks.addAll(realm.allObjects(RWeek.class));
         mLoadEvents.addAll(realm.allObjects(REvent.class));
-        populateView();
+        populateView();*/
     }
 
     public void getDataFromRCal() {

@@ -2,8 +2,6 @@ package com.thermatk.android.meatb.services;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
 import com.github.tibolte.agendacalendarview.CalendarManager;
@@ -109,7 +107,6 @@ public class AgendaUpdateService extends IntentService {
         intentResponse.setAction(ACTION_AgendaUpdateService_DONE);
         intentResponse.addCategory(Intent.CATEGORY_DEFAULT);
         Realm realm = Realm.getDefaultInstance();
-        realm.refresh();
         sendBroadcast(intentResponse);
     }
 

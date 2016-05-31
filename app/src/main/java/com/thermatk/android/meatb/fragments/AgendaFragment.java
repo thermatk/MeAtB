@@ -5,11 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,39 +14,24 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.tibolte.agendacalendarview.AgendaCalendarView;
-import com.github.tibolte.agendacalendarview.CalendarManager;
 import com.github.tibolte.agendacalendarview.CalendarPickerController;
 import com.github.tibolte.agendacalendarview.models.CalendarEvent;
 import com.github.tibolte.agendacalendarview.models.IDayItem;
 import com.github.tibolte.agendacalendarview.models.IWeekItem;
-import com.loopj.android.http.JsonHttpResponseHandler;
-
-import com.thermatk.android.meatb.agenda.ACVDay;
-import com.thermatk.android.meatb.agenda.ACVWeek;
-import com.thermatk.android.meatb.agenda.BocconiCalendarEvent;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.agenda.BocconiEventRenderer;
 import com.thermatk.android.meatb.data.agenda.RCal;
-import com.thermatk.android.meatb.helpers.DataHelper;
-import com.thermatk.android.meatb.data.EventDay;
 import com.thermatk.android.meatb.data.agenda.RDay;
 import com.thermatk.android.meatb.data.agenda.REvent;
 import com.thermatk.android.meatb.data.agenda.RWeek;
-import com.thermatk.android.meatb.helpers.ServiceHelper;
 import com.thermatk.android.meatb.services.AgendaUpdateService;
-import com.thermatk.android.meatb.yabAPIClient;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-import cz.msebera.android.httpclient.Header;
-import io.realm.BaseRealm;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
@@ -63,12 +44,12 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
     List<IWeekItem> mLoadWeeks = new ArrayList<>();
 
 
+    RealmResults<RCal> rCalCandidate;
     RealmResults<RDay> rDays;
     RealmResults<RWeek> rWeeks;
     RealmResults<REvent> rEvents;
 
     private boolean doingAsync = false;
-    private AsyncBroadcastReceiver asyncBroadcastReceiver;
     Realm realm;
     private AgendaCalendarView mAgendaCalendarView;
     private View mProgressView;
@@ -111,10 +92,10 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
 
         if(doingAsync) {
             showProgress(true);
-            attachReceiver();
         } else {
-            RealmResults<EventDay> days = realm.allObjects(EventDay.class);
-            if (days.size() == 0) {
+
+            rCalCandidate = realm.where(RCal.class).findAll();
+            if (rCalCandidate.size() == 0 ||rCalCandidate.first().getrEvents().size() == 0) {
                 // show progress
                 // start service
                 Intent intent = new Intent(getActivity().getApplicationContext(),
@@ -123,7 +104,6 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
                 // show some no events event? or progress fragment?
 
                 doingAsync = true;
-                attachReceiver();
                 showProgress(true);
             } else {
                 // Usual way
@@ -131,13 +111,6 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
             }
         }
         return rootView;
-    }
-
-    public void attachReceiver() {
-        asyncBroadcastReceiver = new AsyncBroadcastReceiver();
-        IntentFilter intentFilter = new IntentFilter(AgendaUpdateService.ACTION_AgendaUpdateService_DONE);
-        intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
-        getActivity().registerReceiver(asyncBroadcastReceiver, intentFilter);
     }
 
     @Override
@@ -171,7 +144,6 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
             rEvents.removeChangeListeners();
         }
         realm.close();
-        getActivity().unregisterReceiver(asyncBroadcastReceiver);
     }
 
     public void getData() {
@@ -179,19 +151,19 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         rDays = realm.where(RDay.class).findAllAsync();
         rDays.addChangeListener(new RealmChangeListener() {
             @Override
-            public void onChange() {
+            public void onChange(Object object) {
                 mLoadDays.addAll(rDays);
                 rDays.removeChangeListeners();
                 rWeeks = realm.where(RWeek.class).findAllAsync();
                 rWeeks.addChangeListener(new RealmChangeListener() {
                     @Override
-                    public void onChange() {
+                    public void onChange(Object object) {
                         mLoadWeeks.addAll(rWeeks);
                         rWeeks.removeChangeListeners();
                         rEvents = realm.where(REvent.class).findAllAsync();
                         rEvents.addChangeListener(new RealmChangeListener() {
                             @Override
-                            public void onChange() {
+                            public void onChange(Object object) {
                                 mLoadEvents.addAll(rEvents);
                                 rEvents.removeChangeListeners();
                                 //////
@@ -237,27 +209,51 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         }
     }
     public void getDataSync() {
+        //RCal cal = realm.where(RCal.class).findAll();
         mLoadDays.addAll(realm.allObjects(RDay.class));
         mLoadWeeks.addAll(realm.allObjects(RWeek.class));
         mLoadEvents.addAll(realm.allObjects(REvent.class));
         populateView();
     }
 
+    public void getDataFromRCal() {
+        RCal candidate = rCalCandidate.first();
+
+        mLoadDays.addAll(candidate.getrDays());
+        mLoadWeeks.addAll(candidate.getrWeeks());
+        mLoadEvents.addAll(candidate.getrEvents());
+    }
+
     public void serviceIsDone() {
         doingAsync = false;
-        realm.close();
-        realm = Realm.getDefaultInstance();
-        realm.refresh();
         getData();
         showProgress(false);
     }
-    public class AsyncBroadcastReceiver extends BroadcastReceiver {
+
+    public static class RetainFragment extends Fragment {
+        private static final String TAG = "RetainFragmentAgenda";
+
+
+        public RetainFragment() {
+        }
+        public static RetainFragment findOrCreateRetainFragment(FragmentManager fm) {
+            RetainFragment fragment = (RetainFragment) fm.findFragmentByTag(TAG);
+            if (fragment == null) {
+                fragment = new RetainFragment();
+                fm.beginTransaction().add(fragment, TAG).commit();
+            }
+            return fragment;
+        }
 
         @Override
-        public void onReceive(Context context, Intent intent) {
-            serviceIsDone();
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setRetainInstance(true);
+        }
+
+        private void loadAsync() {
+
         }
     }
-
 
 }

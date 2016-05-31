@@ -4,6 +4,11 @@ import android.app.IntentService;
 import android.content.Intent;
 
 public class InboxUpdateService extends IntentService {
+
+    public InboxUpdateService() {
+        super("InboxUpdateService");
+    }
+
     public InboxUpdateService(String name) {
         super(name);
     }

@@ -259,9 +259,7 @@ public class DataHelper {
                 e.printStackTrace();
             }
         }
-
-        realm.refresh();
-        realm.close();        
+        realm.close();
     }
 
     private static long getDateAPI(String dateAPI) {
@@ -292,7 +290,6 @@ public class DataHelper {
                 eventList.add(eventBocconi);
             }
         }
-        realm.refresh();
         realm.close();
 
     }
@@ -381,7 +378,6 @@ public class DataHelper {
         rCal.setLastUpdated(currentTime);
 
         realm.commitTransaction();
-        realm.refresh();
         realm.close();
     }
 

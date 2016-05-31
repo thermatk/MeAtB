@@ -62,22 +62,16 @@ public class MainActivity extends AppCompatActivity {
         mActivity = this;
         mSharedPreferences  =  PreferenceManager.getDefaultSharedPreferences(this);
         username = mSharedPreferences.getString("bocconiusername", null);
-        if(username == null || mSharedPreferences.getString("bocconipassword", null) == null) {
-            Log.d(LogConst.LOG, "no credentials, switching to login");
-            Intent i = new Intent(this, LoginActivity.class);
-            i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-            finish();
-            startActivity(i);
-        } else {
-            setContentView(R.layout.activity_main);
-            drawerStart(savedInstanceState);
-            if (savedInstanceState == null) {
-                ProfileFragment firstFragment = new ProfileFragment();
-                firstFragment.setArguments(getIntent().getExtras());
 
-                if (findViewById(R.id.content_main_frame) != null) {
-                    getFragmentManager().beginTransaction().replace(R.id.content_main_frame, firstFragment).commit();
-                }
+
+        setContentView(R.layout.activity_main);
+        drawerStart(savedInstanceState);
+        if (savedInstanceState == null) {
+            ProfileFragment firstFragment = new ProfileFragment();
+            firstFragment.setArguments(getIntent().getExtras());
+
+            if (findViewById(R.id.content_main_frame) != null) {
+                getFragmentManager().beginTransaction().replace(R.id.content_main_frame, firstFragment).commit();
             }
         }
     }

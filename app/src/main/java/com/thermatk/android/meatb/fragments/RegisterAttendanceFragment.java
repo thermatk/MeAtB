@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.FragmentManager;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -24,7 +23,6 @@ import android.widget.TextView;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
-import com.thermatk.android.meatb.activities.MainActivity;
 import com.thermatk.android.meatb.yabAPIClient;
 
 import org.json.JSONException;

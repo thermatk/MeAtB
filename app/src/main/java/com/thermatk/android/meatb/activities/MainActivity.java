@@ -3,7 +3,6 @@ package com.thermatk.android.meatb.activities;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;

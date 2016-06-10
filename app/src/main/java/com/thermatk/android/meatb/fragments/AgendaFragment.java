@@ -71,6 +71,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         getActivity().setTitle("Agenda");
         if(savedInstanceState != null) {
             if(savedInstanceState.getBoolean("doingAsync", false)) {
+                RetainFragment.setFragment(this);
                 doingAsync = true;
             }
         }
@@ -105,9 +106,15 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
 
                 doingAsync = true;
                 showProgress(true);
+
+                RetainFragment retainFragment =
+                        RetainFragment.findOrCreateRetainFragment(getFragmentManager(), rCalCandidate);
+                RetainFragment.setFragment(this);
+                retainFragment.waitAsync();
             } else {
                 // Usual way
-                getData();
+                getDataFromRCal();
+                populateView();
             }
         }
         return rootView;
@@ -138,42 +145,10 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
     @Override
     public void onDetach() {
         super.onDetach();
-        if(rEvents!=null) {
-            rDays.removeChangeListeners();
-            rWeeks.removeChangeListeners();
-            rEvents.removeChangeListeners();
+        if(rCalCandidate!=null) {
+            rCalCandidate.removeChangeListeners();
         }
         realm.close();
-    }
-
-    public void getData() {
-        // TODO: kill orientation workaround and switch to AsyncTask when realm releases freeze
-        rDays = realm.where(RDay.class).findAllAsync();
-        rDays.addChangeListener(new RealmChangeListener() {
-            @Override
-            public void onChange(Object object) {
-                mLoadDays.addAll(rDays);
-                rDays.removeChangeListeners();
-                rWeeks = realm.where(RWeek.class).findAllAsync();
-                rWeeks.addChangeListener(new RealmChangeListener() {
-                    @Override
-                    public void onChange(Object object) {
-                        mLoadWeeks.addAll(rWeeks);
-                        rWeeks.removeChangeListeners();
-                        rEvents = realm.where(REvent.class).findAllAsync();
-                        rEvents.addChangeListener(new RealmChangeListener() {
-                            @Override
-                            public void onChange(Object object) {
-                                mLoadEvents.addAll(rEvents);
-                                rEvents.removeChangeListeners();
-                                //////
-                                populateView();
-                            }
-                        });
-                    }
-                });
-            }
-        });
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
@@ -208,14 +183,6 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
             mAgendaCalendarView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
-    public void getDataSync() {
-        //RCal cal = realm.where(RCal.class).findAll();
-        /*
-        mLoadDays.addAll(realm.allObjects(RDay.class));
-        mLoadWeeks.addAll(realm.allObjects(RWeek.class));
-        mLoadEvents.addAll(realm.allObjects(REvent.class));
-        populateView();*/
-    }
 
     public void getDataFromRCal() {
         RCal candidate = rCalCandidate.first();
@@ -225,23 +192,31 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         mLoadEvents.addAll(candidate.getrEvents());
     }
 
-    public void serviceIsDone() {
+    public void serviceIsDone(RealmResults<RCal> resultRCal) {
+        rCalCandidate = resultRCal;
         doingAsync = false;
-        getData();
+        getDataFromRCal();
+        populateView();
         showProgress(false);
     }
 
     public static class RetainFragment extends Fragment {
         private static final String TAG = "RetainFragmentAgenda";
+        private static AgendaFragment mFragment;
+        private static RealmResults<RCal> rCalCandidateRetain;
 
 
         public RetainFragment() {
         }
-        public static RetainFragment findOrCreateRetainFragment(FragmentManager fm) {
+        public static void setFragment(AgendaFragment current) {
+            mFragment = current;
+        }
+        public static RetainFragment findOrCreateRetainFragment(FragmentManager fm, RealmResults<RCal> rCal) {
             RetainFragment fragment = (RetainFragment) fm.findFragmentByTag(TAG);
             if (fragment == null) {
                 fragment = new RetainFragment();
                 fm.beginTransaction().add(fragment, TAG).commit();
+                rCalCandidateRetain = rCal;
             }
             return fragment;
         }
@@ -252,8 +227,19 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
             setRetainInstance(true);
         }
 
-        private void loadAsync() {
+        private void waitAsync() {
+            rCalCandidateRetain.addChangeListener(new RealmChangeListener<RealmResults<RCal>>() {
+                @Override
+                public void onChange(RealmResults<RCal> results) {
 
+                    if (results.size() == 0 ||results.first().getrEvents().size() == 0) {
+                        // wait more
+                    } else {
+                        rCalCandidateRetain.removeChangeListeners();
+                        mFragment.serviceIsDone(rCalCandidateRetain);
+                    }
+                }
+            });
         }
     }
 

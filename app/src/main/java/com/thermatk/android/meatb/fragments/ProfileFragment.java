@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -49,12 +50,26 @@ public class ProfileFragment extends Fragment{
                 Notification noti;
                 Notification.Builder notificationBuilder = new Notification.Builder(getActivity())
                         .setContentTitle("InboxUpdate" + "test@gmail.com")
-                        .setContentText("Yayyaya").setSmallIcon(R.drawable.ic_notify)
+                        .setContentText("Yayyaya").setSmallIcon(R.drawable.ic_notify).setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
                         .setContentIntent(pIntent);
                 if (Build.VERSION.SDK_INT < 16) {
                     noti = notificationBuilder.getNotification();
                 } else {
                     noti = notificationBuilder.build();
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    int smallIconViewId = getActivity().getResources().getIdentifier("right_icon", "id", android.R.class.getPackage().getName());
+
+                    if (smallIconViewId != 0) {
+                        if (noti.contentIntent != null)
+                            noti.contentView.setViewVisibility(smallIconViewId, View.INVISIBLE);
+
+                        if (noti.headsUpContentView != null)
+                            noti.headsUpContentView.setViewVisibility(smallIconViewId, View.INVISIBLE);
+
+                        if (noti.bigContentView != null)
+                            noti.bigContentView.setViewVisibility(smallIconViewId, View.INVISIBLE);
+                    }
                 }
                 NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
                 // hide the notification after its selected

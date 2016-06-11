@@ -13,7 +13,6 @@ import com.thermatk.android.meatb.agenda.ACVDay;
 import com.thermatk.android.meatb.agenda.ACVWeek;
 import com.thermatk.android.meatb.agenda.BocconiCalendarEvent;
 import com.thermatk.android.meatb.data.EventDay;
-import com.thermatk.android.meatb.data.InboxMessage;
 import com.thermatk.android.meatb.yabAPIClient;
 
 import org.json.JSONArray;

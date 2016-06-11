@@ -13,10 +13,12 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
+import com.evernote.android.job.JobManager;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.mikepenz.materialdrawer.util.DrawerUIUtils;
+import com.thermatk.android.meatb.refresher.MainJobCreator;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -25,6 +27,9 @@ public class ApplicationMain extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        // Evernote's Android-job init
+        JobManager.create(this).addJobCreator(new MainJobCreator());
+
         // Realm default init
         RealmConfiguration realmConfiguration = new RealmConfiguration.Builder(this).build();
         Realm.setDefaultConfiguration(realmConfiguration);

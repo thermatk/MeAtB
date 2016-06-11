@@ -8,26 +8,17 @@ import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.adapters.InboxAdapter;
-import com.thermatk.android.meatb.helpers.DataHelper;
 import com.thermatk.android.meatb.data.InboxMessage;
 import com.thermatk.android.meatb.helpers.ServiceHelper;
 import com.thermatk.android.meatb.services.InboxUpdateService;
-import com.thermatk.android.meatb.yabAPIClient;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import co.moonmonkeylabs.realmrecyclerview.RealmRecyclerView;
-import cz.msebera.android.httpclient.Header;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;

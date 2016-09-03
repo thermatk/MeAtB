@@ -17,6 +17,8 @@ import android.widget.Button;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.activities.MainActivity;
 
+import java.util.Calendar;
+
 
 public class ProfileFragment extends Fragment{
 
@@ -50,7 +52,7 @@ public class ProfileFragment extends Fragment{
                 Notification noti;
                 Notification.Builder notificationBuilder = new Notification.Builder(getActivity())
                         .setContentTitle("InboxUpdate" + "test@gmail.com")
-                        .setContentText("Yayyaya").setSmallIcon(R.drawable.ic_notify).setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
+                        .setContentText("Yayyaya" + Calendar.getInstance().getTimeInMillis()).setSmallIcon(R.drawable.ic_notify).setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
                         .setContentIntent(pIntent);
                 if (Build.VERSION.SDK_INT < 16) {
                     noti = notificationBuilder.getNotification();

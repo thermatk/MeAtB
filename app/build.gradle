@@ -25,18 +25,18 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile('com.mikepenz:materialdrawer:5.3.0@aar') {
+    compile('com.mikepenz:materialdrawer:5.6.0@aar') {
         transitive = true
     }
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:design:24.2.1'
     compile 'com.loopj.android:android-async-http:1.4.9'
     compile 'com.github.bumptech.glide:glide:3.7.0'
-    compile 'com.mikepenz:google-material-typeface:2.2.0.1.original@aar'
+    compile 'com.mikepenz:google-material-typeface:2.2.0.3.original@aar'
     compile project(':libs:agendacalendarview')
     compile 'com.android.support:cardview-v7:24.2.1'
     compile 'com.github.thorbenprimke:realm-recyclerview:0.9.23'
     compile 'com.android.support:cardview-v7:24.2.1'
     compile "com.android.support:support-v4:24.2.1"
-    compile 'com.evernote:android-job:1.0.7'
+    compile 'com.evernote:android-job:1.1.0'
 }

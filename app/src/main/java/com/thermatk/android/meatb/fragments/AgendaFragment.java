@@ -22,9 +22,6 @@ import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.agenda.BocconiEventRenderer;
 import com.thermatk.android.meatb.data.agenda.RCal;
-import com.thermatk.android.meatb.data.agenda.RDay;
-import com.thermatk.android.meatb.data.agenda.REvent;
-import com.thermatk.android.meatb.data.agenda.RWeek;
 import com.thermatk.android.meatb.services.AgendaUpdateService;
 
 import java.util.ArrayList;
@@ -45,9 +42,6 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
 
 
     RealmResults<RCal> rCalCandidate;
-    RealmResults<RDay> rDays;
-    RealmResults<RWeek> rWeeks;
-    RealmResults<REvent> rEvents;
 
     private boolean doingAsync = false;
     Realm realm;

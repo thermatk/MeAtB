@@ -31,7 +31,8 @@ public class ApplicationMain extends Application {
         JobManager.create(this).addJobCreator(new MainJobCreator());
 
         // Realm default init
-        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder(this).build();
+        Realm.init(this);
+        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder().build();
         Realm.setDefaultConfiguration(realmConfiguration);
 
         // Glide image loader

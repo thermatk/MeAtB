@@ -104,9 +104,8 @@ public class DataHelper {
 
                 realm.beginTransaction();
 
-                InboxMessage message = realm.createObject(InboxMessage.class);
+                InboxMessage message = realm.createObject(InboxMessage.class,i + 1);///// TODO: do not forget about the id problem
                 message.setDate(date);
-                message.setId(i + 1); ///// TODO: do not forget about the id problem
                 message.setDateLong(dateLong);
                 message.setLastUpdated(currentTime);
                 message.setInternalId(oneMessage.getLong("id"));
@@ -156,9 +155,8 @@ public class DataHelper {
                 // TODO: find previously done days and compare
 
                 realm.beginTransaction();
-                EventDay day = realm.createObject(EventDay.class);
+                EventDay day = realm.createObject(EventDay.class, i+1);///// TODO: do not forget about the id problem
                 day.setDate(date);
-                day.setId(i + 1); ///// TODO: do not forget about the id problem
                 day.setDateLong(dateLong);
                 day.setDateString(DateFormat.format("dd-MM-yyyy", date).toString());
                 day.setDayString(oneDay.toString());

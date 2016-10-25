@@ -52,7 +52,10 @@ public class ProfileFragment extends Fragment{
                 Notification noti;
                 Notification.Builder notificationBuilder = new Notification.Builder(getActivity())
                         .setContentTitle("InboxUpdate" + "test@gmail.com")
-                        .setContentText("Yayyaya" + Calendar.getInstance().getTimeInMillis()).setSmallIcon(R.drawable.ic_notify).setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
+                        .setContentText("Yayyaya" + Calendar.getInstance().getTimeInMillis())
+                        .setSmallIcon(R.drawable.ic_notify)
+                        .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
+                        //.setColor(ContextCompat.getColor(getActivity(),R.color.iconAccent))
                         .setContentIntent(pIntent);
                 if (Build.VERSION.SDK_INT < 16) {
                     noti = notificationBuilder.getNotification();

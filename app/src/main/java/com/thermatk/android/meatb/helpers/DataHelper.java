@@ -5,19 +5,11 @@ import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.text.format.DateFormat;
 
-import com.github.tibolte.agendacalendarview.models.CalendarEvent;
-import com.github.tibolte.agendacalendarview.models.IDayItem;
-import com.github.tibolte.agendacalendarview.models.IWeekItem;
 import com.thermatk.android.meatb.R;
-import com.thermatk.android.meatb.agenda.BocconiCalendarEvent;
 import com.thermatk.android.meatb.data.AgendaEvent;
 import com.thermatk.android.meatb.data.EventDay;
 import com.thermatk.android.meatb.data.InboxMessage;
 import com.thermatk.android.meatb.data.InitData;
-import com.thermatk.android.meatb.data.agenda.RCal;
-import com.thermatk.android.meatb.data.agenda.RDay;
-import com.thermatk.android.meatb.data.agenda.REvent;
-import com.thermatk.android.meatb.data.agenda.RWeek;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -264,7 +256,7 @@ public class DataHelper {
         return Long.parseLong(dateAPI.substring(dateAPI.indexOf('(')+1,dateAPI.indexOf('+')));
     }
 
-
+    /* REWRITE
     public static void getAgendaEventList(List<CalendarEvent> eventList, Context mContext) {
         /////
 
@@ -388,4 +380,5 @@ public class DataHelper {
             return ContextCompat.getColor(context,id);
         }
     }
+    */
 }

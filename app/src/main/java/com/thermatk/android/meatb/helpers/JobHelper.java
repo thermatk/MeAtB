@@ -3,15 +3,8 @@ package com.thermatk.android.meatb.helpers;
 import android.content.Context;
 import android.util.Log;
 
-import com.github.tibolte.agendacalendarview.CalendarManager;
-import com.github.tibolte.agendacalendarview.models.CalendarEvent;
-import com.github.tibolte.agendacalendarview.models.IDayItem;
-import com.github.tibolte.agendacalendarview.models.IWeekItem;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.thermatk.android.meatb.LogConst;
-import com.thermatk.android.meatb.agenda.ACVDay;
-import com.thermatk.android.meatb.agenda.ACVWeek;
-import com.thermatk.android.meatb.agenda.BocconiCalendarEvent;
 import com.thermatk.android.meatb.data.EventDay;
 import com.thermatk.android.meatb.yabAPIClient;
 
@@ -34,7 +27,7 @@ public class JobHelper {
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 DataHelper.writeAgendaData(response,context);
 
-
+                /* REWRITE
                 Realm realm = Realm.getDefaultInstance();
 
                 // minimum and maximum date of our calendar
@@ -65,6 +58,7 @@ public class JobHelper {
                 List<IWeekItem> readyWeeks = calendarManager.getWeeks();
                 DataHelper.writeAgendaCalendarViewPersistence(readyEvents, readyDays, readyWeeks);
                 realm.close();
+                */
             }
 
             @Override

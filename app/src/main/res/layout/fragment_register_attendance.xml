@@ -42,8 +42,7 @@
                     android:imeOptions="actionUnspecified"
                     android:hint="@string/prompt_codice"
                     android:inputType="number"
-                    android:maxLines="1"
-                    android:singleLine="true" />
+                    android:maxLines="1" />
 
             </android.support.design.widget.TextInputLayout>
 

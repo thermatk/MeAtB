@@ -243,8 +243,9 @@ public class DataHelper {
                         setReminder(context,eventId,10);
                     }
 
-
+                    agendaEvent.setHeader(day);
                     agendaList.add(agendaEvent);
+
                 }
                 day.setAgendaEvents(agendaList);
                 realm.commitTransaction();

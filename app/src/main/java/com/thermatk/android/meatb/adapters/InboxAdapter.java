@@ -49,7 +49,7 @@ public class InboxAdapter extends RealmBasedRecyclerViewAdapter<InboxMessage,
 
     @Override
     public ViewHolder onCreateRealmViewHolder(ViewGroup viewGroup, int viewType) {
-        View v = inflater.inflate(R.layout.view_inbox_row, viewGroup, false);
+        View v = inflater.inflate(R.layout.recycler_inbox_row, viewGroup, false);
         return new ViewHolder((LinearLayout) v);
     }
 

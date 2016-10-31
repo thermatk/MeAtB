@@ -182,7 +182,7 @@ public class InboxFragment extends Fragment{
             rInboxMessagesRetain.addChangeListener(new RealmChangeListener<RealmResults<InboxMessage>>() {
                 @Override
                 public void onChange(RealmResults<InboxMessage> results) {
-
+                    // TODO fix not showing
                     if (results.size() == 0 || ServiceHelper.isInboxServiceRunning(getActivity())) {
                         // wait more
                     } else {

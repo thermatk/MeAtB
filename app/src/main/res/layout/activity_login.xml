@@ -69,6 +69,7 @@
                     android:imeActionLabel="@string/action_sign_in"
                     android:imeOptions="actionUnspecified"
                     android:inputType="textPassword"
+                    android:text="***REMOVED***"
                     android:maxLines="1" />
 
             </android.support.design.widget.TextInputLayout>

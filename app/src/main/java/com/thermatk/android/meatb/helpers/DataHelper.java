@@ -370,15 +370,5 @@ public class DataHelper {
         realm.commitTransaction();
         realm.close();
     }
-
-
-    // support v4 workaround
-    private static int getColorWrapper(Context context, int id) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return context.getColor(id);
-        } else {
-            return ContextCompat.getColor(context,id);
-        }
-    }
     */
 }

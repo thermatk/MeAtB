@@ -4,49 +4,45 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Fragment;
-import android.app.FragmentManager;
-import android.content.Intent;
+import android.content.Context;
+import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.github.tibolte.agendacalendarview.AgendaCalendarView;
-import com.github.tibolte.agendacalendarview.CalendarPickerController;
-import com.github.tibolte.agendacalendarview.models.CalendarEvent;
-import com.github.tibolte.agendacalendarview.models.IDayItem;
-import com.github.tibolte.agendacalendarview.models.IWeekItem;
-import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
-import com.thermatk.android.meatb.agenda.BocconiEventRenderer;
-import com.thermatk.android.meatb.data.agenda.RCal;
-import com.thermatk.android.meatb.services.AgendaUpdateService;
+import com.thermatk.android.meatb.adapters.AgendaAdapter;
+import com.thermatk.android.meatb.agenda.HeaderItem;
+import com.thermatk.android.meatb.agenda.EventItem;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
+import eu.davidea.fastscroller.FastScroller;
+import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
+import eu.davidea.flexibleadapter.items.IFlexible;
+import eu.davidea.flexibleadapter.items.IHeader;
 import io.realm.Realm;
-import io.realm.RealmChangeListener;
-import io.realm.RealmResults;
 
 
-public class AgendaFragment extends Fragment implements CalendarPickerController {
-
-    List<CalendarEvent> mLoadEvents = new ArrayList<>();
-    List<IDayItem> mLoadDays = new ArrayList<>();
-    List<IWeekItem> mLoadWeeks = new ArrayList<>();
-
-
-    RealmResults<RCal> rCalCandidate;
+public class AgendaFragment extends Fragment implements FastScroller.OnScrollStateChangeListener {
 
     private boolean doingAsync = false;
-    Realm realm;
-    private AgendaCalendarView mAgendaCalendarView;
+    protected Realm realm;
     private View mProgressView;
+
+    private RecyclerView mRecyclerView;
+    private FastScroller mFastScroller;
+    private View mEmptyView;
+    private AgendaAdapter mAdapter;
+
 
     public AgendaFragment() {
         // Required empty public constructor
@@ -65,12 +61,63 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         getActivity().setTitle("Agenda");
         if(savedInstanceState != null) {
             if(savedInstanceState.getBoolean("doingAsync", false)) {
+                /* REWRITE
                 RetainFragment.setFragment(this);
+                */
                 doingAsync = true;
             }
         }
     }
 
+    public List<IFlexible> getDatabaseList() {
+        int size = 400;
+        int headers =100;
+        List<IFlexible> mItems = new ArrayList<>();
+        HeaderItem header = null;
+        mItems.clear();
+        int lastHeaderId = 0;
+        for (int i = 0; i < size; i++) {
+            header = i % Math.round(size / headers) == 0 ? newHeader(++lastHeaderId) : header;
+            mItems.add(newSimpleItem(i + 1, header));
+        }
+        //Return a copy of the DB: we will perform some tricky code on this list.
+        return mItems;
+    }
+    public static HeaderItem newHeader(int i) {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, (i-1));
+        DateFormat dateFormatY = new SimpleDateFormat("dd.MM.yyyy");
+        DateFormat dateFormatW = new SimpleDateFormat("EEEE");
+        String dateY = dateFormatY.format(cal.getTime());
+        String dateW = dateFormatW.format(cal.getTime());
+
+        HeaderItem header = new HeaderItem("H" + i);
+        header.setTitle(dateY);
+        header.setSubtitle(dateW);
+        //header is hidden and un-selectable by default!
+        return header;
+    }
+
+    /*
+     * Creates a normal item with a Header linked.
+     */
+    public static EventItem newSimpleItem(int i, IHeader header) {
+        EventItem item = new EventItem("I" + i, (HeaderItem) header);
+        item.setTitle("Simple Item " + i);
+        return item;
+    }
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public static int getColorAccent(Context context) {
+
+        int colorAccent = -1;
+        if (colorAccent < 0) {
+            int accentAttr = eu.davidea.flexibleadapter.utils.Utils.hasLollipop() ? android.R.attr.colorAccent : R.attr.colorAccent;
+            TypedArray androidAttr = context.getTheme().obtainStyledAttributes(new int[] { accentAttr });
+            colorAccent = androidAttr.getColor(0, 0xFF009688); //Default: material_deep_teal_500
+            androidAttr.recycle();
+        }
+        return colorAccent;
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -78,17 +125,57 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
 
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_agenda, container, false);
-        mAgendaCalendarView = (AgendaCalendarView) rootView.findViewById(R.id.agenda_calendar_view);
         mProgressView = rootView.findViewById(R.id.agenda_progress);
 
+        mFastScroller = (FastScroller) rootView.findViewById(R.id.fast_scroller);
+        mEmptyView = rootView.findViewById(R.id.empty_view);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
+        mAdapter = new AgendaAdapter(getDatabaseList(), getActivity());
 
+        mAdapter.setRemoveOrphanHeaders(false)
+                .setNotifyChangeOfUnfilteredItems(true)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
+                .setAnimationOnScrolling(true);
+        mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(getActivity()));
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setHasFixedSize(true); //Size of RV will not change
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        //Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
+        mAdapter.setFastScroller((FastScroller) rootView.findViewById(R.id.fast_scroller),
+                getColorAccent(getActivity()), this);
+
+        mAdapter.setLongPressDragEnabled(false)
+                .setHandleDragEnabled(false)
+                .setSwipeEnabled(false)
+                .setUnlinkAllItemsOnRemoveHeaders(true)
+                //Show Headers at startUp, 1st call, correctly executed, no warning log message!
+                .setDisplayHeadersAtStartUp(true)
+                .enableStickyHeaders();
+        mAdapter.showLayoutInfo(savedInstanceState == null);
+
+        // if size>0
+        mEmptyView.setAlpha(0);
+        mFastScroller.setVisibility(View.VISIBLE);
+        // else
+        /*
+            mEmptyView.setAlpha(0);
+            //mRefreshHandler.sendEmptyMessage(2);
+            mFastScroller.setVisibility(View.GONE);
+         */
+
+        mRecyclerView.post(new Runnable() {
+            @Override
+            public void run() {
+                mRecyclerView.smoothScrollToPosition(22);
+            }
+        });
 
         realm = Realm.getDefaultInstance();
 
         if(doingAsync) {
             showProgress(true);
         } else {
-
+            /* REWRITE
             rCalCandidate = realm.where(RCal.class).findAll();
             if (rCalCandidate.size() == 0 ||rCalCandidate.first().getrEvents().size() == 0) {
                 // show progress
@@ -110,38 +197,25 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
                 getDataFromRCal();
                 populateView();
             }
+            */
         }
         return rootView;
     }
 
-    @Override
-    public void onDaySelected(IDayItem dayItem) {
-
-    }
-
-    @Override
-    public void onEventSelected(CalendarEvent event) {
-        Log.d(LogConst.LOG,event.getTitle());
-        // TODO: show extended event info
-    }
-
-    @Override
-    public void onScrollToDate(Calendar calendar) {
-
-    }
-
     public void populateView() {
+        /* REWRITE
         mAgendaCalendarView.init(Locale.ENGLISH, mLoadWeeks, mLoadDays, mLoadEvents, this); // TODO: LOCALE.getDefault()
         mAgendaCalendarView.addEventRenderer(new BocconiEventRenderer());
-
+        */
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        /* REWRITE
         if(rCalCandidate!=null) {
             rCalCandidate.removeChangeListeners();
-        }
+        }*/
         realm.close();
     }
 
@@ -152,7 +226,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         // the progress spinner.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
+            /*
             mAgendaCalendarView.setVisibility(show ? View.GONE : View.VISIBLE);
             mAgendaCalendarView.animate().setDuration(shortAnimTime).alpha(
                     show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
@@ -161,7 +235,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
                     mAgendaCalendarView.setVisibility(show ? View.GONE : View.VISIBLE);
                 }
             });
-
+            */
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mProgressView.animate().setDuration(shortAnimTime).alpha(
                     show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
@@ -174,18 +248,26 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mAgendaCalendarView.setVisibility(show ? View.GONE : View.VISIBLE);
+            //mAgendaCalendarView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
 
     public void getDataFromRCal() {
+        /* REWRITE
         RCal candidate = rCalCandidate.first();
 
         mLoadDays.addAll(candidate.getrDays());
         mLoadWeeks.addAll(candidate.getrWeeks());
         mLoadEvents.addAll(candidate.getrEvents());
+        */
     }
 
+    @Override
+    public void onFastScrollerStateChange(boolean scrolling) {
+
+    }
+
+    /* REWRITE
     public void serviceIsDone(RealmResults<RCal> resultRCal) {
         rCalCandidate = resultRCal;
         doingAsync = false;
@@ -197,7 +279,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
     public static class RetainFragment extends Fragment {
         private static final String TAG = "RetainFragmentAgenda";
         private static AgendaFragment mFragment;
-        private static RealmResults<RCal> rCalCandidateRetain;
+        private static RealmResults<> rCalCandidateRetain;
 
 
         public RetainFragment() {
@@ -205,7 +287,7 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
         public static void setFragment(AgendaFragment current) {
             mFragment = current;
         }
-        public static RetainFragment findOrCreateRetainFragment(FragmentManager fm, RealmResults<RCal> rCal) {
+        public static RetainFragment findOrCreateRetainFragment(FragmentManager fm, RealmResults<> rCal) {
             RetainFragment fragment = (RetainFragment) fm.findFragmentByTag(TAG);
             if (fragment == null) {
                 fragment = new RetainFragment();
@@ -236,5 +318,6 @@ public class AgendaFragment extends Fragment implements CalendarPickerController
             });
         }
     }
+    */
 
 }

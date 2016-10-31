@@ -20,6 +20,6 @@
         android:layout_height="match_parent"
         app:rrvIsRefreshable="false"
         app:rrvLayoutType="LinearLayout"
-        app:rrvEmptyLayoutId="@layout/empty_view"
+        app:rrvEmptyLayoutId="@layout/recycler_empty_view"
         />
 </FrameLayout>

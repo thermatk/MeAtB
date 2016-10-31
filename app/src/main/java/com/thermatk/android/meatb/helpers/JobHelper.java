@@ -92,6 +92,11 @@ public class JobHelper {
             public void onFailure(int statusCode, Header[] headers, Throwable error, JSONArray response) {
                 Log.i(LogConst.LOG, "InboxRequest failed " + response);
             }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String response, Throwable error) {
+                Log.i(LogConst.LOG, "InboxRequest failed " + response);
+            }
         };
         yabAPIClient inboxClient = new yabAPIClient(context,false);
         inboxClient.getInbox(responseHandler);

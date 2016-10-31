@@ -5,11 +5,13 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,11 +20,14 @@ import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.adapters.AgendaAdapter;
 import com.thermatk.android.meatb.data.AgendaEvent;
 import com.thermatk.android.meatb.data.EventDay;
+import com.thermatk.android.meatb.services.AgendaUpdateService;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import eu.davidea.fastscroller.FastScroller;
@@ -30,6 +35,8 @@ import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.flexibleadapter.items.IHeader;
 import io.realm.Realm;
+import io.realm.RealmResults;
+import io.realm.Sort;
 
 
 public class AgendaFragment extends Fragment implements FastScroller.OnScrollStateChangeListener {
@@ -63,7 +70,7 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
             if(savedInstanceState.getBoolean("doingAsync", false)) {
                 /* REWRITE
                 RetainFragment.setFragment(this);
-                */
+                                *  */
                 doingAsync = true;
             }
         }
@@ -83,6 +90,24 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
         //Return a copy of the DB: we will perform some tricky code on this list.
         return mItems;
     }
+
+    public List<IFlexible> getDatabaseList2() {
+        List<IFlexible> mItems;
+
+        Calendar c = new GregorianCalendar();
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        Date today = c.getTime();
+
+        RealmResults<AgendaEvent> eventList = realm.where(AgendaEvent.class).greaterThan("date_start",today).findAllSorted("date_start", Sort.DESCENDING);
+        mItems = new ArrayList(eventList);
+        Log.d("TESTM",mItems.size() + " size " + ((AgendaEvent) mItems.get(2)).getDuration());
+
+
+        return getDatabaseList();
+    }
+
     public static EventDay newHeader(int i) {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, (i-1));
@@ -127,12 +152,15 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
 
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_agenda, container, false);
+        realm = Realm.getDefaultInstance();
+
+
         mProgressView = rootView.findViewById(R.id.agenda_progress);
 
         mFastScroller = (FastScroller) rootView.findViewById(R.id.fast_scroller);
         mEmptyView = rootView.findViewById(R.id.empty_view);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
-        mAdapter = new AgendaAdapter(getDatabaseList(), getActivity());
+        mAdapter = new AgendaAdapter(getDatabaseList2(), getActivity());
 
         mAdapter.setRemoveOrphanHeaders(false)
                 .setNotifyChangeOfUnfilteredItems(true)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
@@ -172,7 +200,6 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
             }
         });
 
-        realm = Realm.getDefaultInstance();
 
         if(doingAsync) {
             showProgress(true);

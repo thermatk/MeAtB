@@ -92,7 +92,8 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
     }
 
     public List<IFlexible> getDatabaseList2() {
-        List<IFlexible> mItems;
+        List<IFlexible> mItems = new ArrayList<>();
+        List<AgendaEvent> mItemsRAW;
 
         Calendar c = new GregorianCalendar();
         c.set(Calendar.HOUR_OF_DAY, 0);
@@ -101,8 +102,12 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
         Date today = c.getTime();
 
         RealmResults<AgendaEvent> eventList = realm.where(AgendaEvent.class).greaterThan("date_start",today).findAllSorted("date_start", Sort.ASCENDING);
-        mItems = new ArrayList(eventList);
-        Log.d("TESTM",mItems.size() + " size " + ((AgendaEvent) mItems.get(2)).getDate_start_long());
+        // TODO: BETTER WORKAROUND
+        mItemsRAW = realm.copyFromRealm(eventList);
+        for (int i=0; i<mItemsRAW.size(); i++)
+        {
+            mItems.add(mItemsRAW.get(i));
+        }
 
 
         return mItems;
@@ -204,9 +209,6 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
         if(doingAsync) {
             showProgress(true);
         } else {
-            Intent intent = new Intent(getActivity().getApplicationContext(),
-                    AgendaUpdateService.class);
-            getActivity().startService(intent);
             /* REWRITE
             rCalCandidate = realm.where(RCal.class).findAll();
             if (rCalCandidate.size() == 0 ||rCalCandidate.first().getrEvents().size() == 0) {

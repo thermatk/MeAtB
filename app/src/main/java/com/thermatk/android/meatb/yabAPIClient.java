@@ -64,13 +64,13 @@ public class yabAPIClient {
 
         Realm realm = Realm.getDefaultInstance();
         InitData profile = realm.where(InitData.class).findAll().first();
+        String careerId = profile.getCarreerId() + "";
+        realm.close();
 
-        String agendaURL= "http://ks3-mobile.unibocconi.it/universityapp_prod/api/v6/students/"+profile.getCarreerId()+"/agenda?rl=en&start="+dateStart+"&end="+dateEnd;
+        String agendaURL= "http://ks3-mobile.unibocconi.it/universityapp_prod/api/v6/students/"+careerId+"/agenda?rl=en&start="+dateStart+"&end="+dateEnd;
         client.addHeader("auth_secret", "b0cc0n1s3cr3t");
         client.setBasicAuth(username, password);
         client.get(agendaURL, responseHandler);
-        // TODO: what is Realm's best practice to open/close?
-        realm.close();
     }
 
     public void getAgendaForAYear(JsonHttpResponseHandler responseHandler) {

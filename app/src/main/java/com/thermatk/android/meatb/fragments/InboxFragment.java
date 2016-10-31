@@ -8,10 +8,12 @@ import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.adapters.InboxAdapter;
 import com.thermatk.android.meatb.data.InboxMessage;
@@ -91,6 +93,7 @@ public class InboxFragment extends Fragment{
                         RetainFragment.findOrCreateRetainFragment(getFragmentManager(), inboxMessages);
                 RetainFragment.setFragment(this);
                 retainFragment.waitAsync();
+
             } else {
                 attachAdapter(inboxMessages);
             }
@@ -179,10 +182,13 @@ public class InboxFragment extends Fragment{
         }
 
         private void waitAsync() {
+
+            Log.d(LogConst.LOG, "INBOX START WAITING");
             rInboxMessagesRetain.addChangeListener(new RealmChangeListener<RealmResults<InboxMessage>>() {
                 @Override
                 public void onChange(RealmResults<InboxMessage> results) {
                     // TODO fix not showing
+                    Log.d(LogConst.LOG, "INBOX DONE, CALLBACK");
                     if (results.size() == 0 || ServiceHelper.isInboxServiceRunning(getActivity())) {
                         // wait more
                     } else {

@@ -16,8 +16,8 @@ import android.view.ViewGroup;
 
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.adapters.AgendaAdapter;
-import com.thermatk.android.meatb.agenda.HeaderItem;
-import com.thermatk.android.meatb.agenda.EventItem;
+import com.thermatk.android.meatb.data.AgendaEvent;
+import com.thermatk.android.meatb.data.EventDay;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -73,7 +73,7 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
         int size = 400;
         int headers =100;
         List<IFlexible> mItems = new ArrayList<>();
-        HeaderItem header = null;
+        EventDay header = null;
         mItems.clear();
         int lastHeaderId = 0;
         for (int i = 0; i < size; i++) {
@@ -83,7 +83,7 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
         //Return a copy of the DB: we will perform some tricky code on this list.
         return mItems;
     }
-    public static HeaderItem newHeader(int i) {
+    public static EventDay newHeader(int i) {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, (i-1));
         DateFormat dateFormatY = new SimpleDateFormat("dd.MM.yyyy");
@@ -91,9 +91,9 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
         String dateY = dateFormatY.format(cal.getTime());
         String dateW = dateFormatW.format(cal.getTime());
 
-        HeaderItem header = new HeaderItem("H" + i);
-        header.setTitle(dateY);
-        header.setSubtitle(dateW);
+        EventDay header = new EventDay(i);
+        header.setDateString(dateY);
+        header.setWeekdayString(dateW);
         //header is hidden and un-selectable by default!
         return header;
     }
@@ -101,9 +101,11 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
     /*
      * Creates a normal item with a Header linked.
      */
-    public static EventItem newSimpleItem(int i, IHeader header) {
-        EventItem item = new EventItem("I" + i, (HeaderItem) header);
-        item.setTitle("Simple Item " + i);
+    public static AgendaEvent newSimpleItem(int i, IHeader header) {
+        AgendaEvent item = new AgendaEvent(i, (EventDay) header);
+        item.setTitle("Simplest Item " + i);
+        item.setDuration("8:44-"+i);
+        item.setSupertitle("Room 555");
         return item;
     }
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)

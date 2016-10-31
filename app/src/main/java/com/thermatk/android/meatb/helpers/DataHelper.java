@@ -150,7 +150,11 @@ public class DataHelper {
                 EventDay day = realm.createObject(EventDay.class, i+1);///// TODO: do not forget about the id problem
                 day.setDate(date);
                 day.setDateLong(dateLong);
-                day.setDateString(DateFormat.format("dd-MM-yyyy", date).toString());
+                day.setDateString(DateFormat.format("dd.MM.yyyy", date).toString());
+
+                String weekday = DateFormat.format("EEEE", date).toString();
+                day.setWeekdayString(weekday.substring(0, 1).toUpperCase() + weekday.substring(1));
+
                 day.setDayString(oneDay.toString());
                 day.setLastUpdated(currentTime);
                 //Log.d(LogConst.LOG,Long.toString(day.getDateLong()));

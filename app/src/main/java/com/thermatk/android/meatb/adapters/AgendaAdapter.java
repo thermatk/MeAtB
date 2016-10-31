@@ -8,8 +8,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.thermatk.android.meatb.R;
-import com.thermatk.android.meatb.agenda.HeaderItem;
-import com.thermatk.android.meatb.agenda.EventItem;
+import com.thermatk.android.meatb.data.AgendaEvent;
+import com.thermatk.android.meatb.data.EventDay;
 
 import java.util.List;
 
@@ -64,10 +64,10 @@ public class AgendaAdapter extends FlexibleAdapter<IFlexible> {
 
         //return super.onCreateBubbleText(position);
         IFlexible current = itemsList.get(position);
-        if (current instanceof EventItem) {
-            return ((EventItem) itemsList.get(position)).getHeader().getTitle();
-        } else if(current instanceof HeaderItem) {
-            return ((HeaderItem) itemsList.get(position)).getTitle();
+        if (current instanceof AgendaEvent) {
+            return ((AgendaEvent) itemsList.get(position)).getHeader().getDateString();
+        } else if(current instanceof EventDay) {
+            return ((EventDay) itemsList.get(position)).getDateString();
         } else {
             return "-";
         }

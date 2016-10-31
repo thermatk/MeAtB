@@ -30,5 +30,6 @@ public class InboxUpdateService extends IntentService {
         JobHelper.runInboxUpdate(getApplicationContext());
         Log.d(LogConst.LOG, "InboxUpdateService ended");
         ServiceHelper.setInboxServiceRunning(getApplicationContext(),false);
+        // TODO: rewrite to realm service stateholder(so that changelisteners can wait for it)
     }
 }

@@ -18,14 +18,16 @@ import eu.davidea.viewholders.FlexibleViewHolder;
 
 public final class AgendaEventViewHolder extends FlexibleViewHolder {
     public TextView mTitle;
-    public TextView mSubtitle;
+    public TextView mLocation;
+    public TextView mTime;
     public Context mContext;
 
     public AgendaEventViewHolder(View view, FlexibleAdapter adapter) {
         super(view, adapter);
         this.mContext = view.getContext();
         this.mTitle = (TextView) view.findViewById(R.id.view_agenda_event_title);
-        this.mSubtitle = (TextView) view.findViewById(R.id.view_agenda_event_location);
+        this.mLocation = (TextView) view.findViewById(R.id.view_agenda_event_location);
+        this.mTime = (TextView) view.findViewById(R.id.view_agenda_event_time);
     }
 
     @Override

@@ -198,12 +198,12 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
             mFastScroller.setVisibility(View.GONE);
          */
 
-        mRecyclerView.post(new Runnable() {
+        /*mRecyclerView.post(new Runnable() {
             @Override
             public void run() {
                 mRecyclerView.smoothScrollToPosition(22);
             }
-        });
+        });*/
 
 
         if(doingAsync) {

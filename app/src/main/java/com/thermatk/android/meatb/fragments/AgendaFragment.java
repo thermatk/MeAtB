@@ -193,6 +193,7 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
     @Override
     public void onDetach() {
         super.onDetach();
+        // TODO: fix detach?
         /* REWRITE
         if(rCalCandidate!=null) {
             rCalCandidate.removeChangeListeners();
@@ -289,7 +290,6 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
                         // wait more?
                     } else {
                         Log.d(LogConst.LOG, "SERVICE AGENDA DONE, GOGOGO");
-                        rAgendaEvents.removeChangeListeners();
                         rServiceLock.removeChangeListeners();
                         mFragment.serviceIsDone(rAgendaEvents);
                     }

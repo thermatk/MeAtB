@@ -21,15 +21,15 @@ public class InboxUpdateService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        if(ServiceHelper.isInboxServiceRunning(getApplicationContext())) {
+        if(ServiceHelper.isInboxServiceRunning()) {
             Log.d(LogConst.LOG, "InboxUpdateService already running");
             return;
         }
-        ServiceHelper.setInboxServiceRunning(getApplicationContext(),true);
+        ServiceHelper.setInboxServiceRunning(true);
         Log.d(LogConst.LOG, "InboxUpdateService started");
         JobHelper.runInboxUpdate(getApplicationContext());
         Log.d(LogConst.LOG, "InboxUpdateService ended");
-        ServiceHelper.setInboxServiceRunning(getApplicationContext(),false);
+        ServiceHelper.setInboxServiceRunning(false);
         // TODO: rewrite to realm service stateholder(so that changelisteners can wait for it)
     }
 }

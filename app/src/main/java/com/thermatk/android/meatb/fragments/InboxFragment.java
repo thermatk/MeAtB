@@ -17,6 +17,7 @@ import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.adapters.InboxAdapter;
 import com.thermatk.android.meatb.data.InboxMessage;
+import com.thermatk.android.meatb.data.ServiceLock;
 import com.thermatk.android.meatb.helpers.ServiceHelper;
 import com.thermatk.android.meatb.services.InboxUpdateService;
 
@@ -89,8 +90,13 @@ public class InboxFragment extends Fragment{
                 doingAsync = true;
                 showProgress(true);
 
+                ///
+                RealmResults<ServiceLock> sl = realm.where(ServiceLock.class).equalTo("lockId", ServiceHelper.LOCK_INBOX_UPDATE_SERVICE).findAll();
+                ///
+
+
                 RetainFragment retainFragment =
-                        RetainFragment.findOrCreateRetainFragment(getFragmentManager(), inboxMessages);
+                        RetainFragment.findOrCreateRetainFragment(getFragmentManager(), inboxMessages,sl);
                 RetainFragment.setFragment(this);
                 retainFragment.waitAsync();
 
@@ -158,6 +164,7 @@ public class InboxFragment extends Fragment{
         private static final String TAG = "RetainFragmentInbox";
         private static InboxFragment mFragment;
         private static RealmResults<InboxMessage> rInboxMessagesRetain;
+        private static RealmResults<ServiceLock> rServiceLock;
 
 
         public RetainFragment() {
@@ -165,12 +172,13 @@ public class InboxFragment extends Fragment{
         public static void setFragment(InboxFragment current) {
             mFragment = current;
         }
-        public static RetainFragment findOrCreateRetainFragment(FragmentManager fm, RealmResults<InboxMessage> inboxMessages) {
+        public static RetainFragment findOrCreateRetainFragment(FragmentManager fm, RealmResults<InboxMessage> inboxMessages, RealmResults<ServiceLock> serviceLock) {
             RetainFragment fragment = (RetainFragment) fm.findFragmentByTag(TAG);
             if (fragment == null) {
                 fragment = new RetainFragment();
                 fm.beginTransaction().add(fragment, TAG).commit();
                 rInboxMessagesRetain = inboxMessages;
+                rServiceLock = serviceLock;
             }
             return fragment;
         }
@@ -182,17 +190,16 @@ public class InboxFragment extends Fragment{
         }
 
         private void waitAsync() {
-
-            Log.d(LogConst.LOG, "INBOX START WAITING");
-            rInboxMessagesRetain.addChangeListener(new RealmChangeListener<RealmResults<InboxMessage>>() {
+            rServiceLock.addChangeListener(new RealmChangeListener<RealmResults<ServiceLock>>() {
                 @Override
-                public void onChange(RealmResults<InboxMessage> results) {
-                    // TODO fix not showing
-                    Log.d(LogConst.LOG, "INBOX DONE, CALLBACK");
-                    if (results.size() == 0 || ServiceHelper.isInboxServiceRunning(getActivity())) {
-                        // wait more
+                public void onChange(RealmResults<ServiceLock> results) {
+                    if (rInboxMessagesRetain.size() == 0) {
+                        Log.d(LogConst.LOG, "SERVICE INBOX DONE, BUT WOW NOTHING");
+                        // wait more?
                     } else {
+                        Log.d(LogConst.LOG, "SERVICE INBOX DONE, GOGOGO");
                         rInboxMessagesRetain.removeChangeListeners();
+                        rServiceLock.removeChangeListeners();
                         mFragment.serviceIsDone(rInboxMessagesRetain);
                     }
                 }

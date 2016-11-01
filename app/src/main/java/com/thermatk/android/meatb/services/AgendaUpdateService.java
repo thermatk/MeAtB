@@ -20,15 +20,15 @@ public class AgendaUpdateService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        if(ServiceHelper.isAgendaServiceRunning(getApplicationContext())) {
+        if(ServiceHelper.isAgendaServiceRunning()) {
             Log.d(LogConst.LOG, "AgendaUpdateService already running");
             return;
         }
-        ServiceHelper.setAgendaServiceRunning(getApplicationContext(),true);
+        ServiceHelper.setAgendaServiceRunning(true);
         Log.d(LogConst.LOG, "AgendaUpdateService started");
         JobHelper.runAgendaUpdate(getApplicationContext());
         Log.d(LogConst.LOG, "AgendaUpdateService ended");
-        ServiceHelper.setAgendaServiceRunning(getApplicationContext(),false);
+        ServiceHelper.setAgendaServiceRunning(false);
     }
 
 }

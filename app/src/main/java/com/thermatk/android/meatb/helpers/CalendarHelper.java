@@ -15,7 +15,6 @@ import android.util.Log;
 
 import com.thermatk.android.meatb.LogConst;
 
-import java.util.Calendar;
 import java.util.TimeZone;
 
 public class CalendarHelper {

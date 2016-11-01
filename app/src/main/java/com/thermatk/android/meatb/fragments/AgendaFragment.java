@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
@@ -16,14 +17,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.adapters.AgendaAdapter;
 import com.thermatk.android.meatb.data.AgendaEvent;
-import com.thermatk.android.meatb.data.EventDay;
+import com.thermatk.android.meatb.data.ServiceLock;
+import com.thermatk.android.meatb.helpers.ServiceHelper;
 import com.thermatk.android.meatb.services.AgendaUpdateService;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -33,8 +34,8 @@ import java.util.List;
 import eu.davidea.fastscroller.FastScroller;
 import eu.davidea.flexibleadapter.common.SmoothScrollLinearLayoutManager;
 import eu.davidea.flexibleadapter.items.IFlexible;
-import eu.davidea.flexibleadapter.items.IHeader;
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
@@ -49,7 +50,7 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
     private FastScroller mFastScroller;
     private View mEmptyView;
     private AgendaAdapter mAdapter;
-
+    private RealmResults<AgendaEvent> eventList;
 
     public AgendaFragment() {
         // Required empty public constructor
@@ -68,40 +69,24 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
         getActivity().setTitle("Agenda");
         if(savedInstanceState != null) {
             if(savedInstanceState.getBoolean("doingAsync", false)) {
-                /* REWRITE
                 RetainFragment.setFragment(this);
-                                *  */
                 doingAsync = true;
             }
         }
     }
-
-    public List<IFlexible> getDatabaseList() {
-        int size = 400;
-        int headers =100;
-        List<IFlexible> mItems = new ArrayList<>();
-        EventDay header = null;
-        mItems.clear();
-        int lastHeaderId = 0;
-        for (int i = 0; i < size; i++) {
-            header = i % Math.round(size / headers) == 0 ? newHeader(++lastHeaderId) : header;
-            mItems.add(newSimpleItem(i + 1, header));
-        }
-        //Return a copy of the DB: we will perform some tricky code on this list.
-        return mItems;
-    }
-
-    public List<IFlexible> getDatabaseList2() {
-        List<IFlexible> mItems = new ArrayList<>();
-        List<AgendaEvent> mItemsRAW;
+    public static Date getToday() {
 
         Calendar c = new GregorianCalendar();
         c.set(Calendar.HOUR_OF_DAY, 0);
         c.set(Calendar.MINUTE, 0);
         c.set(Calendar.SECOND, 0);
-        Date today = c.getTime();
+        return c.getTime();
+    }
+    public List<IFlexible> formDatabaseList() {
+        List<IFlexible> mItems = new ArrayList<>();
+        List<AgendaEvent> mItemsRAW;
 
-        RealmResults<AgendaEvent> eventList = realm.where(AgendaEvent.class).greaterThan("date_start",today).findAllSorted("date_start", Sort.ASCENDING);
+        eventList = realm.where(AgendaEvent.class).greaterThan("date_start",getToday()).findAllSorted("date_start", Sort.ASCENDING);
         // TODO: BETTER WORKAROUND
         mItemsRAW = realm.copyFromRealm(eventList);
         for (int i=0; i<mItemsRAW.size(); i++)
@@ -113,31 +98,6 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
         return mItems;
     }
 
-    public static EventDay newHeader(int i) {
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, (i-1));
-        DateFormat dateFormatY = new SimpleDateFormat("dd.MM.yyyy");
-        DateFormat dateFormatW = new SimpleDateFormat("EEEE");
-        String dateY = dateFormatY.format(cal.getTime());
-        String dateW = dateFormatW.format(cal.getTime());
-
-        EventDay header = new EventDay(i);
-        header.setDateString(dateY);
-        header.setWeekdayString(dateW);
-        //header is hidden and un-selectable by default!
-        return header;
-    }
-
-    /*
-     * Creates a normal item with a Header linked.
-     */
-    public static AgendaEvent newSimpleItem(int i, IHeader header) {
-        AgendaEvent item = new AgendaEvent(i, (EventDay) header);
-        item.setTitle("Simplest Item " + i);
-        item.setDuration("8:44-"+i);
-        item.setSupertitle("Room 555");
-        return item;
-    }
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public static int getColorAccent(Context context) {
 
@@ -165,53 +125,15 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
         mFastScroller = (FastScroller) rootView.findViewById(R.id.fast_scroller);
         mEmptyView = rootView.findViewById(R.id.empty_view);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
-        mAdapter = new AgendaAdapter(getDatabaseList2(), getActivity());
 
-        mAdapter.setRemoveOrphanHeaders(false)
-                .setNotifyChangeOfUnfilteredItems(true)//We have highlighted text while filtering, so let's enable this feature to be consistent with the active filter
-                .setAnimationOnScrolling(true);
-        mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(getActivity()));
-        mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.setHasFixedSize(true); //Size of RV will not change
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        //Add FastScroll to the RecyclerView, after the Adapter has been attached the RecyclerView!!!
-        mAdapter.setFastScroller((FastScroller) rootView.findViewById(R.id.fast_scroller),
-                getColorAccent(getActivity()), this);
-
-        mAdapter.setLongPressDragEnabled(false)
-                .setHandleDragEnabled(false)
-                .setSwipeEnabled(false)
-                .setUnlinkAllItemsOnRemoveHeaders(true)
-                //Show Headers at startUp, 1st call, correctly executed, no warning log message!
-                .setDisplayHeadersAtStartUp(true)
-                .enableStickyHeaders();
-        mAdapter.showLayoutInfo(savedInstanceState == null);
-
-        // if size>0
-        mEmptyView.setAlpha(0);
-        mFastScroller.setVisibility(View.VISIBLE);
-        // else
-        /*
-            mEmptyView.setAlpha(0);
-            //mRefreshHandler.sendEmptyMessage(2);
-            mFastScroller.setVisibility(View.GONE);
-         */
-
-        /*mRecyclerView.post(new Runnable() {
-            @Override
-            public void run() {
-                mRecyclerView.smoothScrollToPosition(22);
-            }
-        });*/
 
 
         if(doingAsync) {
             showProgress(true);
         } else {
-            /* REWRITE
-            rCalCandidate = realm.where(RCal.class).findAll();
-            if (rCalCandidate.size() == 0 ||rCalCandidate.first().getrEvents().size() == 0) {
+            eventList = realm.where(AgendaEvent.class).greaterThan("date_start",getToday()).findAllSorted("date_start", Sort.ASCENDING);
+
+            if (eventList.size() == 0) { // TODO: corner case - no events actually in schedule
                 // show progress
                 // start service
                 Intent intent = new Intent(getActivity().getApplicationContext(),
@@ -222,25 +144,50 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
                 doingAsync = true;
                 showProgress(true);
 
+
+                ///
+                RealmResults<ServiceLock> sl = realm.where(ServiceLock.class).equalTo("lockId", ServiceHelper.LOCK_AGENDA_UPDATE_SERVICE).findAll();
+                ///
+
                 RetainFragment retainFragment =
-                        RetainFragment.findOrCreateRetainFragment(getFragmentManager(), rCalCandidate);
+                        RetainFragment.findOrCreateRetainFragment(getFragmentManager(), eventList, sl);
                 RetainFragment.setFragment(this);
                 retainFragment.waitAsync();
             } else {
                 // Usual way
-                getDataFromRCal();
                 populateView();
             }
-            */
         }
         return rootView;
     }
 
     public void populateView() {
-        /* REWRITE
-        mAgendaCalendarView.init(Locale.ENGLISH, mLoadWeeks, mLoadDays, mLoadEvents, this); // TODO: LOCALE.getDefault()
-        mAgendaCalendarView.addEventRenderer(new BocconiEventRenderer());
-        */
+        mAdapter = new AgendaAdapter(formDatabaseList(), getActivity());
+        mAdapter.setRemoveOrphanHeaders(false)
+                .setNotifyChangeOfUnfilteredItems(true)
+                .setAnimationOnScrolling(true);
+        mRecyclerView.setLayoutManager(new SmoothScrollLinearLayoutManager(getActivity()));
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mAdapter.setFastScroller(mFastScroller,
+                getColorAccent(getActivity()), this);
+        mAdapter.setLongPressDragEnabled(false)
+                .setHandleDragEnabled(false)
+                .setSwipeEnabled(false)
+                .setUnlinkAllItemsOnRemoveHeaders(true)
+                .setDisplayHeadersAtStartUp(true)
+                .enableStickyHeaders();
+        mAdapter.showLayoutInfo(true);
+        mEmptyView.setAlpha(0);
+        mFastScroller.setVisibility(View.VISIBLE);
+
+        /*mRecyclerView.post(new Runnable() {
+            @Override
+            public void run() {
+                mRecyclerView.smoothScrollToPosition(22);
+            }
+        });*/
     }
 
     @Override
@@ -260,6 +207,9 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
         // the progress spinner.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+            mFastScroller.setVisibility(show ? View.GONE : View.VISIBLE);
+            mEmptyView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mRecyclerView.setVisibility(show ? View.GONE : View.VISIBLE);
             /*
             mAgendaCalendarView.setVisibility(show ? View.GONE : View.VISIBLE);
             mAgendaCalendarView.animate().setDuration(shortAnimTime).alpha(
@@ -282,18 +232,11 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mFastScroller.setVisibility(show ? View.GONE : View.VISIBLE);
+            mEmptyView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mRecyclerView.setVisibility(show ? View.GONE : View.VISIBLE);
             //mAgendaCalendarView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
-    }
-
-    public void getDataFromRCal() {
-        /* REWRITE
-        RCal candidate = rCalCandidate.first();
-
-        mLoadDays.addAll(candidate.getrDays());
-        mLoadWeeks.addAll(candidate.getrWeeks());
-        mLoadEvents.addAll(candidate.getrEvents());
-        */
     }
 
     @Override
@@ -301,11 +244,9 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
 
     }
 
-    /* REWRITE
-    public void serviceIsDone(RealmResults<RCal> resultRCal) {
-        rCalCandidate = resultRCal;
+    public void serviceIsDone(RealmResults<AgendaEvent> resultEvents) {
+        eventList = resultEvents;
         doingAsync = false;
-        getDataFromRCal();
         populateView();
         showProgress(false);
     }
@@ -313,7 +254,8 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
     public static class RetainFragment extends Fragment {
         private static final String TAG = "RetainFragmentAgenda";
         private static AgendaFragment mFragment;
-        private static RealmResults<> rCalCandidateRetain;
+        private static RealmResults<AgendaEvent> rAgendaEvents;
+        private static RealmResults<ServiceLock> rServiceLock;
 
 
         public RetainFragment() {
@@ -321,12 +263,13 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
         public static void setFragment(AgendaFragment current) {
             mFragment = current;
         }
-        public static RetainFragment findOrCreateRetainFragment(FragmentManager fm, RealmResults<> rCal) {
+        public static RetainFragment findOrCreateRetainFragment(FragmentManager fm, RealmResults<AgendaEvent> agendaEvents, RealmResults<ServiceLock> sl) {
             RetainFragment fragment = (RetainFragment) fm.findFragmentByTag(TAG);
             if (fragment == null) {
                 fragment = new RetainFragment();
                 fm.beginTransaction().add(fragment, TAG).commit();
-                rCalCandidateRetain = rCal;
+                rAgendaEvents = agendaEvents;
+                rServiceLock = sl;
             }
             return fragment;
         }
@@ -338,20 +281,21 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
         }
 
         private void waitAsync() {
-            rCalCandidateRetain.addChangeListener(new RealmChangeListener<RealmResults<RCal>>() {
+            rServiceLock.addChangeListener(new RealmChangeListener<RealmResults<ServiceLock>>() {
                 @Override
-                public void onChange(RealmResults<RCal> results) {
-
-                    if (results.size() == 0 ||results.first().getrEvents().size() == 0) {
-                        // wait more
+                public void onChange(RealmResults<ServiceLock> results) {
+                    if (rAgendaEvents.size() == 0) {
+                        Log.d(LogConst.LOG, "SERVICE AGENDA DONE, BUT WOW NOTHING");
+                        // wait more?
                     } else {
-                        rCalCandidateRetain.removeChangeListeners();
-                        mFragment.serviceIsDone(rCalCandidateRetain);
+                        Log.d(LogConst.LOG, "SERVICE AGENDA DONE, GOGOGO");
+                        rAgendaEvents.removeChangeListeners();
+                        rServiceLock.removeChangeListeners();
+                        mFragment.serviceIsDone(rAgendaEvents);
                     }
                 }
             });
         }
     }
-    */
 
 }

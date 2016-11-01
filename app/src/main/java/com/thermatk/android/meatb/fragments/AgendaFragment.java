@@ -102,12 +102,10 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
     public static int getColorAccent(Context context) {
 
         int colorAccent = -1;
-        if (colorAccent < 0) {
             int accentAttr = eu.davidea.flexibleadapter.utils.Utils.hasLollipop() ? android.R.attr.colorAccent : R.attr.colorAccent;
             TypedArray androidAttr = context.getTheme().obtainStyledAttributes(new int[] { accentAttr });
             colorAccent = androidAttr.getColor(0, 0xFF009688); //Default: material_deep_teal_500
             androidAttr.recycle();
-        }
         return colorAccent;
     }
     @Override

@@ -1,11 +1,8 @@
 package com.thermatk.android.meatb.helpers;
 
 import android.content.Context;
-import android.os.Build;
-import android.support.v4.content.ContextCompat;
 import android.text.format.DateFormat;
 
-import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.data.AgendaEvent;
 import com.thermatk.android.meatb.data.EventDay;
 import com.thermatk.android.meatb.data.InboxMessage;
@@ -16,13 +13,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmList;
-import io.realm.RealmResults;
 
 import static com.thermatk.android.meatb.helpers.CalendarHelper.addEvent;
 import static com.thermatk.android.meatb.helpers.CalendarHelper.getReminderState;

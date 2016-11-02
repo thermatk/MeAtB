@@ -221,7 +221,7 @@ public class DataHelper {
                     agendaEvent.setSupertitle(supertitle);
                     agendaEvent.setType(type);
                     agendaEvent.setTitle(title);
-                    // TODO: add calendar
+                    // TODO: move sharedpref up
                     if(getReminderState(context)) {
                         long startTime = date_start.getTime();
 

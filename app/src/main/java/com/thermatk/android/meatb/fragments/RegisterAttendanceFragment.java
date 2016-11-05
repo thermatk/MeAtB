@@ -316,7 +316,7 @@ public class RegisterAttendanceFragment extends Fragment {
                             asyncResultMessage = "Network error";
                         }
                     };
-                    yabAPIClient registerClient = new yabAPIClient(getActivity(),false);
+                    yabAPIClient registerClient = new yabAPIClient(mFragment.getActivity(),false);
                     registerClient.registerAttendance(codice, responseHandler);
 
                     return null;

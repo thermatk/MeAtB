@@ -44,6 +44,7 @@ import com.thermatk.android.meatb.fragments.ProfileFragment;
 import io.realm.Realm;
 
 import static com.thermatk.android.meatb.helpers.CalendarHelper.addCalendar;
+import static com.thermatk.android.meatb.helpers.CalendarHelper.getReminderState;
 import static com.thermatk.android.meatb.helpers.CalendarHelper.setReminderState;
 
 public class MainActivity extends AppCompatActivity {
@@ -182,8 +183,11 @@ public class MainActivity extends AppCompatActivity {
                         return false;
                     }
                 });
+        boolean isReminder = getReminderState(this);
         calendarSwitchDrawerItem = new SwitchDrawerItem().withName("Calendar Reminders").withIcon(GoogleMaterial.Icon.gmd_alarm_on).
-                withChecked(false).withSelectable(false).withOnCheckedChangeListener(onCalendarSwitchListener);
+                withChecked(
+                        isReminder && (ContextCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.WRITE_CALENDAR)!= PackageManager.PERMISSION_GRANTED))
+                .withSelectable(false).withOnCheckedChangeListener(onCalendarSwitchListener);
 
         resultBuilder.addDrawerItems(
                 profileDrawerItem,
@@ -215,16 +219,13 @@ public class MainActivity extends AppCompatActivity {
                         ActivityCompat.requestPermissions(mActivity,
                                 new String[]{Manifest.permission.WRITE_CALENDAR},
                                 MY_PERMISSIONS_REQUEST_WRITE_CALENDAR);
-
-                        // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                        // app-defined int constant. The callback method gets the
-                        // result of the request.
                 }else {
                     long calendarId = addCalendar(getApplicationContext());
                     setReminderState(mSharedPreferences,true,calendarId); //TODO: check if have calendar and need one
                 }
             } else {
                 setReminderState(mSharedPreferences,false,-1);
+                // delete calendars?
             }
         }
     };
@@ -239,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
                     // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
+                    // task you need to do.
                     Log.d(LogConst.LOG, "Granted Calendar!");
                     long calendarId = addCalendar(getApplicationContext());
                     setReminderState(mSharedPreferences,true,calendarId);

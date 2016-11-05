@@ -13,7 +13,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -123,35 +125,21 @@ public class DataHelper {
 
         Realm realm = Realm.getDefaultInstance();
         long currentTime = System.currentTimeMillis();
+        boolean reminders = getReminderState(context);
         //// Days loop
         for (int i = 0; i < response.length(); i++) {
             JSONObject oneDay;
-            long dateLong;
-            Date date;
             try {
                 oneDay = response.getJSONObject(i);
-                String strTemp = oneDay.getString("date");
-
-                dateLong = getDateAPI(strTemp);
-                //TODO: do some better timezone hacks
-                // add 4 hours to be sure we're in the right day
-                //dateLong +=  (DateUtils.HOUR_IN_MILLIS * 4);
-                date = new Date(dateLong);
                 //
                 // TODO: find previously done days and compare
 
                 realm.beginTransaction();
+
                 EventDay day = realm.createObject(EventDay.class, i+1);///// TODO: do not forget about the id problem
-                day.setDate(date);
-                day.setDateLong(dateLong);
-                day.setDateString(DateFormat.format("dd.MM.yyyy", date).toString());
-
-                String weekday = DateFormat.format("EEEE", date).toString();
-                day.setWeekdayString(weekday.substring(0, 1).toUpperCase() + weekday.substring(1));
-
-                day.setDayString(oneDay.toString());
+                fillEventDay(day, oneDay);
                 day.setLastUpdated(currentTime);
-                //Log.d(LogConst.LOG,Long.toString(day.getDateLong()));
+
                 RealmList<AgendaEvent> agendaList = new RealmList<>();
                 ///////Events loop
                 JSONArray eventsArray = oneDay.getJSONArray("events");
@@ -159,82 +147,11 @@ public class DataHelper {
                 for (int j = 0; j < eventsArray.length(); j++) {
 
                     JSONObject oneEvent;
-                    Date date_end;
-                    Date date_start;
-                    long date_end_long = 0;
-                    long date_start_long;
-                    String duration;
-                    String description;
-                    long id;
-                    String supertitle;
-                    String title;
-                    long type;
-                    long courseId;
-
                     oneEvent = eventsArray.getJSONObject(j);
-                    title = oneEvent.getString("title");
-                    supertitle = oneEvent.getString("supertitle");
-                    description = oneEvent.getString("description");
-
-                    id = oneEvent.getLong("id");
-                    type = oneEvent.getInt("type");
-
-                    /// Date fun
-                    strTemp = oneEvent.getString("date_end");
-
-                    if(strTemp.equals("null")) {
-                        date_end = null;
-                    } else {
-                        date_end_long = getDateAPI(strTemp);
-                        date_end = new Date(date_end_long);
-                    }
-                    strTemp = oneEvent.getString("date_start");
-                    date_start_long = getDateAPI(strTemp);
-                    date_start = new Date(date_start_long);
-
-                    if (date_end == null){
-                        duration = DateFormat.format("kk:mm", date_start) + " - ∞";
-                    } else {
-                        duration  = DateFormat.format("kk:mm", date_start) + " - " +DateFormat.format("kk:mm", date_end);
-                    }
-                    //////
-                    ///course id cut fun
-                    strTemp = description.substring(0,description.indexOf(' '));
-                    if(strTemp.matches("[-+]?\\d*\\.?\\d+")){
-                        courseId = Long.parseLong(strTemp);
-                    } else {
-                        courseId = 0L;
-                    }
-                    ///
-
                     AgendaEvent agendaEvent = realm.createObject(AgendaEvent.class);
-
-                    agendaEvent.setCourseId(courseId);
-                    agendaEvent.setDate_end(date_end);
-                    agendaEvent.setDate_start(date_start);
-                    agendaEvent.setDuration(duration);
-                    agendaEvent.setDate_start_long(date_start_long);
-                    agendaEvent.setDate_end_long(date_end_long);
-                    agendaEvent.setDescription(description);
-                    agendaEvent.setId(id);
-                    agendaEvent.setEventString(oneEvent.toString());
-                    agendaEvent.setSupertitle(supertitle);
-                    agendaEvent.setType(type);
-                    agendaEvent.setTitle(title);
-                    // TODO: move sharedpref up
-                    if(getReminderState(context)) {
-                        long startTime = date_start.getTime();
-
-                        long endTime = 0;
-                        if(date_end == null) {
-                            // add 90 minutes
-                            endTime = startTime + 90*60*1000;
-                        } else {
-                            endTime = date_end.getTime();
-                        }
-                        long eventId = addEvent(context,startTime,endTime,title,"me@B class reminder",supertitle);
-                        agendaEvent.setCalendarId(eventId);
-                        setReminder(context,eventId,10);
+                    fillAgendaEvent(agendaEvent, oneEvent);
+                    if(reminders) {
+                        remindAgendaEvent(context, agendaEvent);
                     }
 
                     agendaEvent.setHeader(day);
@@ -249,6 +166,107 @@ public class DataHelper {
             }
         }
         realm.close();
+    }
+
+    public static void remindAgendaEvent(Context context, AgendaEvent agendaEvent) {
+        // TODO: maybe someone wants calendar filled, but no reminders? Easy to separate
+        long startTime = agendaEvent.getDate_start().getTime();
+
+        long endTime = 0;
+        if(agendaEvent.getDate_end() == null) {
+            // add 90 minutes
+            endTime = startTime + 90*60*1000;
+        } else {
+            endTime = agendaEvent.getDate_end().getTime();
+        }
+        long eventId = addEvent(context,startTime,endTime,agendaEvent.getTitle(),"me@B class reminder",agendaEvent.getSupertitle());
+        agendaEvent.setCalendarId(eventId);
+        setReminder(context,eventId,10);
+    }
+
+    public static void fillEventDay(EventDay day, JSONObject oneDay) throws JSONException {
+        String strTemp = oneDay.getString("date");
+
+        long dateLong;
+        Date date;
+
+        dateLong = getDateAPI(strTemp);
+        //TODO: do some better timezone hacks
+        // add 4 hours to be sure we're in the right day
+        //dateLong +=  (DateUtils.HOUR_IN_MILLIS * 4);
+        date = new Date(dateLong);
+
+        day.setDate(date);
+        day.setDateLong(dateLong);
+        day.setDateString(new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH).format(date)); // TODO: LOCALE! or not?
+        String weekday = new SimpleDateFormat("EEEE", Locale.ENGLISH).format(date);
+
+        day.setWeekdayString(weekday.substring(0, 1).toUpperCase() + weekday.substring(1));
+
+        day.setDayString(oneDay.toString());
+
+    }
+    public static void fillAgendaEvent(AgendaEvent agendaEvent, JSONObject oneEvent) throws JSONException {
+        Date date_end;
+        Date date_start;
+        long date_end_long = 0;
+        long date_start_long;
+        String duration;
+        String description;
+        long id;
+        String supertitle;
+        String title;
+        long type;
+        long courseId;
+        String strTemp;
+
+        title = oneEvent.getString("title");
+        supertitle = oneEvent.getString("supertitle");
+        description = oneEvent.getString("description");
+
+        id = oneEvent.getLong("id");
+        type = oneEvent.getInt("type");
+
+        /// Date fun
+        strTemp = oneEvent.getString("date_end");
+
+        if(strTemp.equals("null")) {
+            date_end = null;
+        } else {
+            date_end_long = getDateAPI(strTemp);
+            date_end = new Date(date_end_long);
+        }
+        strTemp = oneEvent.getString("date_start");
+        date_start_long = getDateAPI(strTemp);
+        date_start = new Date(date_start_long);
+
+        if (date_end == null){
+            duration = DateFormat.format("kk:mm", date_start) + " - ∞";
+        } else {
+            duration  = DateFormat.format("kk:mm", date_start) + " - " +DateFormat.format("kk:mm", date_end);
+        }
+        //////
+        ///course id cut fun
+        strTemp = description.substring(0,description.indexOf(' '));
+        if(strTemp.matches("[-+]?\\d*\\.?\\d+")){
+            courseId = Long.parseLong(strTemp);
+        } else {
+            courseId = 0L;
+        }
+        ///
+
+        agendaEvent.setCourseId(courseId);
+        agendaEvent.setDate_end(date_end);
+        agendaEvent.setDate_start(date_start);
+        agendaEvent.setDuration(duration);
+        agendaEvent.setDate_start_long(date_start_long);
+        agendaEvent.setDate_end_long(date_end_long);
+        agendaEvent.setDescription(description);
+        agendaEvent.setId(id);
+        agendaEvent.setEventString(oneEvent.toString());
+        agendaEvent.setSupertitle(supertitle);
+        agendaEvent.setType(type);
+        agendaEvent.setTitle(title);
     }
 
     private static long getDateAPI(String dateAPI) {

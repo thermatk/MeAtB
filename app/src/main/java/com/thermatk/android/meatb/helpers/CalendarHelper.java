@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.CalendarContract;
@@ -18,6 +19,9 @@ import com.thermatk.android.meatb.LogConst;
 import java.util.TimeZone;
 
 public class CalendarHelper {
+    public static final String ACCOUNT_NAME = "me@B";
+    public static final String NAME = "me@B synced classes";
+
     /** Adds Events and Reminders in Calendar. */
     /*
     private void addReminderInCalendar(Context context) {
@@ -72,9 +76,11 @@ public class CalendarHelper {
         editSP.putLong("calendarId", calendarId);
         editSP.apply();
     }
+
     public static boolean getReminderState(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("ReminderSet", false);
     }
+
     public static long getCalendarId(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getLong("calendarId", -1);
     }
@@ -120,17 +126,17 @@ public class CalendarHelper {
     public static long addCalendar(Context context) {
         ContentValues values = new ContentValues();
         values.put(
-                CalendarContract.Calendars.ACCOUNT_NAME,
-                "me@B");
+                CalendarContract.Calendars.ACCOUNT_NAME, ACCOUNT_NAME
+        );
         values.put(
                 CalendarContract.Calendars.ACCOUNT_TYPE,
                 CalendarContract.ACCOUNT_TYPE_LOCAL);
         values.put(
-                CalendarContract.Calendars.NAME,
-                "me@B synced classes");
+                CalendarContract.Calendars.NAME, NAME
+        );
         values.put(
                 CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
-                "me@B synced classes");
+                NAME);
         values.put(
                 CalendarContract.Calendars.CALENDAR_COLOR,
                 0xffff0000);
@@ -139,9 +145,9 @@ public class CalendarHelper {
                 CalendarContract.Calendars.CAL_ACCESS_OWNER);
         values.put(
                 CalendarContract.Calendars.OWNER_ACCOUNT,
-                "me@B");
+                ACCOUNT_NAME);
         values.put(
-                CalendarContract.Calendars.CALENDAR_TIME_ZONE,TimeZone.getDefault().getID());
+                CalendarContract.Calendars.CALENDAR_TIME_ZONE, TimeZone.getDefault().getID());
         values.put(
                 CalendarContract.Calendars.SYNC_EVENTS,
                 1);
@@ -162,8 +168,31 @@ public class CalendarHelper {
         Uri uri =
                 context.getContentResolver().insert(builder.build(), values);
         long calendarId = Long.parseLong(uri.getLastPathSegment());
-        Log.d(LogConst.LOG, "CalendarID: "  + calendarId);
+        Log.d(LogConst.LOG, "CalendarID: " + calendarId);
         return calendarId;
+    }
+
+    public static void deleteCalendar(Context context, long calID) {
+        Uri evuri = CalendarContract.Calendars.CONTENT_URI;
+        Uri deleteUri = ContentUris.withAppendedId(evuri, calID);
+        context.getContentResolver().delete(deleteUri, null, null);
+    }
+
+    public static void findAndDeleteCalendars(Context context) {
+        Uri evuri = CalendarContract.Calendars.CONTENT_URI;
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: wipe but no permission?
+            return;
+        }
+        Cursor result = context.getContentResolver().query(evuri, new String[]{CalendarContract.Calendars._ID, CalendarContract.Calendars.ACCOUNT_NAME, CalendarContract.Calendars.CALENDAR_DISPLAY_NAME}, null, null, null);
+        while (result.moveToNext())
+        {
+            if(result.getString(2).equals(NAME))
+            {
+                long calid = result.getLong(0);
+                deleteCalendar(context, calid);
+            }
+        }
     }
 
     // routine to add reminders with the event

@@ -19,6 +19,8 @@ import com.thermatk.android.meatb.activities.MainActivity;
 
 import java.util.Calendar;
 
+import static com.thermatk.android.meatb.helpers.CalendarHelper.findAndDeleteCalendars;
+
 
 public class ProfileFragment extends Fragment{
 
@@ -44,6 +46,7 @@ public class ProfileFragment extends Fragment{
         mSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                findAndDeleteCalendars(getActivity());
                 Intent intent = new Intent(getActivity(), MainActivity.class);
                 PendingIntent pIntent = PendingIntent.getActivity(getActivity(), (int) System.currentTimeMillis(), intent, 0);
 

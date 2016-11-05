@@ -18,7 +18,7 @@ public class JobHelper {
         JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                if(DataHelper.isAgendaInitial(context)) {
+                if(DataHelper.isAgendaInitial()) {
                     DataHelper.writeAgendaDataInitial(response,context);
                 } else {
                     // TODO: compare before and after

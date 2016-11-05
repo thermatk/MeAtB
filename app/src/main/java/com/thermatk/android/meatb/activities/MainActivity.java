@@ -186,10 +186,9 @@ public class MainActivity extends AppCompatActivity {
                         return false;
                     }
                 });
-        boolean isReminder = getReminderState(this);
         calendarSwitchDrawerItem = new SwitchDrawerItem().withName("Calendar Reminders").withIcon(GoogleMaterial.Icon.gmd_alarm_on).
                 withChecked(
-                        isReminder && (ContextCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.WRITE_CALENDAR)!= PackageManager.PERMISSION_GRANTED))
+                        getReminderState(this) && (ContextCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.WRITE_CALENDAR)== PackageManager.PERMISSION_GRANTED))
                 .withSelectable(false).withOnCheckedChangeListener(onCalendarSwitchListener);
 
         resultBuilder.addDrawerItems(

@@ -54,37 +54,17 @@
 -keep class cz.msebera.android.httpclient.** { *; }
 -keep class com.loopj.android.http.** { *; }
 
-
--keep class com.github.tibolte.agendacalendarview.** { *; }
-
-
--keep public interface com.github.tibolte.agendacalendarview.models.IWeekItem { *; }
--keep public interface com.github.tibolte.agendacalendarview.models.IDayItem { *; }
--keep public class com.github.tibolte.agendacalendarview.models.** {*; }
--keep public class com.github.tibolte.agendacalendarview.render.** {*; }
--keep public class com.github.tibolte.agendacalendarview.agenda.** {*; }
--keep public class com.github.tibolte.agendacalendarview.agenda.AgendaAdapter {*; }
--keep public class com.github.tibolte.agendacalendarview.render.EventRenderer {*; }
-
 -dontwarn java.lang.invoke.*
 -dontwarn sun.misc.Unsafe
 
 -keep public class se.emilsjolander.stickylistheaders.** {*; }
 
+-keep public class com.thermatk.android.meatb.** { *; }
 
--keep public class com.thermatk.android.meatb.agenda.** { *; }
--keep public class com.thermatk.android.meatb.agenda.ACVDay { *; }
--keep public class com.thermatk.android.meatb.agenda.ACVWeek { *; }
--keep public class com.thermatk.android.meatb.agenda.BocconiCalendarEvent { *; }
-
--keep class com.thermatk.android.meatb.agenda.** { *; }
--keep class com.thermatk.android.meatb.agenda.ACVDay { *; }
--keep class com.thermatk.android.meatb.agenda.ACVWeek { *; }
--keep class com.thermatk.android.meatb.agenda.BocconiCalendarEvent { *; }
+-keep class com.thermatk.android.meatb.** { *; }
 
 -keepattributes Signature
 
--keep class android.support.v7.widget.RoundRectDrawable { *; }
 -dontwarn android.support.v4.**
 
 -dontwarn com.evernote.android.job.gcm.**

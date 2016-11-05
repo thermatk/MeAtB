@@ -24,8 +24,7 @@ public class RefreshAllJob extends Job {
     protected Result onRunJob(Params params) {
         // run your job
         JobHelper.runInboxUpdate(getContext());
-        // TODO: wipe calendars as well lol
-        //JobHelper.runAgendaUpdate(getContext());
+        JobHelper.runAgendaUpdate(getContext()); // untested and TODO: add notifications for agenda updates
         doNotify(getContext(), "me@B updated data!", NotificationsHelper.createNotificationAfterJob());
         return Result.SUCCESS;
     }

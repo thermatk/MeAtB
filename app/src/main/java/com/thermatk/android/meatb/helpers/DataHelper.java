@@ -1,6 +1,9 @@
 package com.thermatk.android.meatb.helpers;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.support.v4.content.ContextCompat;
 import android.text.format.DateFormat;
 
 import com.thermatk.android.meatb.data.AgendaEvent;
@@ -23,6 +26,7 @@ import io.realm.RealmResults;
 
 import static com.thermatk.android.meatb.helpers.CalendarHelper.addEvent;
 import static com.thermatk.android.meatb.helpers.CalendarHelper.getReminderState;
+import static com.thermatk.android.meatb.helpers.CalendarHelper.removeEvent;
 import static com.thermatk.android.meatb.helpers.CalendarHelper.setReminder;
 
 public class DataHelper {
@@ -149,7 +153,7 @@ public class DataHelper {
         return answer;
     }
 
-    public static boolean isAgendaInitial(Context context) {
+    public static boolean isAgendaInitial() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<EventDay> results = realm.where(EventDay.class).findAll(); // TODO: another case of whatif there is actually nothing?
         boolean answer = true;
@@ -165,7 +169,14 @@ public class DataHelper {
         realm.beginTransaction();
 
         realm.where(EventDay.class).findAll().deleteAllFromRealm();
-        realm.where(AgendaEvent.class).findAll().deleteAllFromRealm();
+
+        RealmResults<AgendaEvent> agendaEvents = realm.where(AgendaEvent.class).findAll();
+        if (getReminderState(context) && (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_CALENDAR)== PackageManager.PERMISSION_GRANTED)) {
+            for (AgendaEvent event: agendaEvents) {
+                removeEvent(context,event.getCalendarId());
+            }
+        }
+        agendaEvents.deleteAllFromRealm();
 
         realm.commitTransaction();
         realm.close();

@@ -13,11 +13,18 @@ import org.json.JSONObject;
 import cz.msebera.android.httpclient.Header;
 
 public class JobHelper {
+    // TODO: funny corner case when background service deleted everything but interface doesn't know
     public static void runAgendaUpdate(final Context context) {
         JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                DataHelper.writeAgendaData(response,context);
+                if(DataHelper.isAgendaInitial(context)) {
+                    DataHelper.writeAgendaDataInitial(response,context);
+                } else {
+                    // TODO: compare before and after
+                    DataHelper.wipeAgenda(context);
+                    DataHelper.writeAgendaDataInitial(response,context);
+                }
             }
 
             @Override

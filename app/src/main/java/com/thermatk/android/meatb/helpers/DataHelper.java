@@ -19,6 +19,7 @@ import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmList;
+import io.realm.RealmResults;
 
 import static com.thermatk.android.meatb.helpers.CalendarHelper.addEvent;
 import static com.thermatk.android.meatb.helpers.CalendarHelper.getReminderState;
@@ -74,52 +75,103 @@ public class DataHelper {
         Realm realm = Realm.getDefaultInstance();
         long currentTime = System.currentTimeMillis();
 
-
+        long id;
+        if (isInboxInitial()) {
+            id = 1;
+        } else {
+            id = realm.where(InboxMessage.class).findAll().max("id").longValue();
+        }
 
         for (int i = 0; i < response.length(); i++) {
             JSONObject oneMessage;
-            long dateLong;
-            Date date;
             try {
                 oneMessage = response.getJSONObject(i);
-                String strTemp = oneMessage.getString("date_sent");
+                if(existsInboxInternalId(realm, oneMessage.getLong("id"))) {
+                    // TODO: whatif id is the same but content changed?
+                } else {
+                    realm.beginTransaction();
 
-                dateLong = getDateAPI(strTemp);
-                //TODO: do some better timezone hacks
-                // add 4 hours to be sure we're in the right day
-                //dateLong +=  (DateUtils.HOUR_IN_MILLIS * 4);
-                date = new Date(dateLong);
+                    InboxMessage message = realm.createObject(InboxMessage.class, id);///// TODO: do not forget about the id problem
+                    id++;
+                    fillInboxMessage(message, oneMessage);
+                    message.setLastUpdated(currentTime);
 
-                realm.beginTransaction();
-
-                InboxMessage message = realm.createObject(InboxMessage.class,i + 1);///// TODO: do not forget about the id problem
-                message.setDate(date);
-                message.setDateLong(dateLong);
-                message.setLastUpdated(currentTime);
-                message.setInternalId(oneMessage.getLong("id"));
-                message.setDescription(oneMessage.getString("description"));
-                message.setTitle(oneMessage.getString("title"));
-                message.setFavorite(oneMessage.getBoolean("is_favorite"));
-                message.setFeatured(oneMessage.getBoolean("is_featured"));
-                message.setUnread(oneMessage.getBoolean("is_unread"));
-                message.setSupertitle(oneMessage.getString("supertitle"));
-                message.setDownloadedFull(false);
-
-                realm.commitTransaction();
+                    realm.commitTransaction();
+                }
                 ///////
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-
-
-
-
-
         realm.close();
     }
 
-    public static void writeAgendaData(JSONArray response, Context context) {
+    public static boolean existsInboxInternalId(Realm realm, long internalId) {
+        RealmResults<InboxMessage> results = realm.where(InboxMessage.class).equalTo("internalId", internalId).findAll();
+        if (results.size() == 0) {
+            return false;
+        }
+        return true;
+    }
+
+    public static void fillInboxMessage (InboxMessage message, JSONObject oneMessage) throws JSONException {
+        long dateLong;
+        Date date;
+        String strTemp = oneMessage.getString("date_sent");
+
+        dateLong = getDateAPI(strTemp);
+        //TODO: do some better timezone hacks
+        // add 4 hours to be sure we're in the right day
+        //dateLong +=  (DateUtils.HOUR_IN_MILLIS * 4);
+        date = new Date(dateLong);
+
+        message.setDate(date);
+        message.setDateLong(dateLong);
+        message.setInternalId(oneMessage.getLong("id"));
+        message.setDescription(oneMessage.getString("description"));
+        message.setTitle(oneMessage.getString("title"));
+        message.setFavorite(oneMessage.getBoolean("is_favorite"));
+        message.setFeatured(oneMessage.getBoolean("is_featured"));
+        message.setUnread(oneMessage.getBoolean("is_unread"));
+        message.setSupertitle(oneMessage.getString("supertitle"));
+        message.setDownloadedFull(false);
+
+    }
+
+    public static boolean isInboxInitial() {
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<InboxMessage> results = realm.where(InboxMessage.class).findAll(); // TODO: another case of whatif there is actually nothing?
+        boolean answer = true;
+        if(results.size()>0) {
+            answer = false;
+        }
+        realm.close();
+        return answer;
+    }
+
+    public static boolean isAgendaInitial(Context context) {
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<EventDay> results = realm.where(EventDay.class).findAll(); // TODO: another case of whatif there is actually nothing?
+        boolean answer = true;
+        if(results.size()>0) {
+            answer = false;
+        }
+        realm.close();
+        return answer;
+    }
+
+    public static void wipeAgenda(Context context) {
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+
+        realm.where(EventDay.class).findAll().deleteAllFromRealm();
+        realm.where(AgendaEvent.class).findAll().deleteAllFromRealm();
+
+        realm.commitTransaction();
+        realm.close();
+    }
+
+    public static void writeAgendaDataInitial(JSONArray response, Context context) {
 
 
 

@@ -46,6 +46,7 @@ import io.realm.Realm;
 import static com.thermatk.android.meatb.helpers.CalendarHelper.addCalendar;
 import static com.thermatk.android.meatb.helpers.CalendarHelper.getReminderState;
 import static com.thermatk.android.meatb.helpers.CalendarHelper.setReminderState;
+import static com.thermatk.android.meatb.refresher.RefreshAllJob.scheduleJob;
 
 public class MainActivity extends AppCompatActivity {
     private String username = null;
@@ -67,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         drawerStart(savedInstanceState);
         if (savedInstanceState == null) {
+            // schedule job?
+            scheduleJob();
             ProfileFragment firstFragment = new ProfileFragment();
             firstFragment.setArguments(getIntent().getExtras());
 

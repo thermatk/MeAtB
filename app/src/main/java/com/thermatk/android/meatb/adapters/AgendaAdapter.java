@@ -51,7 +51,7 @@ public class AgendaAdapter extends FlexibleAdapter<IFlexible> {
             //Define Example View
             final LayoutItem item = new LayoutItem("LAY-L");
             item.setTitle(mRecyclerView.getContext().getString(R.string.app_name));
-            item.setSubtitle("XDDDD");
+            item.setSubtitle("[SOME UPDATE INFO TO BE SHOWN HERE]");
             addItemWithDelay(0, item, 0L,
                     (scrollToPosition));
             removeItemWithDelay(item, 4000L, true);

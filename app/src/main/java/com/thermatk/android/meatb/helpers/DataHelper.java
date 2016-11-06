@@ -83,7 +83,7 @@ public class DataHelper {
         if (isInboxInitial()) {
             id = 1;
         } else {
-            id = realm.where(InboxMessage.class).findAll().max("id").longValue();
+            id = realm.where(InboxMessage.class).findAll().max("id").longValue() + 1;
         }
 
         for (int i = 0; i < response.length(); i++) {

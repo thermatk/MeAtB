@@ -44,14 +44,6 @@ public class ProfileFragment extends Fragment{
 
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
-        Button mSignInButton = (Button) rootView.findViewById(R.id.button);
-        mSignInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                findAndDeleteCalendars(getActivity());
-                doNotify(getActivity(), "testLOL", "A TEST IS A TEST" + System.currentTimeMillis());
-            }
-        });
 
         return rootView;
     }

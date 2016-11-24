@@ -38,6 +38,7 @@ import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.data.InitData;
 import com.thermatk.android.meatb.fragments.AgendaFragment;
 import com.thermatk.android.meatb.fragments.InboxFragment;
+import com.thermatk.android.meatb.fragments.QRCodeFragment;
 import com.thermatk.android.meatb.fragments.RegisterAttendanceFragment;
 import com.thermatk.android.meatb.fragments.ProfileFragment;
 
@@ -186,6 +187,15 @@ public class MainActivity extends AppCompatActivity {
                         return false;
                     }
                 });
+
+        PrimaryDrawerItem qrDrawerItem = new PrimaryDrawerItem().withName("Request QR").withIcon(GoogleMaterial.Icon.gmd_vpn_key)
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        changeFragment(new QRCodeFragment());
+                        return false;
+                    }
+                });
         calendarSwitchDrawerItem = new SwitchDrawerItem().withName("Calendar Reminders").withIcon(GoogleMaterial.Icon.gmd_alarm_on).
                 withChecked(
                         getReminderState(this) && (ContextCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.WRITE_CALENDAR)== PackageManager.PERMISSION_GRANTED))
@@ -197,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
                 attendanceDrawerItem,
                 agendaDrawerItem,
                 inboxDrawerItem,
+                qrDrawerItem,
                 new DividerDrawerItem(),
                 calendarSwitchDrawerItem
         );

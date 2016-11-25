@@ -67,12 +67,8 @@ public class QRCodeFragment extends Fragment{
         webSettings.setJavaScriptEnabled(true);
         if (Build.VERSION.SDK_INT <= 18) {
             webSettings.setSavePassword(false);
-        } else {
-            // "Saving passwords in WebView will not be supported in future versions"
         }
         webSettings.setDomStorageEnabled(true);
-        //webSettings.setBuiltInZoomControls(true);
-        //qrWebView.setInitialScale(100);
         WebAppInterface wInt = new WebAppInterface(getActivity());
         qrWebView.addJavascriptInterface(wInt, "Android");
 

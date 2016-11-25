@@ -74,3 +74,10 @@
 -keep public class com.evernote.android.job.v14.PlatformAlarmService
 -keep public class com.evernote.android.job.v14.PlatformAlarmReceiver
 -keep public class com.evernote.android.job.JobBootReceiver
+
+-keepattributes WebAppInterface
+-keep public class com.thermatk.android.meatb.fragments.QRCodeFragment$WebAppInterface
+-keep public class * implements com.thermatk.android.meatb.fragments.QRCodeFragment$WebAppInterface
+-keepclassmembers class com.thermatk.android.meatb.fragments.QRCodeFragment$WebAppInterface {
+    <methods>;
+}

@@ -35,17 +35,22 @@ import com.mikepenz.materialdrawer.model.interfaces.Nameable;
 import com.mikepenz.materialdrawer.util.KeyboardUtil;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
+import com.thermatk.android.meatb.data.AgendaEvent;
 import com.thermatk.android.meatb.data.InitData;
 import com.thermatk.android.meatb.fragments.AgendaFragment;
 import com.thermatk.android.meatb.fragments.InboxFragment;
 import com.thermatk.android.meatb.fragments.QRCodeFragment;
 import com.thermatk.android.meatb.fragments.RegisterAttendanceFragment;
 import com.thermatk.android.meatb.fragments.ProfileFragment;
+import com.thermatk.android.meatb.helpers.DataHelper;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 
 import static com.thermatk.android.meatb.helpers.CalendarHelper.addCalendar;
+import static com.thermatk.android.meatb.helpers.CalendarHelper.findAndDeleteCalendars;
 import static com.thermatk.android.meatb.helpers.CalendarHelper.getReminderState;
+import static com.thermatk.android.meatb.helpers.CalendarHelper.removeEvent;
 import static com.thermatk.android.meatb.helpers.CalendarHelper.setReminderState;
 import static com.thermatk.android.meatb.refresher.RefreshAllJob.scheduleJob;
 
@@ -235,14 +240,29 @@ public class MainActivity extends AppCompatActivity {
                 }else {
                     long calendarId = addCalendar(getApplicationContext());
                     setReminderState(mSharedPreferences,true,calendarId); //TODO: check if have calendar and need one
+
+                    setupCalendar();
+
                 }
             } else {
                 setReminderState(mSharedPreferences,false,-1);
                 // delete calendars?
+                findAndDeleteCalendars(getApplicationContext());
             }
         }
     };
 
+    public void setupCalendar() {
+        // TODO: fix it, move to thread?
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+        RealmResults<AgendaEvent> agendaEvents = realm.where(AgendaEvent.class).findAll();
+        for (AgendaEvent event: agendaEvents) {
+            DataHelper.remindAgendaEvent(getApplicationContext(),event);
+        }
+        realm.commitTransaction();
+        realm.close();
+    }
     @Override
     public void onRequestPermissionsResult(int requestCode,
     String permissions[], int[] grantResults) {
@@ -258,6 +278,7 @@ public class MainActivity extends AppCompatActivity {
                     long calendarId = addCalendar(getApplicationContext());
                     setReminderState(mSharedPreferences,true,calendarId);
 
+                    setupCalendar();
                 } else {
                     Log.d(LogConst.LOG, "Denied Calendar!");
                     calendarSwitchDrawerItem.withChecked(false);

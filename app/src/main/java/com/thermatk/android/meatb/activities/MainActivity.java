@@ -255,7 +255,6 @@ public class MainActivity extends AppCompatActivity {
     };
 
     public void setupCalendar() {
-        // TODO: fix it, move to thread?
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {

@@ -6,6 +6,7 @@ import android.app.Fragment;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -110,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .withSavedInstance(savedInstanceState)
+                .withDelayOnDrawerClose(175)
                 .withOnDrawerListener(new Drawer.OnDrawerListener() {
 
                     @Override
@@ -254,14 +256,19 @@ public class MainActivity extends AppCompatActivity {
 
     public void setupCalendar() {
         // TODO: fix it, move to thread?
-        Realm realm = Realm.getDefaultInstance();
-        realm.beginTransaction();
-        RealmResults<AgendaEvent> agendaEvents = realm.where(AgendaEvent.class).findAll();
-        for (AgendaEvent event: agendaEvents) {
-            DataHelper.remindAgendaEvent(getApplicationContext(),event);
-        }
-        realm.commitTransaction();
-        realm.close();
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                Realm realm = Realm.getDefaultInstance();
+                realm.beginTransaction();
+                RealmResults<AgendaEvent> agendaEvents = realm.where(AgendaEvent.class).findAll();
+                for (AgendaEvent event: agendaEvents) {
+                    DataHelper.remindAgendaEvent(getApplicationContext(),event);
+                }
+                realm.commitTransaction();
+                realm.close();
+            }
+        });
     }
     @Override
     public void onRequestPermissionsResult(int requestCode,

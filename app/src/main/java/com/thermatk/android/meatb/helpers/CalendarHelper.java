@@ -193,6 +193,7 @@ public class CalendarHelper {
                 deleteCalendar(context, calid);
             }
         }
+        result.close();
     }
 
     // routine to add reminders with the event

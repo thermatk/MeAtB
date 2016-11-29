@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.thermatk.android.meatb.ApplicationMain;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.data.InitData;
 
@@ -42,7 +43,7 @@ public class ProfileFragment extends Fragment{
         InitData profile = realm.where(InitData.class).findAll().first();
 
         ImageView profPic = (ImageView) rootView.findViewById(R.id.profPic);
-        Glide.with(this).load(profile.getPhoto_url()).override(256, 256).fitCenter().into(profPic);
+        Glide.with(this).load(profile.getPhoto_url()).transform(new ApplicationMain.CircleTransform(getActivity())).into(profPic);
         // TODO: apply transform?
         TextView name = (TextView) rootView.findViewById(R.id.textViewName);
         TextView career = (TextView) rootView.findViewById(R.id.textViewCareer);

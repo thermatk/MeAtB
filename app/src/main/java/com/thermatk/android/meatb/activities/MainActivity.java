@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
                 .withToolbar(toolbar)
                 .withSavedInstance(savedInstanceState)
                 .withDelayOnDrawerClose(0)
-                .withDelayDrawerClickEvent(175)
+                .withDelayDrawerClickEvent(250)
                 .withOnDrawerListener(new Drawer.OnDrawerListener() {
 
                     @Override

@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .withSavedInstance(savedInstanceState)
+                .withDelayOnDrawerClose(0)
                 .withDelayDrawerClickEvent(175)
                 .withOnDrawerListener(new Drawer.OnDrawerListener() {
 

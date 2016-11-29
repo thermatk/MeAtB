@@ -112,10 +112,7 @@ public class DataHelper {
 
     public static boolean existsInboxInternalId(Realm realm, long internalId) {
         RealmResults<InboxMessage> results = realm.where(InboxMessage.class).equalTo("internalId", internalId).findAll();
-        if (results.size() == 0) {
-            return false;
-        }
-        return true;
+        return results.size() != 0;
     }
 
     public static void fillInboxMessage (InboxMessage message, JSONObject oneMessage) throws JSONException {

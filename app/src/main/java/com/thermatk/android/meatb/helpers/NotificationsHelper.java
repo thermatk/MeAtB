@@ -12,19 +12,16 @@ import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.activities.MainActivity;
 import com.thermatk.android.meatb.data.InboxMessage;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-/**
- * Created by thermatk on 05.11.16.
- */
-
 public class NotificationsHelper {
 
     public static void doNotify(Context context, String title, String message) {
-        if (message == "") {
+        if (message.length() < 2) {
             // nothing to report?
         } else {
             // TODO: intent should open the needed fragment

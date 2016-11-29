@@ -51,7 +51,6 @@ import io.realm.RealmResults;
 import static com.thermatk.android.meatb.helpers.CalendarHelper.addCalendar;
 import static com.thermatk.android.meatb.helpers.CalendarHelper.findAndDeleteCalendars;
 import static com.thermatk.android.meatb.helpers.CalendarHelper.getReminderState;
-import static com.thermatk.android.meatb.helpers.CalendarHelper.removeEvent;
 import static com.thermatk.android.meatb.helpers.CalendarHelper.setReminderState;
 import static com.thermatk.android.meatb.refresher.RefreshAllJob.scheduleJob;
 
@@ -111,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .withSavedInstance(savedInstanceState)
-                .withDelayOnDrawerClose(175)
+                .withDelayDrawerClickEvent(175)
                 .withOnDrawerListener(new Drawer.OnDrawerListener() {
 
                     @Override
@@ -294,7 +293,6 @@ public class MainActivity extends AppCompatActivity {
                     setReminderState(mSharedPreferences,false,-1);
 
                 }
-                return;
             }
 
             // other 'case' lines to check for other

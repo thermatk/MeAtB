@@ -20,7 +20,6 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Button;
 
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
@@ -41,6 +40,7 @@ public class QRCodeFragment extends Fragment{
         super.onCreate(savedInstanceState);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

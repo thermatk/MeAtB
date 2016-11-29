@@ -1,6 +1,5 @@
 package com.thermatk.android.meatb.refresher;
 
-import android.app.Notification;
 import android.support.annotation.NonNull;
 import android.util.Log;
 

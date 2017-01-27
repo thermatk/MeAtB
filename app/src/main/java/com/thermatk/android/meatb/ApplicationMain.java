@@ -45,6 +45,12 @@ public class ApplicationMain extends Application {
             }
 
             @Override
+            public void set(ImageView imageView, Uri uri, Drawable placeholder, String tag) {
+                // whatever
+                set(imageView,uri,placeholder);
+            }
+
+            @Override
             public void cancel(ImageView imageView) {
                 Glide.clear(imageView);
             }

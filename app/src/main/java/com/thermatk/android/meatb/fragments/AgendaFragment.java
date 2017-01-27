@@ -175,7 +175,7 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
                 .setSwipeEnabled(false)
                 .setUnlinkAllItemsOnRemoveHeaders(true)
                 .setDisplayHeadersAtStartUp(true)
-                .enableStickyHeaders();
+                .setStickyHeaders(true);;
         mAdapter.showLayoutInfo(true);
         mEmptyView.setAlpha(0);
         mFastScroller.setVisibility(View.VISIBLE);

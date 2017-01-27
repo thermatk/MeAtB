@@ -46,7 +46,7 @@ public class yabAPIClient {
         } else {
             client = new SyncHttpClient();
         }
-        String testLoginURL = "http://ks3-mobile.unibocconi.it/universityapp_prod/api/v6/app/init?os=android";
+        String testLoginURL = "https://ks3-mobile.unibocconi.it/universityapp_https_prod/api/v6/app/init?os=android";
         client.addHeader("auth_secret", "b0cc0n1s3cr3t");
         client.setBasicAuth(username, password);
         client.get(testLoginURL, responseHandler);
@@ -67,7 +67,7 @@ public class yabAPIClient {
         String careerId = profile.getCarreerId() + "";
         realm.close();
 
-        String agendaURL= "http://ks3-mobile.unibocconi.it/universityapp_prod/api/v6/students/"+careerId+"/agenda?rl=en&start="+dateStart+"&end="+dateEnd;
+        String agendaURL= "https://ks3-mobile.unibocconi.it/universityapp_https_prod/api/v6/students/"+careerId+"/agenda?rl=en&start="+dateStart+"&end="+dateEnd;
         client.addHeader("auth_secret", "b0cc0n1s3cr3t");
         client.setBasicAuth(username, password);
         client.get(agendaURL, responseHandler);
@@ -81,7 +81,7 @@ public class yabAPIClient {
     }
 
     public void getInbox(JsonHttpResponseHandler responseHandler) {
-        String agendaURL= "http://ks3-mobile.unibocconi.it/universityapp_prod/api/v6/inbox?rl=en";
+        String agendaURL= "https://ks3-mobile.unibocconi.it/universityapp_https_prod/api/v6/inbox?rl=en";
         client.addHeader("auth_secret", "b0cc0n1s3cr3t");
         client.setBasicAuth(username, password);
         client.get(agendaURL, responseHandler);

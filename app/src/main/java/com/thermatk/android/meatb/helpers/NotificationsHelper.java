@@ -12,7 +12,6 @@ import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.activities.MainActivity;
 import com.thermatk.android.meatb.data.InboxMessage;
 
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import io.realm.Realm;

@@ -171,7 +171,7 @@ public class AgendaController extends Controller implements FastScroller.OnScrol
                 .setSwipeEnabled(false)
                 .setUnlinkAllItemsOnRemoveHeaders(true)
                 .setDisplayHeadersAtStartUp(true)
-                .setStickyHeaders(true);;
+                .setStickyHeaders(true);
         mAdapter.showLayoutInfo(true);
         mEmptyView.setAlpha(0);
         mFastScroller.setVisibility(View.VISIBLE);

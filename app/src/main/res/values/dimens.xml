@@ -3,12 +3,6 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="action_bar_top_padding">24dp</dimen>
 
-    <dimen name="margin_top">16dp</dimen>
-    <dimen name="margin_top_medium">8dp</dimen>
-    <dimen name="margin_bottom">16dp</dimen>
-    <dimen name="margin_bottom_small">8dp</dimen>
     <dimen name="margin_left">16dp</dimen>
-    <dimen name="margin_small">8dp</dimen>
     <dimen name="margin_right">16dp</dimen>
-    <dimen name="margin_right_handle">22dp</dimen>
 </resources>

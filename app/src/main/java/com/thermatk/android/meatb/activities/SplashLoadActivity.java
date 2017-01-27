@@ -40,7 +40,6 @@ public class SplashLoadActivity extends AppCompatActivity {
         } else {
             i = new Intent(this, MainActivity.class);
         }
-        i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this);
         ActivityCompat.startActivity(this, i, options.toBundle());

@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         router.saveInstanceState(outState);
+        outState = result.saveInstanceState(outState);
         Log.d(LogConst.LOG, "saving state");
         super.onSaveInstanceState(outState);
     }

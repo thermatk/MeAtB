@@ -1,4 +1,4 @@
-package com.thermatk.android.meatb.fragments;
+package com.thermatk.android.meatb.controllers;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bluelinelabs.conductor.Controller;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.adapters.AgendaAdapter;
@@ -40,7 +42,7 @@ import io.realm.RealmResults;
 import io.realm.Sort;
 
 
-public class AgendaFragment extends Fragment implements FastScroller.OnScrollStateChangeListener {
+public class AgendaController extends Controller implements FastScroller.OnScrollStateChangeListener {
 
     private boolean doingAsync = false;
     protected Realm realm;
@@ -52,28 +54,22 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
     private AgendaAdapter mAdapter;
     private RealmResults<AgendaEvent> eventList;
 
-    public AgendaFragment() {
-        // Required empty public constructor
-    }
-
-
     @Override
     public void onSaveInstanceState (Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean("doingAsync", doingAsync);
     }
 
-    @Override
+    /*@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActivity().setTitle("Agenda");
         if(savedInstanceState != null) {
             if(savedInstanceState.getBoolean("doingAsync", false)) {
                 RetainFragment.setFragment(this);
                 doingAsync = true;
             }
         }
-    }
+    }*/
     public static Date getToday() {
 
         Calendar c = new GregorianCalendar();
@@ -109,12 +105,12 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
         return colorAccent;
     }
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container) {
+        getActivity().setTitle("Agenda");
 
 
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_agenda, container, false);
+        View rootView = inflater.inflate(R.layout.controller_agenda, container, false);
         realm = Realm.getDefaultInstance();
 
 
@@ -148,7 +144,7 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
                 ///
 
                 RetainFragment retainFragment =
-                        RetainFragment.findOrCreateRetainFragment(getFragmentManager(), eventList, sl);
+                        RetainFragment.findOrCreateRetainFragment(getActivity().getFragmentManager(), eventList, sl);
                 RetainFragment.setFragment(this);
                 retainFragment.waitAsync();
             } else {
@@ -189,8 +185,8 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
+    protected void onDestroyView(@NonNull View view) {
+        super.onDestroyView(view);
         // TODO: fix detach?
         /* REWRITE
         if(rCalCandidate!=null) {
@@ -252,14 +248,14 @@ public class AgendaFragment extends Fragment implements FastScroller.OnScrollSta
 
     public static class RetainFragment extends Fragment {
         private static final String TAG = "RetainFragmentAgenda";
-        private static AgendaFragment mFragment;
+        private static AgendaController mFragment;
         private static RealmResults<AgendaEvent> rAgendaEvents;
         private static RealmResults<ServiceLock> rServiceLock;
 
 
         public RetainFragment() {
         }
-        public static void setFragment(AgendaFragment current) {
+        public static void setFragment(AgendaController current) {
             mFragment = current;
         }
         public static RetainFragment findOrCreateRetainFragment(FragmentManager fm, RealmResults<AgendaEvent> agendaEvents, RealmResults<ServiceLock> sl) {

@@ -1,14 +1,14 @@
-package com.thermatk.android.meatb.fragments;
+package com.thermatk.android.meatb.controllers;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.support.design.widget.TextInputEditText;
 import android.text.TextUtils;
 import android.util.Log;
@@ -20,6 +20,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.bluelinelabs.conductor.Controller;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
@@ -31,7 +32,7 @@ import org.json.JSONObject;
 import cz.msebera.android.httpclient.Header;
 
 
-public class RegisterAttendanceFragment extends Fragment {
+public class RegisterAttendanceController extends Controller {
     private final static int AS_RESULT_SUCCESS =1;
     private final static int AS_RESULT_WARNING =2;
     private final static int AS_RESULT_NETWORK =3;
@@ -50,11 +51,7 @@ public class RegisterAttendanceFragment extends Fragment {
         outState.putBoolean("doingAsync", doingAsync);
 
     }
-
-    public RegisterAttendanceFragment() {
-        // Required empty public constructor
-    }
-
+    /*
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,13 +62,12 @@ public class RegisterAttendanceFragment extends Fragment {
                 doingAsync = true;
             }
         }
-    }
+    }*/
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container) {
 
-        View rootView = inflater.inflate(R.layout.fragment_register_attendance, container, false);
+        View rootView = inflater.inflate(R.layout.controller_register_attendance, container, false);
 
 
         // Set up the form.
@@ -125,11 +121,11 @@ public class RegisterAttendanceFragment extends Fragment {
 
         // Check for a valid password
         if (TextUtils.isEmpty(codice)) {
-            mCodiceView.setError(getString(R.string.error_field_required));
+            mCodiceView.setError(getActivity().getString(R.string.error_field_required));
             focusView = mCodiceView;
             cancel = true;
         } else if (!isCodiceValid(codice)) {
-            mCodiceView.setError(getString(R.string.error_faulty_codice));
+            mCodiceView.setError(getActivity().getString(R.string.error_faulty_codice));
             focusView = mCodiceView;
             cancel = true;
         }
@@ -143,7 +139,7 @@ public class RegisterAttendanceFragment extends Fragment {
 
             doingAsync = true;
             RetainFragment retainFragment =
-                    RetainFragment.findOrCreateRetainFragment(getFragmentManager(), codice);
+                    RetainFragment.findOrCreateRetainFragment(getActivity().getFragmentManager(), codice);
             RetainFragment.setFragment(this);
             retainFragment.loadAsync();
         }
@@ -237,12 +233,12 @@ public class RegisterAttendanceFragment extends Fragment {
     public static class RetainFragment extends Fragment {
         private static final String TAG = "RetainFragmentAttendance";
         private static String codice;
-        private static RegisterAttendanceFragment mFragment;
+        private static RegisterAttendanceController mFragment;
 
 
         public RetainFragment() {
         }
-        public static void setFragment(RegisterAttendanceFragment current) {
+        public static void setFragment(RegisterAttendanceController current) {
             mFragment = current;
         }
         public static RetainFragment findOrCreateRetainFragment(FragmentManager fm, String codiceFragment) {

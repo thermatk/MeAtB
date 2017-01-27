@@ -2,7 +2,6 @@ package com.thermatk.android.meatb.activities;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
@@ -15,12 +14,16 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.transition.Fade;
-import android.transition.Slide;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CompoundButton;
 
+import com.bluelinelabs.conductor.Conductor;
+import com.bluelinelabs.conductor.Controller;
+import com.bluelinelabs.conductor.Router;
+import com.bluelinelabs.conductor.RouterTransaction;
+import com.bluelinelabs.conductor.changehandler.FadeChangeHandler;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -36,13 +39,13 @@ import com.mikepenz.materialdrawer.model.interfaces.Nameable;
 import com.mikepenz.materialdrawer.util.KeyboardUtil;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
+import com.thermatk.android.meatb.controllers.AgendaController;
+import com.thermatk.android.meatb.controllers.InboxController;
+import com.thermatk.android.meatb.controllers.ProfileController;
+import com.thermatk.android.meatb.controllers.QRCodeController;
+import com.thermatk.android.meatb.controllers.RegisterAttendanceController;
 import com.thermatk.android.meatb.data.AgendaEvent;
 import com.thermatk.android.meatb.data.InitData;
-import com.thermatk.android.meatb.fragments.AgendaFragment;
-import com.thermatk.android.meatb.fragments.InboxFragment;
-import com.thermatk.android.meatb.fragments.QRCodeFragment;
-import com.thermatk.android.meatb.fragments.RegisterAttendanceFragment;
-import com.thermatk.android.meatb.fragments.ProfileFragment;
 import com.thermatk.android.meatb.helpers.DataHelper;
 
 import io.realm.Realm;
@@ -55,6 +58,11 @@ import static com.thermatk.android.meatb.helpers.CalendarHelper.setReminderState
 import static com.thermatk.android.meatb.refresher.RefreshAllJob.scheduleJob;
 
 public class MainActivity extends AppCompatActivity {
+
+    private Router router;
+    public ViewGroup container;
+
+
     private String username = null;
     private SharedPreferences mSharedPreferences;
     Drawer result;
@@ -63,6 +71,23 @@ public class MainActivity extends AppCompatActivity {
 
     private final int MY_PERMISSIONS_REQUEST_WRITE_CALENDAR = 1;
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        router.saveInstanceState(outState);
+        Log.d(LogConst.LOG, "saving state");
+        super.onSaveInstanceState(outState);
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(LogConst.LOG, "Activity stops");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onStop();
+        Log.d(LogConst.LOG, "Activity destroyed");
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,20 +98,35 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         drawerStart(savedInstanceState);
+
+        container = (ViewGroup)findViewById(R.id.controller_container);
+
+
+
+        router = Conductor.attachRouter(this, container, savedInstanceState);
         if (savedInstanceState == null) {
+            Log.d(LogConst.LOG, "no saved state");
+
             // schedule job?
             scheduleJob();
-            ProfileFragment firstFragment = new ProfileFragment();
-            firstFragment.setArguments(getIntent().getExtras());
-
-            if (findViewById(R.id.content_main_frame) != null) {
-                getFragmentManager().beginTransaction().replace(R.id.content_main_frame, firstFragment).commit();
+            if (!router.hasRootController()) {
+                Log.d(LogConst.LOG, "init router: MainActivity");
+                router.setRoot(RouterTransaction.with(new ProfileController()));
             }
+
+        } else {
+
         }
     }
-    private void changeFragment(final Fragment fragmentCurrent) {
+    private void changeController(Controller controller) {
+
+        router.pushController(
+                RouterTransaction.with(controller)
+                        .pushChangeHandler(new FadeChangeHandler())
+                        .popChangeHandler(new FadeChangeHandler()));
 
         // TODO: no replacement of the same type fragment
+        /*
         if (findViewById(R.id.content_main_frame) != null) {
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -96,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }, 200);
         }
+        */
     }
     private void drawerStart(Bundle savedInstanceState) {
         // TODO: check InitData
@@ -166,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        changeFragment(new ProfileFragment());
+                        changeController(new ProfileController());
                         return false;
                     }
                 });
@@ -174,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        changeFragment(new RegisterAttendanceFragment());
+                        changeController(new RegisterAttendanceController());
                         return false;
                     }
                 });
@@ -182,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        changeFragment(new AgendaFragment());
+                        changeController(new AgendaController());
                         return false;
                     }
                 });
@@ -190,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        changeFragment(new InboxFragment());
+                        changeController(new InboxController());
                         return false;
                     }
                 });
@@ -199,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        changeFragment(new QRCodeFragment());
+                        changeController(new QRCodeController());
                         return false;
                     }
                 });
@@ -300,16 +341,11 @@ public class MainActivity extends AppCompatActivity {
             // permissions this app might request
         }
     }
-    private void setupWindowAnimations(Fragment fragment) {
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Fade fade;
-            fade = new Fade();
-            fade.setDuration(1000);
-            fragment.setEnterTransition(fade);
 
-            Slide slide = new Slide();
-            slide.setDuration(1000);
-            fragment.setReturnTransition(slide);
-         }
+    @Override
+    public void onBackPressed() {
+        if (!router.handleBack()) {
+            super.onBackPressed();
+        }
     }
 }

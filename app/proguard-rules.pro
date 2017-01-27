@@ -81,3 +81,8 @@
 -keepclassmembers class com.thermatk.android.meatb.fragments.QRCodeFragment$WebAppInterface {
     <methods>;
 }
+
+-keepclassmembers public class * extends com.bluelinelabs.conductor.Controller {
+   public <init>();
+   public <init>(android.os.Bundle);
+}

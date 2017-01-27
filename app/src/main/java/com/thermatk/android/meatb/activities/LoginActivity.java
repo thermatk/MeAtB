@@ -327,6 +327,12 @@ public class LoginActivity extends AppCompatActivity{
                             Log.i(LogConst.LOG, "AuthRequest failed " + response);
                             asyncResult = AS_RESULT_ERROR_NETWORK;
                         }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, String response, Throwable error) {
+                            Log.i(LogConst.LOG, "AuthRequest failed " + response);
+                            asyncResult = AS_RESULT_ERROR_NETWORK;
+                        }
                     };
 
                     yabAPIClient.getLogin(username,password,responseHandler, false);

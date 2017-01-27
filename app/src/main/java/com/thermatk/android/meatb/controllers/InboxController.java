@@ -1,4 +1,4 @@
-package com.thermatk.android.meatb.fragments;
+package com.thermatk.android.meatb.controllers;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -8,11 +8,13 @@ import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bluelinelabs.conductor.Controller;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.adapters.InboxAdapter;
@@ -28,7 +30,7 @@ import io.realm.RealmResults;
 import io.realm.Sort;
 
 
-public class InboxFragment extends Fragment{
+public class InboxController extends Controller {
 
     private RealmRecyclerView realmRecyclerView;
     private View mProgressView;
@@ -38,11 +40,6 @@ public class InboxFragment extends Fragment{
 
     private boolean doingAsync = false;
 
-    public InboxFragment() {
-        // Required empty public constructor
-    }
-
-
 
     @Override
     public void onSaveInstanceState (Bundle outState) {
@@ -50,7 +47,7 @@ public class InboxFragment extends Fragment{
         outState.putBoolean("doingAsync", doingAsync);
     }
 
-    @Override
+    /*@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActivity().setTitle("Agenda");
@@ -60,16 +57,15 @@ public class InboxFragment extends Fragment{
                 doingAsync = true;
             }
         }
-    }
+    }*/
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container) {
         getActivity().setTitle("Inbox");
 
 
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_inbox, container, false);
+        View rootView = inflater.inflate(R.layout.controller_inbox, container, false);
 
         realm = Realm.getDefaultInstance();
         realmRecyclerView = (RealmRecyclerView) rootView.findViewById(R.id.realm_recycler_view);
@@ -96,7 +92,7 @@ public class InboxFragment extends Fragment{
 
 
                 RetainFragment retainFragment =
-                        RetainFragment.findOrCreateRetainFragment(getFragmentManager(), inboxMessages,sl);
+                        RetainFragment.findOrCreateRetainFragment(getActivity().getFragmentManager(), inboxMessages,sl);
                 RetainFragment.setFragment(this);
                 retainFragment.waitAsync();
 
@@ -121,8 +117,8 @@ public class InboxFragment extends Fragment{
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
+    protected void onDestroyView(@NonNull View view) {
+        super.onDestroyView(view);
         if(inboxMessages!=null) {
             inboxMessages.removeChangeListeners();
         }
@@ -162,14 +158,14 @@ public class InboxFragment extends Fragment{
     }
     public static class RetainFragment extends Fragment {
         private static final String TAG = "RetainFragmentInbox";
-        private static InboxFragment mFragment;
+        private static InboxController mFragment;
         private static RealmResults<InboxMessage> rInboxMessagesRetain;
         private static RealmResults<ServiceLock> rServiceLock;
 
 
         public RetainFragment() {
         }
-        public static void setFragment(InboxFragment current) {
+        public static void setFragment(InboxController current) {
             mFragment = current;
         }
         public static RetainFragment findOrCreateRetainFragment(FragmentManager fm, RealmResults<InboxMessage> inboxMessages, RealmResults<ServiceLock> serviceLock) {

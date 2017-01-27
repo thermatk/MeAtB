@@ -1,9 +1,8 @@
-package com.thermatk.android.meatb.fragments;
+package com.thermatk.android.meatb.controllers;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -21,34 +20,24 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.bluelinelabs.conductor.Controller;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
 
 
-public class QRCodeFragment extends Fragment{
+public class QRCodeController extends Controller {
     private WebView qrWebView;
     private View mProgressView;
     String authScript="javascript:document.body.style.margin=\"3%\";(function main(){Android.currentState('PR');var check_dest=false;var values=new Array(\"badge.unibocconi.it\");for(i in values){if(location.href.toLowerCase().indexOf(values[i].toLowerCase())!=-1){check_dest=true}}if(check_dest){Android.currentState('OK')}else if(location.href.toLowerCase().indexOf('loginfailed=true')!=-1){Android.currentState('KO')}else{var check_login=false;var loginURLs=new Array();loginURLs[0]='https://idp.unibocconi.it:443/idp/Authn/UserPassword';loginURLs[1]='http://idp.unibocconi.it:443/idp/Authn/UserPassword';loginURLs[2]='https://idp.unibocconi.it/idp/Authn/UserPassword';loginURLs[3]='http://idp.unibocconi.it/idp/Authn/UserPassword';for(i in loginURLs){if(location.href.indexOf(loginURLs[i])!=-1){check_login=true}}if(check_login){var usernameFieldName='j_username';var passwordFieldName='j_password';var usernameField=null;var passwordField=null;var submitButton=null;var inputElements=document.getElementsByTagName('input');for(i in inputElements){if(inputElements[i].type=='text'&&inputElements[i].name==usernameFieldName){usernameField=inputElements[i]}else if(inputElements[i].type=='password'&&inputElements[i].name==passwordFieldName){passwordField=inputElements[i]}if(usernameField&&passwordField){break}}var buttonElements=document.getElementsByTagName(\"button\");for(b in buttonElements){if(buttonElements[b].type==\"submit\"){submitButton=buttonElements[b]}if(submitButton){break}}if(usernameField&&passwordField&&submitButton){usernameField.value='{username}';passwordField.value='{password}';submitButton.click()}}}})();";
-    public QRCodeFragment() {
-        // Required empty public constructor
-    }
-
-
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
 
     @SuppressWarnings("deprecation")
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container) {
         getActivity().setTitle("QR Code");
         // TODO: orientation change fun etc
 
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_qr, container, false);
+        View rootView = inflater.inflate(R.layout.controller_qr, container, false);
         qrWebView = (WebView) rootView.findViewById(R.id.webview);
         mProgressView = rootView.findViewById(R.id.qr_progress);
 
@@ -87,13 +76,13 @@ public class QRCodeFragment extends Fragment{
                 public void onPageFinished(WebView view, String url) {
                     super.onPageFinished(view, url);
                         if (Build.VERSION.SDK_INT >= 19) {
-                            view.evaluateJavascript(QRCodeFragment.this.authScript, new ValueCallback<String>() {
+                            view.evaluateJavascript(QRCodeController.this.authScript, new ValueCallback<String>() {
                                 public void onReceiveValue(String s) {
                                     Log.d(LogConst.LOG,"WebView onReceiveValue " + s);
                                 }
                             });
                         } else {
-                            view.loadUrl(QRCodeFragment.this.authScript);
+                            view.loadUrl(QRCodeController.this.authScript);
                         }
                 }
         });

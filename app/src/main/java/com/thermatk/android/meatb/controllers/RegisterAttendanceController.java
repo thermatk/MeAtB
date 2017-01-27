@@ -55,7 +55,6 @@ public class RegisterAttendanceController extends Controller {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActivity().setTitle("Attendance");
         if(savedInstanceState != null) {
             if(savedInstanceState.getBoolean("doingAsync", false)) {
                 RetainFragment.setFragment(this);
@@ -66,6 +65,7 @@ public class RegisterAttendanceController extends Controller {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container) {
+        getActivity().setTitle("Attendance");
 
         View rootView = inflater.inflate(R.layout.controller_register_attendance, container, false);
 

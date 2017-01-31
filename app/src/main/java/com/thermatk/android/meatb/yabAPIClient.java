@@ -86,4 +86,10 @@ public class yabAPIClient {
         client.setBasicAuth(username, password);
         client.get(inboxURL, responseHandler);
     }
+
+    public void getNewAtBToken(JsonHttpResponseHandler responseHandler) {
+        String loginURL = "https://portalapp.unibocconi.it/portal.api/api/Auth/User/Login";
+        client.setBasicAuth(username, password);
+        client.post(loginURL, responseHandler);
+    }
 }

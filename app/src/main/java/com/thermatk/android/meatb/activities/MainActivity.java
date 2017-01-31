@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.CompoundButton;
 
 import com.bluelinelabs.conductor.Conductor;
@@ -69,6 +70,10 @@ public class MainActivity extends AppCompatActivity {
     private Activity mActivity;
 
     private final int MY_PERMISSIONS_REQUEST_WRITE_CALENDAR = 1;
+
+    // fun for webview backstack
+    private boolean inWebview = false;
+    private WebView webView;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -202,11 +207,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void setWebview(boolean state) {
+        webView = null;
+        inWebview = state;
+    }
+
+    public void setWebview(WebView aWebView) {
+        webView = aWebView;
+    }
+
     private void addDrawerItems(DrawerBuilder resultBuilder) {
         PrimaryDrawerItem profileDrawerItem = new PrimaryDrawerItem().withName("Profile").withIcon(GoogleMaterial.Icon.gmd_perm_identity).withTag("Profile")
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        setWebview(false);
                         changeController(new ProfileController());
                         return false;
                     }
@@ -215,6 +230,7 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        setWebview(false);
                         changeController(new RegisterAttendanceController());
                         return false;
                     }
@@ -223,6 +239,7 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        setWebview(false);
                         changeController(new AgendaController());
                         return false;
                     }
@@ -231,6 +248,7 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        setWebview(false);
                         changeController(new InboxController());
                         return false;
                     }
@@ -240,6 +258,7 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        setWebview(true);
                         changeController(new QRCodeController());
                         return false;
                     }
@@ -250,6 +269,7 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        setWebview(true);
                         changeController(new NewWebController());
                         return false;
                     }
@@ -356,8 +376,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // TODO: webview go back
-        if (!router.handleBack()) {
+        if (inWebview && webView!=null && webView.canGoBack()) {
+            webView.goBack();
+        } else if (!router.handleBack()) {
             super.onBackPressed();
         }
     }

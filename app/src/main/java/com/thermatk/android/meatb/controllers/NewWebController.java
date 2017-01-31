@@ -43,7 +43,7 @@ import cz.msebera.android.httpclient.Header;
 public class NewWebController extends Controller {
     private WebView theWebView;
     private View mProgressView;
-    String authScript="javascript:(function main(){JsMobileApp.addLog('script '+location.href);JsMobileApp.currentState('PR');var usernameField=null;var passwordField=null;var inputElements=document.getElementsByTagName('input');for(i in inputElements){if(inputElements[i].type=='text'&&inputElements[i].name=='j_username'){usernameField=inputElements[i]}else if(inputElements[i].type=='password'&&inputElements[i].name=='j_password'){passwordField=inputElements[i]}if(usernameField&&passwordField){break}}if(usernameField&&passwordField){JsMobileApp.addLog('script shibboleth tento autologin');usernameField.value='{username}';passwordField.value='{password}';JsMobileApp.currentState('OK');document.forms[0].submit()}else{JsMobileApp.currentState('KO')}})()";
+    String authScript="javascript:(function main(){Android.addLog('script '+location.href);Android.currentState('PR');var usernameField=null;var passwordField=null;var inputElements=document.getElementsByTagName('input');for(i in inputElements){if(inputElements[i].type=='text'&&inputElements[i].name=='j_username'){usernameField=inputElements[i]}else if(inputElements[i].type=='password'&&inputElements[i].name=='j_password'){passwordField=inputElements[i]}if(usernameField&&passwordField){break}}if(usernameField&&passwordField){Android.addLog('script shibboleth tento autologin');usernameField.value='{username}';passwordField.value='{password}';Android.currentState('OK');document.forms[0].submit()}else{Android.currentState('KO')}})()";
 
     @SuppressWarnings("deprecation")
     @Override
@@ -57,6 +57,7 @@ public class NewWebController extends Controller {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.controller_qr, container, false);
         theWebView = (WebView) rootView.findViewById(R.id.webview);
+        mainActivity.setWebview(theWebView);
         mProgressView = rootView.findViewById(R.id.qr_progress);
 
         showProgress(true);

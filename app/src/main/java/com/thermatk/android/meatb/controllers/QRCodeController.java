@@ -43,6 +43,7 @@ public class QRCodeController extends Controller {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.controller_qr, container, false);
         qrWebView = (WebView) rootView.findViewById(R.id.webview);
+        mainActivity.setWebview(qrWebView);
         mProgressView = rootView.findViewById(R.id.qr_progress);
 
         showProgress(true);

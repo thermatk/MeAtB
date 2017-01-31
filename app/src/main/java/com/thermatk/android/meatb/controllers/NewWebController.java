@@ -36,7 +36,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import cz.msebera.android.httpclient.Header;
-import io.realm.RealmResults;
 
 
 public class NewWebController extends Controller {

@@ -39,6 +39,7 @@ import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
 import com.thermatk.android.meatb.controllers.AgendaController;
 import com.thermatk.android.meatb.controllers.InboxController;
+import com.thermatk.android.meatb.controllers.NewWebController;
 import com.thermatk.android.meatb.controllers.ProfileController;
 import com.thermatk.android.meatb.controllers.QRCodeController;
 import com.thermatk.android.meatb.controllers.RegisterAttendanceController;
@@ -243,6 +244,17 @@ public class MainActivity extends AppCompatActivity {
                         return false;
                     }
                 });
+
+
+        PrimaryDrawerItem newAtBDrawerItem = new PrimaryDrawerItem().withName("new@B").withIcon(GoogleMaterial.Icon.gmd_dvr)
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        changeController(new NewWebController());
+                        return false;
+                    }
+                });
+
         calendarSwitchDrawerItem = new SwitchDrawerItem().withName("Calendar Reminders").withIcon(GoogleMaterial.Icon.gmd_alarm_on).
                 withChecked(
                         getReminderState(this) && (ContextCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.WRITE_CALENDAR)== PackageManager.PERMISSION_GRANTED))
@@ -255,6 +267,7 @@ public class MainActivity extends AppCompatActivity {
                 agendaDrawerItem,
                 inboxDrawerItem,
                 qrDrawerItem,
+                newAtBDrawerItem,
                 new DividerDrawerItem(),
                 calendarSwitchDrawerItem
         );

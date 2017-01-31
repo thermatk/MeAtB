@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
     private String username = null;
     private SharedPreferences mSharedPreferences;
-    Drawer result;
+    public Drawer result;
     SwitchDrawerItem calendarSwitchDrawerItem;
     private Activity mActivity;
 
@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addDrawerItems(DrawerBuilder resultBuilder) {
-        PrimaryDrawerItem profileDrawerItem = new PrimaryDrawerItem().withName("Profile").withIcon(GoogleMaterial.Icon.gmd_perm_identity)
+        PrimaryDrawerItem profileDrawerItem = new PrimaryDrawerItem().withName("Profile").withIcon(GoogleMaterial.Icon.gmd_perm_identity).withTag("Profile")
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
                         return false;
                     }
                 });
-        PrimaryDrawerItem attendanceDrawerItem = new PrimaryDrawerItem().withName("Attendance").withIcon(GoogleMaterial.Icon.gmd_person_add)
+        PrimaryDrawerItem attendanceDrawerItem = new PrimaryDrawerItem().withName("Attendance").withIcon(GoogleMaterial.Icon.gmd_person_add).withTag("Attendance")
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
                         return false;
                     }
                 });
-        PrimaryDrawerItem agendaDrawerItem = new PrimaryDrawerItem().withName("Agenda").withIcon(GoogleMaterial.Icon.gmd_date_range)
+        PrimaryDrawerItem agendaDrawerItem = new PrimaryDrawerItem().withName("Agenda").withIcon(GoogleMaterial.Icon.gmd_date_range).withTag("Agenda")
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
                         return false;
                     }
                 });
-        PrimaryDrawerItem inboxDrawerItem = new PrimaryDrawerItem().withName("Inbox").withIcon(GoogleMaterial.Icon.gmd_email)
+        PrimaryDrawerItem inboxDrawerItem = new PrimaryDrawerItem().withName("Inbox").withIcon(GoogleMaterial.Icon.gmd_email).withTag("Inbox")
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
@@ -236,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        PrimaryDrawerItem qrDrawerItem = new PrimaryDrawerItem().withName("Request QR").withIcon(GoogleMaterial.Icon.gmd_vpn_key)
+        PrimaryDrawerItem qrDrawerItem = new PrimaryDrawerItem().withName("Request QR").withIcon(GoogleMaterial.Icon.gmd_vpn_key).withTag("QR")
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
@@ -246,7 +246,7 @@ public class MainActivity extends AppCompatActivity {
                 });
 
 
-        PrimaryDrawerItem newAtBDrawerItem = new PrimaryDrawerItem().withName("new@B").withIcon(GoogleMaterial.Icon.gmd_dvr)
+        PrimaryDrawerItem newAtBDrawerItem = new PrimaryDrawerItem().withName("new@B").withIcon(GoogleMaterial.Icon.gmd_dvr).withTag("newAtB")
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {

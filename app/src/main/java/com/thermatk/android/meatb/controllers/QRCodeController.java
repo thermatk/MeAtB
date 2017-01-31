@@ -20,8 +20,10 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.bluelinelabs.conductor.Controller;
+import com.mikepenz.materialdrawer.Drawer;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
+import com.thermatk.android.meatb.activities.MainActivity;
 
 
 public class QRCodeController extends Controller {
@@ -32,7 +34,10 @@ public class QRCodeController extends Controller {
     @SuppressWarnings("deprecation")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container) {
-        getActivity().setTitle("QR Code");
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.setTitle("QR");
+        Drawer drawer = mainActivity.result;
+        drawer.setSelection(drawer.getDrawerItem("QR"),false);
         // TODO: orientation change fun etc
 
         // Inflate the layout for this fragment

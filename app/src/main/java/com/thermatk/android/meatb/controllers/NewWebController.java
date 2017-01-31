@@ -25,8 +25,10 @@ import android.webkit.WebViewClient;
 
 import com.bluelinelabs.conductor.Controller;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.mikepenz.materialdrawer.Drawer;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
+import com.thermatk.android.meatb.activities.MainActivity;
 import com.thermatk.android.meatb.yabAPIClient;
 
 import org.json.JSONException;
@@ -46,7 +48,10 @@ public class NewWebController extends Controller {
     @SuppressWarnings("deprecation")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container) {
-        getActivity().setTitle("NewAtB");
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.setTitle("new@B");
+        Drawer drawer = mainActivity.result;
+        drawer.setSelection(drawer.getDrawerItem("newAtB"),false);
         // TODO: orientation change fun etc
 
         // Inflate the layout for this fragment

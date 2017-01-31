@@ -8,18 +8,25 @@ import android.widget.TextView;
 
 import com.bluelinelabs.conductor.Controller;
 import com.bumptech.glide.Glide;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.thermatk.android.meatb.ApplicationMain;
 import com.thermatk.android.meatb.R;
+import com.thermatk.android.meatb.activities.MainActivity;
 import com.thermatk.android.meatb.data.InitData;
 
 import io.realm.Realm;
 
 
 public class ProfileController extends Controller {
-
+    IDrawerItem drawerItem;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container) {
-        getActivity().setTitle("Profile");
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.setTitle("Profile");
+        Drawer drawer = mainActivity.result;
+        drawer.setSelection(drawer.getDrawerItem("Profile"),false);
 
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.controller_profile, container, false);

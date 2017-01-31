@@ -22,8 +22,10 @@ import android.widget.TextView;
 
 import com.bluelinelabs.conductor.Controller;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.mikepenz.materialdrawer.Drawer;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
+import com.thermatk.android.meatb.activities.MainActivity;
 import com.thermatk.android.meatb.yabAPIClient;
 
 import org.json.JSONException;
@@ -65,7 +67,11 @@ public class RegisterAttendanceController extends Controller {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container) {
-        getActivity().setTitle("Attendance");
+        // TODO: better drawer fun
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.setTitle("Attendance");
+        Drawer drawer = mainActivity.result;
+        drawer.setSelection(drawer.getDrawerItem("Attendance"),false);
 
         View rootView = inflater.inflate(R.layout.controller_register_attendance, container, false);
 

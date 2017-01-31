@@ -15,8 +15,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bluelinelabs.conductor.Controller;
+import com.mikepenz.materialdrawer.Drawer;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
+import com.thermatk.android.meatb.activities.MainActivity;
 import com.thermatk.android.meatb.adapters.InboxAdapter;
 import com.thermatk.android.meatb.data.InboxMessage;
 import com.thermatk.android.meatb.data.ServiceLock;
@@ -61,7 +63,10 @@ public class InboxController extends Controller {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container) {
-        getActivity().setTitle("Inbox");
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.setTitle("Inbox");
+        Drawer drawer = mainActivity.result;
+        drawer.setSelection(drawer.getDrawerItem("Inbox"),false);
 
 
         // Inflate the layout for this fragment

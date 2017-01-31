@@ -19,8 +19,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bluelinelabs.conductor.Controller;
+import com.mikepenz.materialdrawer.Drawer;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
+import com.thermatk.android.meatb.activities.MainActivity;
 import com.thermatk.android.meatb.adapters.AgendaAdapter;
 import com.thermatk.android.meatb.data.AgendaEvent;
 import com.thermatk.android.meatb.data.ServiceLock;
@@ -106,8 +108,10 @@ public class AgendaController extends Controller implements FastScroller.OnScrol
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container) {
-        getActivity().setTitle("Agenda");
-
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.setTitle("Agenda");
+        Drawer drawer = mainActivity.result;
+        drawer.setSelection(drawer.getDrawerItem("Agenda"),false);
 
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.controller_agenda, container, false);

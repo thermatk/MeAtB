@@ -7,6 +7,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -92,8 +93,13 @@ public class NewWebController extends Controller {
                     return false;
                 }
                 @Override
+                public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                    showProgress(true);
+                }
+                @Override
                 public void onPageFinished(WebView view, String url) {
                     super.onPageFinished(view, url);
+                    Log.d(LogConst.LOG,"NewAtB address: " + url);
                     if (url.contains("idp.unibocconi")) {
                         Log.d(LogConst.LOG,"NewAtB in a case of login");
 
@@ -107,6 +113,8 @@ public class NewWebController extends Controller {
                             view.loadUrl(NewWebController.this.authScript);
                         }
 
+                    } else {
+                        showProgress(false);
                     }
                 }
         });
@@ -186,7 +194,6 @@ public class NewWebController extends Controller {
     }
 
     public void requestDoneSuccess(String username, String token, String url) {
-        showProgress(false);
         Log.d(LogConst.LOG, "token: " + token + ", url: " + url);
 
         final HashMap<String, String> hashMap = new HashMap<>();

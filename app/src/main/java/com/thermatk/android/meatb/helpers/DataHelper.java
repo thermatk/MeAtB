@@ -10,6 +10,7 @@ import com.thermatk.android.meatb.data.AgendaEvent;
 import com.thermatk.android.meatb.data.EventDay;
 import com.thermatk.android.meatb.data.InboxMessage;
 import com.thermatk.android.meatb.data.InitData;
+import com.thermatk.android.meatb.data.model.UserApi;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,6 +31,9 @@ import static com.thermatk.android.meatb.helpers.CalendarHelper.removeEvent;
 import static com.thermatk.android.meatb.helpers.CalendarHelper.setReminder;
 
 public class DataHelper {
+    public static void writeNewInitData(UserApi userApi) {
+
+    }
     public static void writeInitData(JSONObject rawJSON) {
         // TODO: make async https://realm.io/docs/java/latest/#asynchronous-transactions
         String firstname = null;

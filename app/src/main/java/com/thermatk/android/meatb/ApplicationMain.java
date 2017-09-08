@@ -28,7 +28,7 @@ public class ApplicationMain extends Application {
     public void onCreate() {
         super.onCreate();
         // Evernote's Android-job init
-        JobManager.create(this).addJobCreator(new MainJobCreator());
+        //JobManager.create(this).addJobCreator(new MainJobCreator());
 
         // Realm default init
         Realm.init(this);

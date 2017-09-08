@@ -5,10 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 
@@ -24,32 +20,33 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.thermatk.android.meatb.helpers.DataHelper;
+import com.thermatk.android.meatb.NewBocconiAPI;
+import com.thermatk.android.meatb.data.model.UserApi;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
-import com.thermatk.android.meatb.yabAPIClient;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import cz.msebera.android.httpclient.Header;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 /**
  * A login screen that offers login via username/password.
  */
 public class LoginActivity extends AppCompatActivity{
-    private final static int AS_RESULT_SUCCESS =1;
-    private final static int AS_RESULT_ERROR_CREDENTIAL =2;
-    private final static int AS_RESULT_ERROR_NETWORK =3;
+    public enum LOGIN_RESULTS {
+        SUCCESS, ERROR_CREDENTIALS, ERROR_NETWORK, ERROR_UNKNOWN
+    }
 
     // UI references.
-    private TextInputEditText mUsernameView;
-    private TextInputEditText mPasswordView;
-    private View mProgressView;
-    private View mLoginFormView;
-    private TextView mErrorTextView;
+    @BindView(R.id.username) TextInputEditText mUsernameView;
+    @BindView(R.id.password) TextInputEditText mPasswordView;
+    @BindView(R.id.login_progress) View mProgressView;
+    @BindView(R.id.login_form) View mLoginFormView;
+    @BindView(R.id.errorTextView) TextView mErrorTextView;
+
     private boolean doingAsync = false;
 
     @Override
@@ -62,17 +59,15 @@ public class LoginActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        ButterKnife.bind(this);
 
         //
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         this.setSupportActionBar(toolbar);
         ///
 
         // Set up the login form.
-        mUsernameView = (TextInputEditText) findViewById(R.id.username);
 
-        mPasswordView = (TextInputEditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -84,17 +79,14 @@ public class LoginActivity extends AppCompatActivity{
             }
         });
 
-        Button mSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        Button mSignInButton = (Button) findViewById(R.id.sign_in_button);
         mSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptLogin();
             }
         });
-
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
-        mErrorTextView = (TextView) findViewById(R.id.errorTextView);
+        
         if(savedInstanceState != null) {
             if(savedInstanceState.getBoolean("doingAsync", false)) {
                 showProgress(true);
@@ -151,6 +143,7 @@ public class LoginActivity extends AppCompatActivity{
             focusView.requestFocus();
         } else {
             doingAsync = true;
+            showProgress(true);
             RetainFragment retainFragment =
                     RetainFragment.findOrCreateRetainFragment(getFragmentManager(), username, password);
             RetainFragment.setActivity(this);
@@ -228,25 +221,33 @@ public class LoginActivity extends AppCompatActivity{
         //preventing going back to MainActivity
     }
 
-    private void responseFromAsync(int result) {
+    private void responseFromAsync(LOGIN_RESULTS result) {
         Log.d(LogConst.LOG, "Got response from async");
 
-        if(result == AS_RESULT_SUCCESS) {
-            Intent returnIntent =new Intent(this, MainActivity.class);
-            finish();
-            startActivity(returnIntent);
-        } else if(result  == AS_RESULT_ERROR_CREDENTIAL) {
-            showProgress(false);
-            // TODO: show different error codes
-            showError("Credentials not recognized");
-        } else if(result ==AS_RESULT_ERROR_NETWORK) {
-            showError("Network error");
-            showProgress(false);
 
-        } else {
-            showError("Unknown error");
-            showProgress(false);
+        switch (result) {
+            case SUCCESS:
+                /*
+                Intent returnIntent =new Intent(this, MainActivity.class);
+                finish();
+                startActivity(returnIntent);
+                */
+                break;
+
+            case ERROR_CREDENTIALS:
+                // TODO: show different error codes
+                showError("Credentials not recognized");
+                break;
+
+            case ERROR_NETWORK:
+                showError("Network error");
+                break;
+
+            default:
+                showError("Unknown error");
+                break;
         }
+        showProgress(false);
         doingAsync = false;
     }
 
@@ -280,29 +281,18 @@ public class LoginActivity extends AppCompatActivity{
         }
 
         private void loadAsync() {
-            new AsyncTask<JSONObject, Void, Void>() {
-                private int asyncResult;
+
+            NewBocconiAPI.getLoginAPIService().getLogin(NewBocconiAPI.basicAuthHeader(username,password)).enqueue(new Callback<UserApi>() {
                 @Override
-                protected void onPreExecute() {
-                    super.onPreExecute();
-
-                    mActivity.showProgress(true);
-                }
-
-                @Override
-                protected Void doInBackground(JSONObject... params) {
-
-                    JsonHttpResponseHandler responseHandler = new JsonHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                            // fail by default
-                            int authState = 2;
-                            try {
-                                authState = Integer.parseInt(response.get("auth_state").toString());
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            if(authState == 1) {
+                public void onResponse(Call<UserApi> call, Response<UserApi> response) {
+                    LOGIN_RESULTS asyncResult;
+                    if(response.isSuccessful()) {
+                        UserApi userApi = response.body();
+                        if (userApi.getStatoAuth()==1) {
+                            Log.d(LogConst.LOG, "All Goood! " + userApi.getToken());
+                            asyncResult = LOGIN_RESULTS.SUCCESS;
+                            /////
+                                /*
                                 // Store credentials
                                 SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
                                 editor.putString("bocconiusername", username);
@@ -312,38 +302,27 @@ public class LoginActivity extends AppCompatActivity{
                                 // TODO: Save profile info
                                 DataHelper.writeInitData(response);
                                 ////
-                                Log.i(LogConst.LOG, "AuthRequest success, login state 1");
-                                asyncResult = AS_RESULT_SUCCESS;
-                            } else {
-
-                                Log.i(LogConst.LOG, "AuthRequest success, login state FAIL, response:" + response.toString());
-
-                                asyncResult = AS_RESULT_ERROR_CREDENTIAL;
-                            }
+                                */
+                            /////
+                        } else {
+                            Log.i(LogConst.LOG, "AuthRequest success, login state FAIL, response:" + response.body().getStatoAuthDes());
+                            asyncResult = LOGIN_RESULTS.ERROR_CREDENTIALS;
                         }
+                    } else {
+                        int statusCode  = response.code();
+                        Log.i(LogConst.LOG, "AuthRequest success, but FAIL" + statusCode + ", response:" + response.toString());
+                        asyncResult = LOGIN_RESULTS.ERROR_NETWORK;
+                    }
 
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, Throwable error, JSONObject response) {
-                            Log.i(LogConst.LOG, "AuthRequest failed " + response);
-                            asyncResult = AS_RESULT_ERROR_NETWORK;
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, String response, Throwable error) {
-                            Log.i(LogConst.LOG, "AuthRequest failed " + response);
-                            asyncResult = AS_RESULT_ERROR_NETWORK;
-                        }
-                    };
-
-                    yabAPIClient.getLogin(username,password,responseHandler, false);
-                    return null;
+                    mActivity.responseFromAsync(asyncResult);
                 }
 
                 @Override
-                protected void onPostExecute(Void response) {
-                    mActivity.responseFromAsync(asyncResult);
+                public void onFailure(Call<UserApi> call, Throwable t) {
+                    Log.i(LogConst.LOG, "AuthRequest failed, network ");
+                    mActivity.responseFromAsync(LOGIN_RESULTS.ERROR_NETWORK);
                 }
-            }.execute();
+            });
         }
     }
 }

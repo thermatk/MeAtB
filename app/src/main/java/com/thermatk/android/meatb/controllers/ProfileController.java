@@ -13,7 +13,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.thermatk.android.meatb.ApplicationMain;
 import com.thermatk.android.meatb.R;
-import com.thermatk.android.meatb.activities.MainActivity;
+import com.thermatk.android.meatb.activities.NewActivity;
 import com.thermatk.android.meatb.data.InitData;
 
 import io.realm.Realm;
@@ -23,7 +23,7 @@ public class ProfileController extends Controller {
     IDrawerItem drawerItem;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container) {
-        MainActivity mainActivity = (MainActivity) getActivity();
+        NewActivity mainActivity = (NewActivity) getActivity();
         mainActivity.setTitle("Profile");
         Drawer drawer = mainActivity.result;
         drawer.setSelection(drawer.getDrawerItem("Profile"),false);
@@ -31,7 +31,7 @@ public class ProfileController extends Controller {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.controller_profile, container, false);
 
-
+        /*
         Realm realm = Realm.getDefaultInstance();
         InitData profile = realm.where(InitData.class).findAll().first();
 
@@ -49,6 +49,7 @@ public class ProfileController extends Controller {
 
 
         realm.close();
+        */
         return rootView;
     }
 

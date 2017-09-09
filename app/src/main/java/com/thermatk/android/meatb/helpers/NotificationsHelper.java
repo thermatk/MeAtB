@@ -9,7 +9,7 @@ import android.graphics.BitmapFactory;
 import android.support.v4.content.ContextCompat;
 
 import com.thermatk.android.meatb.R;
-import com.thermatk.android.meatb.activities.MainActivity;
+import com.thermatk.android.meatb.activities.NewActivity;
 import com.thermatk.android.meatb.data.InboxMessage;
 
 import java.util.concurrent.TimeUnit;
@@ -24,7 +24,7 @@ public class NotificationsHelper {
             // nothing to report?
         } else {
             // TODO: intent should open the needed fragment
-            Intent intent = new Intent(context, MainActivity.class);
+            Intent intent = new Intent(context, NewActivity.class);
             PendingIntent pIntent = PendingIntent.getActivity(context, (int) System.currentTimeMillis(), intent, 0);
 
             // Build notification

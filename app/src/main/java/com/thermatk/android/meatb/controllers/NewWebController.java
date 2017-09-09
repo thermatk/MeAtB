@@ -12,6 +12,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +31,8 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.mikepenz.materialdrawer.Drawer;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
-import com.thermatk.android.meatb.activities.MainActivity;
+import com.thermatk.android.meatb.activities.NewActivity;
+import com.thermatk.android.meatb.data.model.UserApi;
 import com.thermatk.android.meatb.yabAPIClient;
 
 import org.json.JSONException;
@@ -38,18 +41,24 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import cz.msebera.android.httpclient.Header;
 
 
 public class NewWebController extends Controller {
-    private WebView theWebView;
-    private View mProgressView;
+    private Unbinder unbinder;
+
+    @BindView(R.id.webview) WebView theWebView;
+    @BindView(R.id.qr_progress) View mProgressView;
+
     String authScript="javascript:(function main(){Android.addLog('script '+location.href);Android.currentState('PR');var usernameField=null;var passwordField=null;var inputElements=document.getElementsByTagName('input');for(i in inputElements){if(inputElements[i].type=='text'&&inputElements[i].name=='j_username'){usernameField=inputElements[i]}else if(inputElements[i].type=='password'&&inputElements[i].name=='j_password'){passwordField=inputElements[i]}if(usernameField&&passwordField){break}}if(usernameField&&passwordField){Android.addLog('script shibboleth tento autologin');usernameField.value='{username}';passwordField.value='{password}';Android.currentState('OK');document.forms[0].submit()}else{Android.currentState('KO')}})()";
 
     @SuppressWarnings("deprecation")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container) {
-        MainActivity mainActivity = (MainActivity) getActivity();
+        NewActivity mainActivity = (NewActivity) getActivity();
         mainActivity.setTitle("new@B");
         Drawer drawer = mainActivity.result;
         drawer.setSelection(drawer.getDrawerItem("newAtB"),false);
@@ -57,9 +66,9 @@ public class NewWebController extends Controller {
 
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.controller_qr, container, false);
-        theWebView = (WebView) rootView.findViewById(R.id.webview);
+        unbinder = ButterKnife.bind(this, rootView);
+
         mainActivity.setWebview(theWebView);
-        mProgressView = rootView.findViewById(R.id.qr_progress);
 
         showProgress(true);
 
@@ -74,9 +83,6 @@ public class NewWebController extends Controller {
 
         WebSettings webSettings = theWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-        if (Build.VERSION.SDK_INT <= 18) {
-            webSettings.setSavePassword(false);
-        }
         webSettings.setDomStorageEnabled(true);
         WebAppInterface wInt = new WebAppInterface(getActivity());
         theWebView.addJavascriptInterface(wInt, "Android");
@@ -114,6 +120,8 @@ public class NewWebController extends Controller {
                         }
 
                     } else {
+                        view.loadUrl("javascript:window.Android.showHTML" +
+                                "('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');");
                         showProgress(false);
                     }
                 }
@@ -129,38 +137,33 @@ public class NewWebController extends Controller {
         return rootView;
     }
 
+    @Override
+    protected void onDestroyView(@NonNull View view) {
+        super.onDestroyView(view);
+        unbinder.unbind();
+        unbinder = null;
+    }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-            theWebView.setVisibility(show ? View.GONE : View.VISIBLE);
-            theWebView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    theWebView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
+        theWebView.setVisibility(show ? View.GONE : View.VISIBLE);
+        theWebView.animate().setDuration(shortAnimTime).alpha(
+                show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                theWebView.setVisibility(show ? View.GONE : View.VISIBLE);
+            }
+        });
 
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            theWebView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
+        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        mProgressView.animate().setDuration(shortAnimTime).alpha(
+                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     public class WebAppInterface {
@@ -191,6 +194,20 @@ public class NewWebController extends Controller {
         @JavascriptInterface
         public void addLog(String toast) {
         }
+
+        @JavascriptInterface
+        public void showHTML(String html) {
+            //Log.d(LogConst.LOG, "HTML!: "+ html);
+            int maxLogSize = 1000;
+            for(int i = 0; i <= html.length() / maxLogSize; i++) {
+                int start = i * maxLogSize;
+                int end = (i+1) * maxLogSize;
+                end = end > html.length() ? html.length() : end;
+                Log.v(LogConst.LOG, html.substring(start, end));
+            }
+            /*new AlertDialog.Builder(mContext).setTitle("HTML").setMessage(html)
+                    .setPositiveButton(android.R.string.ok, null).setCancelable(false).create().show();*/
+        }
     }
 
     public void requestDoneSuccess(String username, String token, String url) {
@@ -199,7 +216,7 @@ public class NewWebController extends Controller {
         final HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("token", token);
         hashMap.put("cn", username);
-        theWebView.loadUrl(url + "/AppMobile", (Map)hashMap);
+        theWebView.loadUrl(url + "/AppMobile", (Map) hashMap);
     }
     public void requestDoneFail() {
         showProgress(false);

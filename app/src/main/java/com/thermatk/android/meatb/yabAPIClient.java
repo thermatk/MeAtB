@@ -39,18 +39,6 @@ public class yabAPIClient {
             Log.d(LogConst.LOG,"Couldn't load credentials");
         }
     }
-    public static void getLogin(String username, String password, JsonHttpResponseHandler responseHandler, boolean async) {
-        AsyncHttpClient client;
-        if(async) {
-            client = new AsyncHttpClient();
-        } else {
-            client = new SyncHttpClient();
-        }
-        String testLoginURL = apiUrl + "app/init?os=android";
-        client.addHeader("auth_secret", "b0cc0n1s3cr3t");
-        client.setBasicAuth(username, password);
-        client.get(testLoginURL, responseHandler);
-    }
 
     public void registerAttendance(String codice, JsonHttpResponseHandler responseHandler) {
         String registerAttendanceURL = "https://app-public.unibocconi.it/PresencesPubl/RilevaPresenza/RilevaPresenza?username="+username+"&password="+password+"&codicePin="+codice;

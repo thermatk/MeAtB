@@ -2,9 +2,11 @@ package com.thermatk.android.meatb.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 
@@ -15,7 +17,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.TextView;
@@ -24,71 +25,72 @@ import com.thermatk.android.meatb.NewBocconiAPI;
 import com.thermatk.android.meatb.data.model.UserApi;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
+import com.thermatk.android.meatb.helpers.DataHelper;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnEditorAction;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-
 /**
  * A login screen that offers login via username/password.
  */
-public class LoginActivity extends AppCompatActivity{
+
+public class LoginActivity extends AppCompatActivity {
     public enum LOGIN_RESULTS {
         SUCCESS, ERROR_CREDENTIALS, ERROR_NETWORK, ERROR_UNKNOWN
     }
 
-    // UI references.
-    @BindView(R.id.username) TextInputEditText mUsernameView;
-    @BindView(R.id.password) TextInputEditText mPasswordView;
-    @BindView(R.id.login_progress) View mProgressView;
-    @BindView(R.id.login_form) View mLoginFormView;
-    @BindView(R.id.errorTextView) TextView mErrorTextView;
-
     private boolean doingAsync = false;
 
+    // UI references.
+    @BindView(R.id.username)
+    TextInputEditText mUsernameView;
+    @BindView(R.id.password)
+    TextInputEditText mPasswordView;
+    @BindView(R.id.login_progress)
+    View mProgressView;
+    @BindView(R.id.login_form)
+    View mLoginFormView;
+    @BindView(R.id.errorTextView)
+    TextView mErrorTextView;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+
+    @OnClick(R.id.sign_in_button)
+    public void submit(Button button) {
+        attemptLogin();
+    }
+
+    @OnEditorAction(R.id.password)
+    public boolean editorAction(TextView textView, int id, KeyEvent keyEvent) {
+        if (id == R.id.login || id == EditorInfo.IME_NULL) {
+            attemptLogin();
+            return true;
+        }
+        return false;
+    }
+
     @Override
-    protected void onSaveInstanceState (Bundle outState) {
+    protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean("doingAsync", doingAsync);
 
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
-        //
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         this.setSupportActionBar(toolbar);
-        ///
 
-        // Set up the login form.
-
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        Button mSignInButton = (Button) findViewById(R.id.sign_in_button);
-        mSignInButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptLogin();
-            }
-        });
-        
-        if(savedInstanceState != null) {
-            if(savedInstanceState.getBoolean("doingAsync", false)) {
+        if (savedInstanceState != null) {
+            if (savedInstanceState.getBoolean("doingAsync", false)) {
                 showProgress(true);
                 RetainFragment.setActivity(this);
                 doingAsync = true;
@@ -96,12 +98,6 @@ public class LoginActivity extends AppCompatActivity{
         }
     }
 
-
-    /**
-     * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
-     */
     private void attemptLogin() {
 
         // Reset errors.
@@ -126,7 +122,7 @@ public class LoginActivity extends AppCompatActivity{
             cancel = true;
         }
 
-        // Check for a valid username address.
+        // Check for a valid username
         if (TextUtils.isEmpty(username)) {
             mUsernameView.setError(getString(R.string.error_field_required));
             focusView = mUsernameView;
@@ -137,9 +133,8 @@ public class LoginActivity extends AppCompatActivity{
             cancel = true;
         }
 
+        // If there was an error
         if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
             focusView.requestFocus();
         } else {
             doingAsync = true;
@@ -161,61 +156,44 @@ public class LoginActivity extends AppCompatActivity{
         return true;
     }
 
-    private void showError(String error){
+    private void showError(String error) {
         mErrorTextView.setText(error);
 
-        if(mErrorTextView.getVisibility()==View.GONE) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-                int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-                mErrorTextView.setVisibility(View.VISIBLE);
-                mErrorTextView.animate().setDuration(shortAnimTime).alpha(1).setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        mErrorTextView.setVisibility(View.VISIBLE);
-                    }
-                });
-            } else {
-                mErrorTextView.setVisibility(View.VISIBLE);
-            }
-        }
-    }
-
-    /**
-     * Shows the progress UI and hides the login form.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+        if (mErrorTextView.getVisibility() == View.GONE) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+            mErrorTextView.setVisibility(View.VISIBLE);
+            mErrorTextView.animate().setDuration(shortAnimTime).alpha(1).setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                    mErrorTextView.setVisibility(View.VISIBLE);
                 }
             });
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
+
+    private void showProgress(final boolean show) {
+        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+        mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+        mLoginFormView.animate().setDuration(shortAnimTime).alpha(
+                show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            }
+        });
+
+        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        mProgressView.animate().setDuration(shortAnimTime).alpha(
+                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            }
+        });
+    }
+
     @Override
     public void onBackPressed() {
         //preventing going back to MainActivity
@@ -224,18 +202,9 @@ public class LoginActivity extends AppCompatActivity{
     private void responseFromAsync(LOGIN_RESULTS result) {
         Log.d(LogConst.LOG, "Got response from async");
 
-
         switch (result) {
-            case SUCCESS:
-                /*
-                Intent returnIntent =new Intent(this, MainActivity.class);
-                finish();
-                startActivity(returnIntent);
-                */
-                break;
-
             case ERROR_CREDENTIALS:
-                // TODO: show different error codes
+                // TODO: understand the error codes
                 showError("Credentials not recognized");
                 break;
 
@@ -260,17 +229,22 @@ public class LoginActivity extends AppCompatActivity{
 
         public RetainFragment() {
         }
+
         public static void setActivity(LoginActivity current) {
             mActivity = current;
         }
+
         public static RetainFragment findOrCreateRetainFragment(FragmentManager fm, String usernameAct, String passwordAct) {
             RetainFragment fragment = (RetainFragment) fm.findFragmentByTag(TAG);
+
             if (fragment == null) {
                 fragment = new RetainFragment();
                 fm.beginTransaction().add(fragment, TAG).commit();
-                username = usernameAct;
-                password = passwordAct;
             }
+
+            username = usernameAct;
+            password = passwordAct;
+
             return fragment;
         }
 
@@ -281,40 +255,32 @@ public class LoginActivity extends AppCompatActivity{
         }
 
         private void loadAsync() {
-
-            NewBocconiAPI.getLoginAPIService().getLogin(NewBocconiAPI.basicAuthHeader(username,password)).enqueue(new Callback<UserApi>() {
+            NewBocconiAPI.getLoginAPIService().getLogin(NewBocconiAPI.basicAuthHeader(username, password)).enqueue(new Callback<UserApi>() {
                 @Override
                 public void onResponse(Call<UserApi> call, Response<UserApi> response) {
-                    LOGIN_RESULTS asyncResult;
-                    if(response.isSuccessful()) {
+                    if (response.isSuccessful()) {
                         UserApi userApi = response.body();
-                        if (userApi.getStatoAuth()==1) {
-                            Log.d(LogConst.LOG, "All Goood! " + userApi.getToken());
-                            asyncResult = LOGIN_RESULTS.SUCCESS;
-                            /////
-                                /*
-                                // Store credentials
-                                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
-                                editor.putString("bocconiusername", username);
-                                editor.putString("bocconipassword", password);
+                        if (userApi.getStatoAuth() == 1) {
+                            Log.d(LogConst.LOG, "All Good! " + userApi.getToken());
 
-                                editor.apply();
-                                // TODO: Save profile info
-                                DataHelper.writeInitData(response);
-                                ////
-                                */
-                            /////
+                            DataHelper.writeNewInitData(userApi);
+                            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+                            editor.putString("bocconiusername", username);
+                            editor.putString("bocconipassword", password);
+                            editor.apply();
+
+                            Intent returnIntent = new Intent(mActivity, NewActivity.class);
+                            returnIntent.putExtra("userApi", userApi);
+                            mActivity.finish();
+                            startActivity(returnIntent);
                         } else {
-                            Log.i(LogConst.LOG, "AuthRequest success, login state FAIL, response:" + response.body().getStatoAuthDes());
-                            asyncResult = LOGIN_RESULTS.ERROR_CREDENTIALS;
+                            Log.i(LogConst.LOG, "AuthRequest success, login state FAIL, response:" + response.body().toString());
+                            mActivity.responseFromAsync(LOGIN_RESULTS.ERROR_CREDENTIALS);
                         }
                     } else {
-                        int statusCode  = response.code();
-                        Log.i(LogConst.LOG, "AuthRequest success, but FAIL" + statusCode + ", response:" + response.toString());
-                        asyncResult = LOGIN_RESULTS.ERROR_NETWORK;
+                        Log.i(LogConst.LOG, "AuthRequest success, but FAILED, response:" + response.body().toString());
+                        mActivity.responseFromAsync(LOGIN_RESULTS.ERROR_NETWORK);
                     }
-
-                    mActivity.responseFromAsync(asyncResult);
                 }
 
                 @Override

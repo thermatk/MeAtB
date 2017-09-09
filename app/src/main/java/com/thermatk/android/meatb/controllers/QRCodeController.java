@@ -23,7 +23,7 @@ import com.bluelinelabs.conductor.Controller;
 import com.mikepenz.materialdrawer.Drawer;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
-import com.thermatk.android.meatb.activities.MainActivity;
+import com.thermatk.android.meatb.activities.NewActivity;
 
 
 public class QRCodeController extends Controller {
@@ -34,7 +34,7 @@ public class QRCodeController extends Controller {
     @SuppressWarnings("deprecation")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container) {
-        MainActivity mainActivity = (MainActivity) getActivity();
+        NewActivity mainActivity = (NewActivity) getActivity();
         mainActivity.setTitle("QR");
         Drawer drawer = mainActivity.result;
         drawer.setSelection(drawer.getDrawerItem("QR"),false);
@@ -59,9 +59,6 @@ public class QRCodeController extends Controller {
 
         WebSettings webSettings = qrWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-        if (Build.VERSION.SDK_INT <= 18) {
-            webSettings.setSavePassword(false);
-        }
         webSettings.setDomStorageEnabled(true);
         WebAppInterface wInt = new WebAppInterface(getActivity());
         qrWebView.addJavascriptInterface(wInt, "Android");
@@ -98,38 +95,26 @@ public class QRCodeController extends Controller {
         return rootView;
     }
 
-
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-            qrWebView.setVisibility(show ? View.GONE : View.VISIBLE);
-            qrWebView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    qrWebView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
+        qrWebView.setVisibility(show ? View.GONE : View.VISIBLE);
+        qrWebView.animate().setDuration(shortAnimTime).alpha(
+                show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                qrWebView.setVisibility(show ? View.GONE : View.VISIBLE);
+            }
+        });
 
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            qrWebView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
+        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        mProgressView.animate().setDuration(shortAnimTime).alpha(
+                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     public class WebAppInterface {

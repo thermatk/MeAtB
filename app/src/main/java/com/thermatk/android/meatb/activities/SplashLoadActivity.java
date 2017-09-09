@@ -38,7 +38,7 @@ public class SplashLoadActivity extends AppCompatActivity {
             Log.d(LogConst.LOG, "no credentials, switching to login");
             i = new Intent(this, LoginActivity.class);
         } else {
-            i = new Intent(this, MainActivity.class);
+            i = new Intent(this, NewActivity.class);
         }
 
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this);

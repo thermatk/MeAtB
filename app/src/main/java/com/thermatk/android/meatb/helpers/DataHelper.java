@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import io.realm.Realm;
+import io.realm.RealmAsyncTask;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 
@@ -31,8 +32,26 @@ import static com.thermatk.android.meatb.helpers.CalendarHelper.removeEvent;
 import static com.thermatk.android.meatb.helpers.CalendarHelper.setReminder;
 
 public class DataHelper {
-    public static void writeNewInitData(UserApi userApi) {
+    public static void writeNewInitData(final UserApi userApi) {
 
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm bgRealm) {
+                bgRealm.where(UserApi.class).findAll().deleteAllFromRealm();
+                bgRealm.copyToRealm(userApi);
+            }
+        }, new Realm.Transaction.OnSuccess() {
+            @Override
+            public void onSuccess() {
+                // Transaction was a success.
+            }
+        }, new Realm.Transaction.OnError() {
+            @Override
+            public void onError(Throwable error) {
+                // Transaction failed and was automatically canceled.
+            }
+        });
     }
     public static void writeInitData(JSONObject rawJSON) {
         // TODO: make async https://realm.io/docs/java/latest/#asynchronous-transactions

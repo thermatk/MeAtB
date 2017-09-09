@@ -25,7 +25,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.mikepenz.materialdrawer.Drawer;
 import com.thermatk.android.meatb.LogConst;
 import com.thermatk.android.meatb.R;
-import com.thermatk.android.meatb.activities.MainActivity;
+import com.thermatk.android.meatb.activities.NewActivity;
 import com.thermatk.android.meatb.yabAPIClient;
 
 import org.json.JSONException;
@@ -68,7 +68,7 @@ public class RegisterAttendanceController extends Controller {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container) {
         // TODO: better drawer fun
-        MainActivity mainActivity = (MainActivity) getActivity();
+        NewActivity mainActivity = (NewActivity) getActivity();
         mainActivity.setTitle("Attendance");
         Drawer drawer = mainActivity.result;
         drawer.setSelection(drawer.getDrawerItem("Attendance"),false);
@@ -165,55 +165,38 @@ public class RegisterAttendanceController extends Controller {
             mErrorTextView.setTextColor(Color.parseColor("#0bf513"));
         }
         if(mErrorTextView.getVisibility()==View.GONE) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-                int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-                mErrorTextView.setVisibility(View.VISIBLE);
-                mErrorTextView.animate().setDuration(shortAnimTime).alpha(1).setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        mErrorTextView.setVisibility(View.VISIBLE);
-                    }
-                });
-            } else {
-                mErrorTextView.setVisibility(View.VISIBLE);
-            }
-        }
-    }
-    /**
-     * Shows the progress UI and hides the login form.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-            mAttendanceFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mAttendanceFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+            mErrorTextView.setVisibility(View.VISIBLE);
+            mErrorTextView.animate().setDuration(shortAnimTime).alpha(1).setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    mAttendanceFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                    mErrorTextView.setVisibility(View.VISIBLE);
                 }
             });
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mAttendanceFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
+    }
+
+    private void showProgress(final boolean show) {
+        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+        mAttendanceFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+        mAttendanceFormView.animate().setDuration(shortAnimTime).alpha(
+                show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mAttendanceFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            }
+        });
+
+        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        mProgressView.animate().setDuration(shortAnimTime).alpha(
+                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     private void responseFromAsync(int result, String message) {

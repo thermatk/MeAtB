@@ -40,6 +40,8 @@ dependencies {
     compile 'com.github.thorbenprimke:realm-recyclerview:0.9.25'
     // rc2 out
     compile 'eu.davidea:flexible-adapter:5.0.0-rc1'
+    // android O in 1.2.0
+    compile 'com.evernote:android-job:1.1.11'
 
     //
     compile 'com.android.support:appcompat-v7:26.0.2'
@@ -50,8 +52,6 @@ dependencies {
         transitive = true
     }
     compile 'com.mikepenz:google-material-typeface:3.0.1.1.original@aar'
-
-    compile 'com.evernote:android-job:1.1.11'
     compile 'com.bluelinelabs:conductor:2.1.4'
 
     compile 'com.jakewharton:butterknife:8.8.1'
@@ -60,4 +60,6 @@ dependencies {
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
     compile 'com.squareup.retrofit2:converter-gson:2.3.0'
     compile 'com.google.code.gson:gson:2.7'
+    compile 'pl.droidsonroids:jspoon:1.0.0'
+    compile 'pl.droidsonroids.retrofit2:converter-jspoon:1.0.0'
 }

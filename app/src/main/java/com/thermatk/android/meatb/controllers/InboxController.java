@@ -129,12 +129,8 @@ public class InboxController extends Controller {
         }
         realm.close();
     }
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+
     private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
             realmRecyclerView.setVisibility(show ? View.GONE : View.VISIBLE);
@@ -154,12 +150,6 @@ public class InboxController extends Controller {
                     mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
                 }
             });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            realmRecyclerView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
     }
     public static class RetainFragment extends Fragment {
         private static final String TAG = "RetainFragmentInbox";

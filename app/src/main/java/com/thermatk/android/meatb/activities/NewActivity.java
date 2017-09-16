@@ -39,6 +39,7 @@ import com.thermatk.android.meatb.data.model.UserApi;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.realm.Realm;
 
 public class NewActivity extends AppCompatActivity {
 
@@ -127,7 +128,8 @@ public class NewActivity extends AppCompatActivity {
     }
 
     private void getNewToken() {
-
+        Realm realm = Realm.getDefaultInstance();
+        userApi = realm.where(UserApi.class).findFirst();
     }
 
     private void drawerStart(Bundle savedInstanceState) {

@@ -198,6 +198,7 @@ public class NewWebController extends Controller {
         @JavascriptInterface
         public void showHTML(String html) {
             //Log.d(LogConst.LOG, "HTML!: "+ html);
+            /*
             int maxLogSize = 1000;
             for(int i = 0; i <= html.length() / maxLogSize; i++) {
                 int start = i * maxLogSize;
@@ -205,6 +206,7 @@ public class NewWebController extends Controller {
                 end = end > html.length() ? html.length() : end;
                 Log.v(LogConst.LOG, html.substring(start, end));
             }
+            */
             /*new AlertDialog.Builder(mContext).setTitle("HTML").setMessage(html)
                     .setPositiveButton(android.R.string.ok, null).setCancelable(false).create().show();*/
         }
